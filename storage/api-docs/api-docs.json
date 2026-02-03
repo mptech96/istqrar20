@@ -1,0 +1,2949 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Quality System API",
+        "description": "نظام إدارة الجودة والتدقيق - API Documentation",
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://localhost:8585",
+            "description": "Local Server"
+        },
+        {
+            "url": "https://istqrar.flz.sa",
+            "description": "Production Server"
+        }
+    ],
+    "paths": {
+        "/api/v1/auth/login": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "تسجيل الدخول",
+                "description": "تسجيل دخول المستخدم والحصول على token",
+                "operationId": "4f9ab8567202f849a4206bc7e9b6d385",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "admin@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "تم تسجيل الدخول بنجاح",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "user": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "name": {
+                                                            "type": "string",
+                                                            "example": "أحمد محمد"
+                                                        },
+                                                        "email": {
+                                                            "type": "string",
+                                                            "example": "admin@example.com"
+                                                        },
+                                                        "role": {
+                                                            "type": "string",
+                                                            "example": "auditor"
+                                                        },
+                                                        "status": {
+                                                            "type": "boolean",
+                                                            "example": true
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "token": {
+                                                    "type": "string",
+                                                    "example": "1|randomtoken123"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "تم تسجيل الدخول بنجاح"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "مصادقة فاشلة"
+                    },
+                    "422": {
+                        "description": "بيانات غير صالحة"
+                    }
+                }
+            }
+        },
+        "/api/v1/auth/logout": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "تسجيل الخروج",
+                "description": "إلغاء token المستخدم الحالي",
+                "operationId": "1cb29d1c15d945905bd1c10e70623919",
+                "responses": {
+                    "200": {
+                        "description": "تم تسجيل الخروج بنجاح"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/auth/me": {
+            "get": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "بيانات المستخدم الحالي",
+                "description": "الحصول على بيانات المستخدم المسجل دخوله",
+                "operationId": "daa60b241f16b7c51051aa405fc9142b",
+                "responses": {
+                    "200": {
+                        "description": "بيانات المستخدم",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "أحمد محمد"
+                                                },
+                                                "email": {
+                                                    "type": "string",
+                                                    "example": "ahmed@example.com"
+                                                },
+                                                "role": {
+                                                    "type": "string",
+                                                    "example": "auditor"
+                                                },
+                                                "status": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "company_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "branch_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/branches": {
+            "get": {
+                "tags": [
+                    "Branches"
+                ],
+                "summary": "عرض قائمة الفروع",
+                "description": "استرجاع قائمة الفروع مع إمكانية الفلترة والترتيب",
+                "operationId": "getBranches",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "رقم الصفحة",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "عدد العناصر في الصفحة",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 15
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "بحث بالاسم أو البريد الإلكتروني أو الهاتف",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "company_id",
+                        "in": "query",
+                        "description": "فلتر بمعرف الشركة",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "فلتر بحالة الفرع",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "name": "city",
+                        "in": "query",
+                        "description": "فلتر بالمدينة",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "category",
+                        "in": "query",
+                        "description": "فلتر بالتصنيف",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "needs_visit",
+                        "in": "query",
+                        "description": "فلتر بالفروع التي تحتاج زيارة",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "name": "sort_by",
+                        "in": "query",
+                        "description": "ترتيب النتائج حسب",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "created_at",
+                            "enum": [
+                                "name",
+                                "email",
+                                "created_at",
+                                "compliance_score",
+                                "next_scheduled_visit"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "sort_order",
+                        "in": "query",
+                        "description": "اتجاه الترتيب",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "desc",
+                            "enum": [
+                                "asc",
+                                "desc"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "قائمة الفروع",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "name": {
+                                                        "type": "string",
+                                                        "example": "الفرع الرئيسي"
+                                                    },
+                                                    "email": {
+                                                        "type": "string",
+                                                        "example": "branch@company.com"
+                                                    },
+                                                    "phone": {
+                                                        "type": "string",
+                                                        "example": "+966500000001"
+                                                    },
+                                                    "city": {
+                                                        "type": "string",
+                                                        "example": "الرياض"
+                                                    },
+                                                    "status": {
+                                                        "type": "boolean",
+                                                        "example": true
+                                                    },
+                                                    "compliance_score": {
+                                                        "type": "number",
+                                                        "format": "float",
+                                                        "example": 85.5
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string",
+                                                        "format": "date-time"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "links": {
+                                            "properties": {
+                                                "first": {
+                                                    "type": "string"
+                                                },
+                                                "last": {
+                                                    "type": "string"
+                                                },
+                                                "prev": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                },
+                                                "next": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "meta": {
+                                            "properties": {
+                                                "current_page": {
+                                                    "type": "integer"
+                                                },
+                                                "from": {
+                                                    "type": "integer",
+                                                    "nullable": true
+                                                },
+                                                "last_page": {
+                                                    "type": "integer"
+                                                },
+                                                "path": {
+                                                    "type": "string"
+                                                },
+                                                "per_page": {
+                                                    "type": "integer"
+                                                },
+                                                "to": {
+                                                    "type": "integer",
+                                                    "nullable": true
+                                                },
+                                                "total": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "غير مصرح به"
+                    },
+                    "403": {
+                        "description": "ممنوع الوصول"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Branches"
+                ],
+                "summary": "إنشاء فرع جديد مع مديره",
+                "description": "إنشاء فرع جديد مع بيانات مدير الفرع المرتبط به",
+                "operationId": "createBranch",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "company_id",
+                                    "name",
+                                    "email",
+                                    "phone",
+                                    "city",
+                                    "address",
+                                    "category",
+                                    "user_name",
+                                    "user_email",
+                                    "user_password",
+                                    "user_password_confirmation",
+                                    "user_phone"
+                                ],
+                                "properties": {
+                                    "company_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "name": {
+                                        "type": "string",
+                                        "example": "الفرع الرئيسي - الرياض"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "branch.riyadh@company.com"
+                                    },
+                                    "phone": {
+                                        "type": "string",
+                                        "example": "+966500000002"
+                                    },
+                                    "city": {
+                                        "type": "string",
+                                        "example": "الرياض"
+                                    },
+                                    "address": {
+                                        "type": "string",
+                                        "example": "حي النخيل، برج التجارة"
+                                    },
+                                    "latitude": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 24.7136
+                                    },
+                                    "longitude": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 46.6753
+                                    },
+                                    "category": {
+                                        "type": "string",
+                                        "example": "رئيسي"
+                                    },
+                                    "compliance_score": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 0
+                                    },
+                                    "status": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "user_name": {
+                                        "type": "string",
+                                        "example": "مدير الفرع"
+                                    },
+                                    "user_email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "branch.manager@company.com"
+                                    },
+                                    "user_password": {
+                                        "type": "string",
+                                        "format": "password"
+                                    },
+                                    "user_password_confirmation": {
+                                        "type": "string",
+                                        "format": "password"
+                                    },
+                                    "user_phone": {
+                                        "type": "string",
+                                        "example": "+966511111112"
+                                    },
+                                    "user_personal_photo": {
+                                        "type": "file",
+                                        "format": "binary"
+                                    },
+                                    "user_birth_date": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "1992-05-15"
+                                    },
+                                    "user_gender": {
+                                        "type": "integer",
+                                        "enum": [
+                                            1,
+                                            2,
+                                            3
+                                        ],
+                                        "example": 2
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "تم إنشاء الفرع بنجاح",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "email": {
+                                                    "type": "string"
+                                                },
+                                                "phone": {
+                                                    "type": "string"
+                                                },
+                                                "city": {
+                                                    "type": "string"
+                                                },
+                                                "status": {
+                                                    "type": "boolean"
+                                                },
+                                                "manager_name": {
+                                                    "type": "string"
+                                                },
+                                                "manager_email": {
+                                                    "type": "string"
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "تم إنشاء الفرع بنجاح"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "بيانات غير صالحة",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "type": "object",
+                                            "additionalProperties": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/branches/{branch}": {
+            "get": {
+                "tags": [
+                    "Branches"
+                ],
+                "summary": "عرض تفاصيل فرع",
+                "description": "استرجاع تفاصيل فرع معين",
+                "operationId": "getBranch",
+                "parameters": [
+                    {
+                        "name": "branch",
+                        "in": "path",
+                        "description": "معرف الفرع",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "include",
+                        "in": "query",
+                        "description": "العلاقات المطلوب تضمينها",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "company,manager,users,visits"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "تفاصيل الفرع",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "الفرع الرئيسي - الرياض"
+                                                },
+                                                "email": {
+                                                    "type": "string",
+                                                    "example": "branch.riyadh@company.com"
+                                                },
+                                                "phone": {
+                                                    "type": "string",
+                                                    "example": "+966500000002"
+                                                },
+                                                "city": {
+                                                    "type": "string",
+                                                    "example": "الرياض"
+                                                },
+                                                "address": {
+                                                    "type": "string",
+                                                    "example": "حي النخيل، برج التجارة"
+                                                },
+                                                "latitude": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 24.7136
+                                                },
+                                                "longitude": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 46.6753
+                                                },
+                                                "manager_name": {
+                                                    "type": "string",
+                                                    "example": "مدير الفرع"
+                                                },
+                                                "manager_email": {
+                                                    "type": "string",
+                                                    "example": "branch.manager@company.com"
+                                                },
+                                                "manager_phone": {
+                                                    "type": "string",
+                                                    "example": "+966511111112"
+                                                },
+                                                "category": {
+                                                    "type": "string",
+                                                    "example": "رئيسي"
+                                                },
+                                                "compliance_score": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 85.5
+                                                },
+                                                "total_visits": {
+                                                    "type": "integer",
+                                                    "example": 10
+                                                },
+                                                "status": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "الفرع غير موجود"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Branches"
+                ],
+                "summary": "تحديث بيانات فرع",
+                "description": "تحديث بيانات فرع موجود",
+                "operationId": "updateBranch",
+                "parameters": [
+                    {
+                        "name": "branch",
+                        "in": "path",
+                        "description": "معرف الفرع",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "الفرع الرئيسي - الرياض (محدث)"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "updated.branch@company.com"
+                                    },
+                                    "phone": {
+                                        "type": "string",
+                                        "example": "+966500000003"
+                                    },
+                                    "city": {
+                                        "type": "string",
+                                        "example": "الرياض"
+                                    },
+                                    "address": {
+                                        "type": "string",
+                                        "example": "حي العليا، برج المملكة"
+                                    },
+                                    "latitude": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 24.7539
+                                    },
+                                    "longitude": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 46.6424
+                                    },
+                                    "category": {
+                                        "type": "string",
+                                        "example": "رئيسي"
+                                    },
+                                    "compliance_score": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 95.5
+                                    },
+                                    "total_visits": {
+                                        "type": "integer",
+                                        "example": 12
+                                    },
+                                    "last_visit_date": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2024-01-15"
+                                    },
+                                    "next_scheduled_visit": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2024-02-15"
+                                    },
+                                    "status": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "manager_name": {
+                                        "type": "string",
+                                        "example": "مدير الفرع (محدث)"
+                                    },
+                                    "manager_email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "updated.manager@company.com"
+                                    },
+                                    "manager_phone": {
+                                        "type": "string",
+                                        "example": "+966511111113"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "تم تحديث الفرع بنجاح",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "تم تحديث الفرع بنجاح"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "الفرع الرئيسي - الرياض (محدث)"
+                                                },
+                                                "email": {
+                                                    "type": "string",
+                                                    "example": "updated.branch@company.com"
+                                                },
+                                                "phone": {
+                                                    "type": "string",
+                                                    "example": "+966500000003"
+                                                },
+                                                "city": {
+                                                    "type": "string",
+                                                    "example": "الرياض"
+                                                },
+                                                "address": {
+                                                    "type": "string",
+                                                    "example": "حي العليا، برج المملكة"
+                                                },
+                                                "compliance_score": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 95.5
+                                                },
+                                                "status": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "الفرع غير موجود"
+                    },
+                    "422": {
+                        "description": "بيانات غير صالحة"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Branches"
+                ],
+                "summary": "حذف فرع",
+                "description": "حذف فرع معين (حذف ناعم)",
+                "operationId": "deleteBranch",
+                "parameters": [
+                    {
+                        "name": "branch",
+                        "in": "path",
+                        "description": "معرف الفرع",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "force",
+                        "in": "query",
+                        "description": "حذف نهائي",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "default": false
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "تم حذف الفرع بنجاح",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "تم حذف الفرع بنجاح"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "الفرع الرئيسي - الرياض"
+                                                },
+                                                "email": {
+                                                    "type": "string",
+                                                    "example": "branch.riyadh@company.com"
+                                                },
+                                                "phone": {
+                                                    "type": "string",
+                                                    "example": "+966500000002"
+                                                },
+                                                "status": {
+                                                    "type": "boolean",
+                                                    "example": false
+                                                },
+                                                "deleted_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2026-02-01T12:00:00Z",
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "الفرع غير موجود"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/branches/{branch}/restore": {
+            "post": {
+                "tags": [
+                    "Branches"
+                ],
+                "summary": "استعادة فرع محذوف",
+                "description": "استعادة فرع تم حذفه (حذف ناعم)",
+                "operationId": "restoreBranch",
+                "parameters": [
+                    {
+                        "name": "branch",
+                        "in": "path",
+                        "description": "معرف الفرع",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "تم استعادة الفرع بنجاح",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "تم استعادة الفرع بنجاح"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "الفرع الرئيسي - الرياض"
+                                                },
+                                                "email": {
+                                                    "type": "string",
+                                                    "example": "branch.riyadh@company.com"
+                                                },
+                                                "phone": {
+                                                    "type": "string",
+                                                    "example": "+966500000002"
+                                                },
+                                                "status": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "deleted_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": null,
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "الفرع غير موجود"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/companies": {
+            "get": {
+                "tags": [
+                    "Companies"
+                ],
+                "summary": "عرض قائمة الشركات",
+                "description": "استرجاع قائمة الشركات مع إمكانية الفلترة والترتيب",
+                "operationId": "getCompanies",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "رقم الصفحة",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "عدد العناصر في الصفحة",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 15
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "بحث بالاسم أو البريد الإلكتروني أو الهاتف",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "فلتر بحالة الشركة",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "name": "subscription_status",
+                        "in": "query",
+                        "description": "فلتر بحالة الاشتراك",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "active",
+                                "inactive",
+                                "suspended"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "category",
+                        "in": "query",
+                        "description": "فلتر بالتصنيف",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "sort_by",
+                        "in": "query",
+                        "description": "ترتيب النتائج حسب",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "created_at",
+                            "enum": [
+                                "name",
+                                "email",
+                                "created_at",
+                                "subscription_end"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "sort_order",
+                        "in": "query",
+                        "description": "اتجاه الترتيب",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "desc",
+                            "enum": [
+                                "asc",
+                                "desc"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "قائمة الشركات",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "name": {
+                                                        "type": "string",
+                                                        "example": "شركة الجودة"
+                                                    },
+                                                    "email": {
+                                                        "type": "string",
+                                                        "example": "info@company.com"
+                                                    },
+                                                    "phone": {
+                                                        "type": "string",
+                                                        "example": "+966500000000"
+                                                    },
+                                                    "status": {
+                                                        "type": "boolean",
+                                                        "example": true
+                                                    },
+                                                    "subscription_status": {
+                                                        "type": "string",
+                                                        "example": "active"
+                                                    },
+                                                    "subscription_end": {
+                                                        "type": "string",
+                                                        "format": "date",
+                                                        "example": "2026-12-31"
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string",
+                                                        "format": "date-time"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "links": {
+                                            "properties": {
+                                                "first": {
+                                                    "type": "string"
+                                                },
+                                                "last": {
+                                                    "type": "string"
+                                                },
+                                                "prev": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                },
+                                                "next": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "meta": {
+                                            "properties": {
+                                                "current_page": {
+                                                    "type": "integer"
+                                                },
+                                                "from": {
+                                                    "type": "integer",
+                                                    "nullable": true
+                                                },
+                                                "last_page": {
+                                                    "type": "integer"
+                                                },
+                                                "path": {
+                                                    "type": "string"
+                                                },
+                                                "per_page": {
+                                                    "type": "integer"
+                                                },
+                                                "to": {
+                                                    "type": "integer",
+                                                    "nullable": true
+                                                },
+                                                "total": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "غير مصرح به"
+                    },
+                    "403": {
+                        "description": "ممنوع الوصول"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Companies"
+                ],
+                "summary": "إنشاء شركة جديدة مع مديرها",
+                "description": "إنشاء شركة جديدة مع بيانات المدير المرتبط بها",
+                "operationId": "createCompany",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "email",
+                                    "phone",
+                                    "commercial_registration",
+                                    "city",
+                                    "address",
+                                    "contact_person",
+                                    "subscription_start",
+                                    "subscription_end",
+                                    "subscription_status",
+                                    "category",
+                                    "user_name",
+                                    "user_email",
+                                    "user_password",
+                                    "user_password_confirmation"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "شركة التقنية المحدودة"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "company@example.com"
+                                    },
+                                    "phone": {
+                                        "type": "string",
+                                        "example": "+966500000000"
+                                    },
+                                    "commercial_registration": {
+                                        "type": "string",
+                                        "example": "1010123456"
+                                    },
+                                    "city": {
+                                        "type": "string",
+                                        "example": "الرياض"
+                                    },
+                                    "address": {
+                                        "type": "string",
+                                        "example": "حي النخيل، شارع الملك فهد"
+                                    },
+                                    "contact_person": {
+                                        "type": "string",
+                                        "example": "أحمد محمد"
+                                    },
+                                    "logo": {
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "subscription_start": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2024-01-01"
+                                    },
+                                    "subscription_end": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2024-12-31"
+                                    },
+                                    "subscription_status": {
+                                        "type": "string",
+                                        "enum": [
+                                            "active",
+                                            "inactive",
+                                            "suspended"
+                                        ],
+                                        "example": "active"
+                                    },
+                                    "category": {
+                                        "type": "string",
+                                        "example": "تقنية المعلومات"
+                                    },
+                                    "status": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "is_verified": {
+                                        "type": "boolean",
+                                        "example": false
+                                    },
+                                    "user_name": {
+                                        "type": "string",
+                                        "example": "مدير الشركة"
+                                    },
+                                    "user_email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "manager@company.com"
+                                    },
+                                    "user_password": {
+                                        "type": "string",
+                                        "format": "password"
+                                    },
+                                    "user_password_confirmation": {
+                                        "type": "string",
+                                        "format": "password"
+                                    },
+                                    "user_phone": {
+                                        "type": "string",
+                                        "example": "+966511111111"
+                                    },
+                                    "user_personal_photo": {
+                                        "type": "file",
+                                        "format": "binary"
+                                    },
+                                    "user_birth_date": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "1990-01-01"
+                                    },
+                                    "user_gender": {
+                                        "type": "integer",
+                                        "enum": [
+                                            1,
+                                            2,
+                                            3
+                                        ],
+                                        "example": 1
+                                    },
+                                    "user_status": {
+                                        "type": "boolean",
+                                        "example": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "تم إنشاء الشركة بنجاح",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "email": {
+                                                    "type": "string"
+                                                },
+                                                "phone": {
+                                                    "type": "string"
+                                                },
+                                                "status": {
+                                                    "type": "boolean"
+                                                },
+                                                "subscription_status": {
+                                                    "type": "string"
+                                                },
+                                                "subscription_end": {
+                                                    "type": "string",
+                                                    "format": "date"
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "تم إنشاء الشركة بنجاح"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "بيانات غير صالحة",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "type": "object",
+                                            "additionalProperties": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/companies/{company}": {
+            "get": {
+                "tags": [
+                    "Companies"
+                ],
+                "summary": "عرض تفاصيل شركة",
+                "description": "استرجاع تفاصيل شركة معينة",
+                "operationId": "getCompany",
+                "parameters": [
+                    {
+                        "name": "company",
+                        "in": "path",
+                        "description": "معرف الشركة",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "include",
+                        "in": "query",
+                        "description": "العلاقات المطلوب تضمينها",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "branches,users"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "تفاصيل الشركة",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "شركة التقنية المحدودة"
+                                                },
+                                                "email": {
+                                                    "type": "string",
+                                                    "example": "company@example.com"
+                                                },
+                                                "phone": {
+                                                    "type": "string",
+                                                    "example": "+966500000000"
+                                                },
+                                                "commercial_registration": {
+                                                    "type": "string",
+                                                    "example": "1010123456"
+                                                },
+                                                "city": {
+                                                    "type": "string",
+                                                    "example": "الرياض"
+                                                },
+                                                "address": {
+                                                    "type": "string",
+                                                    "example": "حي النخيل، شارع الملك فهد"
+                                                },
+                                                "contact_person": {
+                                                    "type": "string",
+                                                    "example": "أحمد محمد"
+                                                },
+                                                "logo": {
+                                                    "type": "string",
+                                                    "format": "binary"
+                                                },
+                                                "subscription_start": {
+                                                    "type": "string",
+                                                    "format": "date",
+                                                    "example": "2024-01-01"
+                                                },
+                                                "subscription_end": {
+                                                    "type": "string",
+                                                    "format": "date",
+                                                    "example": "2024-12-31"
+                                                },
+                                                "subscription_status": {
+                                                    "type": "string",
+                                                    "example": "active"
+                                                },
+                                                "category": {
+                                                    "type": "string",
+                                                    "example": "تقنية المعلومات"
+                                                },
+                                                "status": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "is_verified": {
+                                                    "type": "boolean",
+                                                    "example": false
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "الشركة غير موجودة"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Companies"
+                ],
+                "summary": "تحديث بيانات شركة",
+                "description": "تحديث بيانات شركة موجودة",
+                "operationId": "updateCompany",
+                "parameters": [
+                    {
+                        "name": "company",
+                        "in": "path",
+                        "description": "معرف الشركة",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "شركة التقنية المحدودة"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "updated@example.com"
+                                    },
+                                    "phone": {
+                                        "type": "string",
+                                        "example": "+966500000001"
+                                    },
+                                    "city": {
+                                        "type": "string",
+                                        "example": "جدة"
+                                    },
+                                    "address": {
+                                        "type": "string",
+                                        "example": "حي الصفا، شارع الأمير سلطان"
+                                    },
+                                    "contact_person": {
+                                        "type": "string",
+                                        "example": "محمد أحمد"
+                                    },
+                                    "logo": {
+                                        "description": "شعار الشركة",
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "subscription_status": {
+                                        "type": "string",
+                                        "enum": [
+                                            "active",
+                                            "inactive",
+                                            "suspended"
+                                        ],
+                                        "example": "active"
+                                    },
+                                    "status": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "is_verified": {
+                                        "type": "boolean",
+                                        "example": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "تم تحديث الشركة بنجاح",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "تم تحديث الشركة بنجاح"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "شركة التقنية المحدودة"
+                                                },
+                                                "email": {
+                                                    "type": "string",
+                                                    "example": "updated@example.com"
+                                                },
+                                                "phone": {
+                                                    "type": "string",
+                                                    "example": "+966500000001"
+                                                },
+                                                "city": {
+                                                    "type": "string",
+                                                    "example": "جدة"
+                                                },
+                                                "address": {
+                                                    "type": "string",
+                                                    "example": "حي الصفا، شارع الأمير سلطان"
+                                                },
+                                                "contact_person": {
+                                                    "type": "string",
+                                                    "example": "محمد أحمد"
+                                                },
+                                                "logo": {
+                                                    "type": "string",
+                                                    "format": "binary"
+                                                },
+                                                "subscription_status": {
+                                                    "type": "string",
+                                                    "example": "active"
+                                                },
+                                                "status": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "is_verified": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "الشركة غير موجودة"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Companies"
+                ],
+                "summary": "حذف شركة",
+                "description": "حذف شركة معينة (حذف ناعم)",
+                "operationId": "deleteCompany",
+                "parameters": [
+                    {
+                        "name": "company",
+                        "in": "path",
+                        "description": "معرف الشركة",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "force",
+                        "in": "query",
+                        "description": "حذف نهائي",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "default": false
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "تم حذف الشركة بنجاح",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "تم حذف الشركة بنجاح"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "شركة التقنية المحدودة"
+                                                },
+                                                "email": {
+                                                    "type": "string",
+                                                    "example": "company@example.com"
+                                                },
+                                                "phone": {
+                                                    "type": "string",
+                                                    "example": "+966500000000"
+                                                },
+                                                "status": {
+                                                    "type": "boolean",
+                                                    "example": false
+                                                },
+                                                "deleted_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2026-02-01T12:00:00Z",
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "الشركة غير موجودة"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/companies/{company}/restore": {
+            "post": {
+                "tags": [
+                    "Companies"
+                ],
+                "summary": "استعادة شركة محذوفة",
+                "description": "استعادة شركة تم حذفها (حذف ناعم)",
+                "operationId": "restoreCompany",
+                "parameters": [
+                    {
+                        "name": "company",
+                        "in": "path",
+                        "description": "معرف الشركة",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "تم استعادة الشركة بنجاح",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "تم استعادة الشركة بنجاح"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "شركة التقنية المحدودة"
+                                                },
+                                                "email": {
+                                                    "type": "string",
+                                                    "example": "company@example.com"
+                                                },
+                                                "phone": {
+                                                    "type": "string",
+                                                    "example": "+966500000000"
+                                                },
+                                                "status": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "deleted_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": null,
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "الشركة غير موجودة"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/users": {
+            "get": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "عرض قائمة المستخدمين",
+                "description": "استرجاع قائمة المستخدمين مع إمكانية الفلترة والترتيب",
+                "operationId": "getUsers",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "رقم الصفحة",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "عدد العناصر في الصفحة",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 15
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "بحث بالاسم أو البريد الإلكتروني أو الهاتف",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "role",
+                        "in": "query",
+                        "description": "فلتر بالدور",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "super_admin",
+                                "auditor",
+                                "company_admin",
+                                "branch_manager"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "company_id",
+                        "in": "query",
+                        "description": "فلتر بمعرف الشركة",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "branch_id",
+                        "in": "query",
+                        "description": "فلتر بمعرف الفرع",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "فلتر بحالة المستخدم",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "enum": [
+                                0,
+                                1,
+                                2
+                            ]
+                        }
+                    },
+                    {
+                        "name": "sort_by",
+                        "in": "query",
+                        "description": "ترتيب النتائج حسب",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "created_at",
+                            "enum": [
+                                "name",
+                                "email",
+                                "created_at",
+                                "last_login_at"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "sort_order",
+                        "in": "query",
+                        "description": "اتجاه الترتيب",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "desc",
+                            "enum": [
+                                "asc",
+                                "desc"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "قائمة المستخدمين",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "name": {
+                                                        "type": "string",
+                                                        "example": "محمد أحمد"
+                                                    },
+                                                    "email": {
+                                                        "type": "string",
+                                                        "example": "user@example.com"
+                                                    },
+                                                    "phone": {
+                                                        "type": "string",
+                                                        "example": "+966511111111"
+                                                    },
+                                                    "role": {
+                                                        "type": "string",
+                                                        "example": "auditor"
+                                                    },
+                                                    "status": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string",
+                                                        "format": "date-time"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "links": {
+                                            "properties": {
+                                                "first": {
+                                                    "type": "string"
+                                                },
+                                                "last": {
+                                                    "type": "string"
+                                                },
+                                                "prev": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                },
+                                                "next": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "meta": {
+                                            "properties": {
+                                                "current_page": {
+                                                    "type": "integer"
+                                                },
+                                                "from": {
+                                                    "type": "integer",
+                                                    "nullable": true
+                                                },
+                                                "last_page": {
+                                                    "type": "integer"
+                                                },
+                                                "path": {
+                                                    "type": "string"
+                                                },
+                                                "per_page": {
+                                                    "type": "integer"
+                                                },
+                                                "to": {
+                                                    "type": "integer",
+                                                    "nullable": true
+                                                },
+                                                "total": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "غير مصرح به"
+                    },
+                    "403": {
+                        "description": "ممنوع الوصول"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "إنشاء مستخدم جديد",
+                "description": "إنشاء مستخدم جديد في النظام",
+                "operationId": "createUser",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "email",
+                                    "password",
+                                    "password_confirmation",
+                                    "phone",
+                                    "role"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "محمد أحمد"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "user@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password"
+                                    },
+                                    "password_confirmation": {
+                                        "type": "string",
+                                        "format": "password"
+                                    },
+                                    "phone": {
+                                        "type": "string",
+                                        "example": "+966511111111"
+                                    },
+                                    "role": {
+                                        "type": "string",
+                                        "enum": [
+                                            "super_admin",
+                                            "auditor",
+                                            "company_admin",
+                                            "branch_manager"
+                                        ],
+                                        "example": "auditor"
+                                    },
+                                    "department": {
+                                        "type": "string",
+                                        "example": "الجودة"
+                                    },
+                                    "position": {
+                                        "type": "string",
+                                        "example": "مراجع"
+                                    },
+                                    "national_number": {
+                                        "type": "string",
+                                        "example": "1234567890"
+                                    },
+                                    "municipality_certificate": {
+                                        "type": "file",
+                                        "format": "binary"
+                                    },
+                                    "driving_license": {
+                                        "type": "file",
+                                        "format": "binary"
+                                    },
+                                    "personal_photo": {
+                                        "type": "file",
+                                        "format": "binary"
+                                    },
+                                    "certificate_expiry": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2025-12-31"
+                                    },
+                                    "license_expiry": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2025-12-31"
+                                    },
+                                    "id_expiry": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2025-12-31"
+                                    },
+                                    "birth_date": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "1990-01-01"
+                                    },
+                                    "gender": {
+                                        "type": "string",
+                                        "enum": [
+                                            "male",
+                                            "female",
+                                            "other"
+                                        ],
+                                        "example": "male"
+                                    },
+                                    "status": {
+                                        "type": "integer",
+                                        "enum": [
+                                            0,
+                                            1,
+                                            2
+                                        ],
+                                        "example": 1
+                                    },
+                                    "must_change_password": {
+                                        "type": "boolean",
+                                        "example": false
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "تم إنشاء المستخدم بنجاح",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "email": {
+                                                    "type": "string"
+                                                },
+                                                "phone": {
+                                                    "type": "string"
+                                                },
+                                                "role": {
+                                                    "type": "string"
+                                                },
+                                                "status": {
+                                                    "type": "integer"
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "تم إنشاء المستخدم بنجاح"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "بيانات غير صالحة",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "type": "object",
+                                            "additionalProperties": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/users/{user}": {
+            "get": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "عرض تفاصيل مستخدم",
+                "description": "استرجاع تفاصيل مستخدم معين",
+                "operationId": "getUser",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "path",
+                        "description": "معرف المستخدم",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "include",
+                        "in": "query",
+                        "description": "العلاقات المطلوب تضمينها",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "company,branch,creator"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "تفاصيل المستخدم",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "محمد أحمد"
+                                                },
+                                                "email": {
+                                                    "type": "string",
+                                                    "example": "user@example.com"
+                                                },
+                                                "phone": {
+                                                    "type": "string",
+                                                    "example": "+966511111111"
+                                                },
+                                                "role": {
+                                                    "type": "string",
+                                                    "example": "auditor"
+                                                },
+                                                "national_number": {
+                                                    "type": "string",
+                                                    "example": "1234567890"
+                                                },
+                                                "status": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "المستخدم غير موجود"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "تحديث بيانات مستخدم",
+                "description": "تحديث بيانات مستخدم موجود",
+                "operationId": "updateUser",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "path",
+                        "description": "معرف المستخدم",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "محمد أحمد (محدث)"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "updated.user@example.com"
+                                    },
+                                    "phone": {
+                                        "type": "string",
+                                        "example": "+966511111112"
+                                    },
+                                    "municipality_certificate": {
+                                        "type": "file",
+                                        "format": "binary"
+                                    },
+                                    "driving_license": {
+                                        "type": "file",
+                                        "format": "binary"
+                                    },
+                                    "personal_photo": {
+                                        "type": "file",
+                                        "format": "binary"
+                                    },
+                                    "role": {
+                                        "type": "string",
+                                        "enum": [
+                                            "super_admin",
+                                            "auditor",
+                                            "company_admin",
+                                            "branch_manager"
+                                        ],
+                                        "example": "auditor"
+                                    },
+                                    "department": {
+                                        "type": "string",
+                                        "example": "الجودة"
+                                    },
+                                    "position": {
+                                        "type": "string",
+                                        "example": "مراجع"
+                                    },
+                                    "national_number": {
+                                        "type": "string",
+                                        "example": "1234567890"
+                                    },
+                                    "certificate_expiry": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2025-12-31"
+                                    },
+                                    "license_expiry": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2025-12-31"
+                                    },
+                                    "id_expiry": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2025-12-31"
+                                    },
+                                    "birth_date": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "1990-01-01"
+                                    },
+                                    "gender": {
+                                        "type": "string",
+                                        "enum": [
+                                            "male",
+                                            "female",
+                                            "other"
+                                        ],
+                                        "example": "male"
+                                    },
+                                    "status": {
+                                        "type": "integer",
+                                        "enum": [
+                                            0,
+                                            1,
+                                            2
+                                        ],
+                                        "example": 1
+                                    },
+                                    "must_change_password": {
+                                        "type": "boolean",
+                                        "example": false
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "تم تحديث المستخدم بنجاح",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "تم تحديث المستخدم بنجاح"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "محمد أحمد (محدث)"
+                                                },
+                                                "email": {
+                                                    "type": "string",
+                                                    "example": "updated.user@example.com"
+                                                },
+                                                "phone": {
+                                                    "type": "string",
+                                                    "example": "+966511111112"
+                                                },
+                                                "role": {
+                                                    "type": "string",
+                                                    "example": "auditor"
+                                                },
+                                                "status": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "المستخدم غير موجود"
+                    },
+                    "422": {
+                        "description": "بيانات غير صالحة"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "حذف مستخدم",
+                "description": "حذف مستخدم معين (حذف ناعم)",
+                "operationId": "deleteUser",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "path",
+                        "description": "معرف المستخدم",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "force",
+                        "in": "query",
+                        "description": "حذف نهائي",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "default": false
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "تم حذف المستخدم بنجاح",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "تم حذف المستخدم بنجاح"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "محمد أحمد"
+                                                },
+                                                "email": {
+                                                    "type": "string",
+                                                    "example": "user@example.com"
+                                                },
+                                                "phone": {
+                                                    "type": "string",
+                                                    "example": "+966511111111"
+                                                },
+                                                "status": {
+                                                    "type": "integer",
+                                                    "example": 0
+                                                },
+                                                "deleted_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2026-02-01T12:00:00Z",
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "المستخدم غير موجود"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/users/{user}/restore": {
+            "post": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "استعادة مستخدم محذوف",
+                "description": "استعادة مستخدم تم حذفه (حذف ناعم)",
+                "operationId": "restoreUser",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "path",
+                        "description": "معرف المستخدم",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "تم استعادة المستخدم بنجاح",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "تم استعادة المستخدم بنجاح"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "محمد أحمد"
+                                                },
+                                                "email": {
+                                                    "type": "string",
+                                                    "example": "user@example.com"
+                                                },
+                                                "phone": {
+                                                    "type": "string",
+                                                    "example": "+966511111111"
+                                                },
+                                                "status": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "deleted_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": null,
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "المستخدم غير موجود"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/users/{user}/documents-expiry": {
+            "get": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "عرض حالة صلاحية وثائق المراجع",
+                "description": "عرض حالة صلاحية وثائق المراجع (شهادة البلدية، رخصة القيادة، الهوية)",
+                "operationId": "getUserDocumentsExpiry",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "path",
+                        "description": "معرف المستخدم (يجب أن يكون دور المراجع)",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "حالة صلاحية الوثائق",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "certificate_expiry": {
+                                            "type": "string",
+                                            "format": "date"
+                                        },
+                                        "license_expiry": {
+                                            "type": "string",
+                                            "format": "date"
+                                        },
+                                        "id_expiry": {
+                                            "type": "string",
+                                            "format": "date"
+                                        },
+                                        "is_certificate_valid": {
+                                            "type": "boolean"
+                                        },
+                                        "is_license_valid": {
+                                            "type": "boolean"
+                                        },
+                                        "is_id_valid": {
+                                            "type": "boolean"
+                                        },
+                                        "certificate_days_left": {
+                                            "type": "integer"
+                                        },
+                                        "license_days_left": {
+                                            "type": "integer"
+                                        },
+                                        "id_days_left": {
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "المستخدم ليس مراجعاً"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "bearerFormat": "JWT",
+                "scheme": "bearer"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Authentication",
+            "description": "عمليات المصادقة والتسجيل"
+        },
+        {
+            "name": "Users",
+            "description": "إدارة المستخدمين"
+        },
+        {
+            "name": "Companies",
+            "description": "إدارة الشركات"
+        },
+        {
+            "name": "Branches",
+            "description": "إدارة فروع الشركات"
+        }
+    ]
+}

@@ -1,0 +1,43 @@
+<?php
+
+namespace App\Http\Resources\V1;
+
+use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
+
+class CompanyResource extends JsonResource
+{
+    public function toArray(Request $request): array
+    {
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'email' => $this->email,
+            'phone' => $this->phone,
+            'commercial_registration' => $this->commercial_registration,
+            'city' => $this->city,
+            'address' => $this->address,
+            'contact_person' => $this->contact_person,
+            'logo' => $this->logo ? asset('uploads/companies/logos/' . $this->logo) : null,
+            'subscription_start' => $this->subscription_start,
+            'subscription_end' => $this->subscription_end,
+            'subscription_status' => $this->subscription_status,
+            'total_branches' => $this->total_branches,
+            'overall_score' => (float) $this->overall_score,
+            'category' => $this->category,
+            'status' => (bool) $this->status,
+            'status_text' => $this->status ? 'نشط' : 'غير نشط',
+            'is_verified' => (bool) $this->is_verified,
+            'is_subscription_active' => $this->is_subscription_active,
+            'average_score' => (float) $this->average_score,
+            'created_at' => $this->created_at?->format('Y-m-d | h:m:s A'),
+            'updated_at' => $this->updated_at?->format('Y-m-d | h:m:s A'),
+            'deleted_at' => $this->deleted_at?->format('Y-m-d | h:m:s A'),
+            
+            // Relationships
+            //'branches' => BranchResource::collection($this->whenLoaded('branches')),
+            'manager' => new UserResource($this->whenLoaded('manager')),
+            //'visits' => VisitResource::collection($this->whenLoaded('visits')),
+        ];
+    }
+}
