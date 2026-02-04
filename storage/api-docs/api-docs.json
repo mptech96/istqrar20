@@ -1098,6 +1098,981 @@
                 ]
             }
         },
+        "/api/v1/checklists": {
+            "get": {
+                "tags": [
+                    "Checklists"
+                ],
+                "summary": "عرض قوائم المراجعة",
+                "description": "استرجاع قائمة قوائم المراجعة مع إمكانية الفلترة والترتيب",
+                "operationId": "getChecklists",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "رقم الصفحة",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "عدد العناصر في الصفحة",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 15
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "بحث بالاسم أو الوصف أو الكود",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "company_id",
+                        "in": "query",
+                        "description": "فلتر بمعرف الشركة (NULL للعامة)",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "is_active",
+                        "in": "query",
+                        "description": "فلتر بالنشاط",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "name": "is_template",
+                        "in": "query",
+                        "description": "فلتر بالنماذج",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "name": "industry_type",
+                        "in": "query",
+                        "description": "فلتر بنوع الصناعة",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "sort_by",
+                        "in": "query",
+                        "description": "ترتيب النتائج حسب",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "created_at",
+                            "enum": [
+                                "name",
+                                "code",
+                                "total_score",
+                                "created_at"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "sort_order",
+                        "in": "query",
+                        "description": "اتجاه الترتيب",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "desc",
+                            "enum": [
+                                "asc",
+                                "desc"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "include",
+                        "in": "query",
+                        "description": "العلاقات المطلوب تضمينها",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "company,questions,creator"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "قائمة قوائم المراجعة",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "name": {
+                                                        "type": "string",
+                                                        "example": "قائمة مراجعة النظافة"
+                                                    },
+                                                    "code": {
+                                                        "type": "string",
+                                                        "example": "CL-001"
+                                                    },
+                                                    "version": {
+                                                        "type": "string",
+                                                        "example": "1.0"
+                                                    },
+                                                    "total_score": {
+                                                        "type": "integer",
+                                                        "example": 100
+                                                    },
+                                                    "passing_score": {
+                                                        "type": "integer",
+                                                        "example": 70
+                                                    },
+                                                    "is_active": {
+                                                        "type": "boolean",
+                                                        "example": true
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string",
+                                                        "format": "date-time"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "links": {
+                                            "properties": {
+                                                "first": {
+                                                    "type": "string"
+                                                },
+                                                "last": {
+                                                    "type": "string"
+                                                },
+                                                "prev": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                },
+                                                "next": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "meta": {
+                                            "properties": {
+                                                "current_page": {
+                                                    "type": "integer"
+                                                },
+                                                "from": {
+                                                    "type": "integer",
+                                                    "nullable": true
+                                                },
+                                                "last_page": {
+                                                    "type": "integer"
+                                                },
+                                                "path": {
+                                                    "type": "string"
+                                                },
+                                                "per_page": {
+                                                    "type": "integer"
+                                                },
+                                                "to": {
+                                                    "type": "integer",
+                                                    "nullable": true
+                                                },
+                                                "total": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "غير مصرح به"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Checklists"
+                ],
+                "summary": "إنشاء قائمة مراجعة جديدة",
+                "description": "إنشاء قائمة مراجعة جديدة مع إعداداتها",
+                "operationId": "createChecklist",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "total_score",
+                                    "passing_score"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "قائمة مراجعة النظافة"
+                                    },
+                                    "code": {
+                                        "type": "string",
+                                        "example": "CL-001"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "قائمة مراجعة شاملة للنظافة"
+                                    },
+                                    "version": {
+                                        "type": "string",
+                                        "example": "1.0"
+                                    },
+                                    "company_id": {
+                                        "type": "integer",
+                                        "example": 1,
+                                        "nullable": true
+                                    },
+                                    "industry_type": {
+                                        "type": "string",
+                                        "example": "المطاعم"
+                                    },
+                                    "total_score": {
+                                        "type": "integer",
+                                        "example": 100
+                                    },
+                                    "passing_score": {
+                                        "type": "integer",
+                                        "example": 70
+                                    },
+                                    "time_estimate": {
+                                        "type": "integer",
+                                        "example": 60
+                                    },
+                                    "is_active": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "is_template": {
+                                        "type": "boolean",
+                                        "example": false
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "تم إنشاء القائمة بنجاح",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "قائمة مراجعة النظافة"
+                                                },
+                                                "code": {
+                                                    "type": "string",
+                                                    "example": "CL-001"
+                                                },
+                                                "version": {
+                                                    "type": "string",
+                                                    "example": "1.0"
+                                                },
+                                                "total_score": {
+                                                    "type": "integer",
+                                                    "example": 100
+                                                },
+                                                "passing_score": {
+                                                    "type": "integer",
+                                                    "example": 70
+                                                },
+                                                "is_active": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "تم إنشاء القائمة بنجاح"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "بيانات غير صالحة"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/checklists/industry-types": {
+            "get": {
+                "tags": [
+                    "Checklists"
+                ],
+                "summary": "عرض أنواع الصناعة لقوائم المراجعة",
+                "description": "استرجاع قائمة أنواع الصناعة الفريدة لقوائم المراجعة",
+                "operationId": "getChecklistIndustryTypes",
+                "responses": {
+                    "200": {
+                        "description": "قائمة أنواع الصناعة",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string",
+                                                "example": "المطاعم"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/checklists/{checklist}": {
+            "get": {
+                "tags": [
+                    "Checklists"
+                ],
+                "summary": "عرض تفاصيل قائمة مراجعة",
+                "description": "استرجاع تفاصيل قائمة مراجعة مع أسئلتها",
+                "operationId": "getChecklist",
+                "parameters": [
+                    {
+                        "name": "checklist",
+                        "in": "path",
+                        "description": "معرف القائمة",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "include",
+                        "in": "query",
+                        "description": "العلاقات المطلوب تضمينها",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "company,questions,creator"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "تفاصيل القائمة",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "قائمة مراجعة النظافة"
+                                                },
+                                                "code": {
+                                                    "type": "string",
+                                                    "example": "CL-001"
+                                                },
+                                                "description": {
+                                                    "type": "string",
+                                                    "example": "قائمة مراجعة شاملة للنظافة"
+                                                },
+                                                "version": {
+                                                    "type": "string",
+                                                    "example": "1.0"
+                                                },
+                                                "company_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "industry_type": {
+                                                    "type": "string",
+                                                    "example": "المطاعم"
+                                                },
+                                                "total_score": {
+                                                    "type": "integer",
+                                                    "example": 100
+                                                },
+                                                "passing_score": {
+                                                    "type": "integer",
+                                                    "example": 70
+                                                },
+                                                "time_estimate": {
+                                                    "type": "integer",
+                                                    "example": 60
+                                                },
+                                                "is_active": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "is_template": {
+                                                    "type": "boolean",
+                                                    "example": false
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "القائمة غير موجودة"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Checklists"
+                ],
+                "summary": "تحديث بيانات قائمة مراجعة",
+                "description": "تحديث بيانات قائمة مراجعة موجودة",
+                "operationId": "updateChecklist",
+                "parameters": [
+                    {
+                        "name": "checklist",
+                        "in": "path",
+                        "description": "معرف القائمة",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "قائمة مراجعة النظافة (محدثة)"
+                                    },
+                                    "code": {
+                                        "type": "string",
+                                        "example": "CL-001-A"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "قائمة مراجعة شاملة للنظافة - محدثة"
+                                    },
+                                    "version": {
+                                        "type": "string",
+                                        "example": "1.1"
+                                    },
+                                    "company_id": {
+                                        "type": "integer",
+                                        "example": 1,
+                                        "nullable": true
+                                    },
+                                    "industry_type": {
+                                        "type": "string",
+                                        "example": "المطاعم والفنادق"
+                                    },
+                                    "total_score": {
+                                        "type": "integer",
+                                        "example": 120
+                                    },
+                                    "passing_score": {
+                                        "type": "integer",
+                                        "example": 80
+                                    },
+                                    "time_estimate": {
+                                        "type": "integer",
+                                        "example": 75
+                                    },
+                                    "is_active": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "is_template": {
+                                        "type": "boolean",
+                                        "example": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "تم تحديث القائمة بنجاح",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "تم تحديث القائمة بنجاح"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "قائمة مراجعة النظافة (محدثة)"
+                                                },
+                                                "code": {
+                                                    "type": "string",
+                                                    "example": "CL-001-A"
+                                                },
+                                                "version": {
+                                                    "type": "string",
+                                                    "example": "1.1"
+                                                },
+                                                "total_score": {
+                                                    "type": "integer",
+                                                    "example": 120
+                                                },
+                                                "passing_score": {
+                                                    "type": "integer",
+                                                    "example": 80
+                                                },
+                                                "is_active": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "القائمة غير موجودة"
+                    },
+                    "422": {
+                        "description": "بيانات غير صالحة"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Checklists"
+                ],
+                "summary": "حذف قائمة مراجعة",
+                "description": "حذف قائمة مراجعة مع أسئلتها (حذف ناعم)",
+                "operationId": "deleteChecklist",
+                "parameters": [
+                    {
+                        "name": "checklist",
+                        "in": "path",
+                        "description": "معرف القائمة",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "force",
+                        "in": "query",
+                        "description": "حذف نهائي",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "default": false
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "تم حذف القائمة بنجاح",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "تم حذف القائمة بنجاح"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "قائمة مراجعة النظافة"
+                                                },
+                                                "code": {
+                                                    "type": "string",
+                                                    "example": "CL-001"
+                                                },
+                                                "is_active": {
+                                                    "type": "boolean",
+                                                    "example": false
+                                                },
+                                                "deleted_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2026-02-01T12:00:00Z",
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "القائمة غير موجودة"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/checklists/{checklist}/restore": {
+            "post": {
+                "tags": [
+                    "Checklists"
+                ],
+                "summary": "استعادة قائمة محذوفة",
+                "description": "استعادة قائمة مراجعة تم حذفها (حذف ناعم)",
+                "operationId": "restoreChecklist",
+                "parameters": [
+                    {
+                        "name": "checklist",
+                        "in": "path",
+                        "description": "معرف القائمة",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "تم استعادة القائمة بنجاح",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "تم استعادة القائمة بنجاح"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "قائمة مراجعة النظافة"
+                                                },
+                                                "code": {
+                                                    "type": "string",
+                                                    "example": "CL-001"
+                                                },
+                                                "is_active": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "deleted_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": null,
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "القائمة غير موجودة"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/checklists/{checklist}/duplicate": {
+            "post": {
+                "tags": [
+                    "Checklists"
+                ],
+                "summary": "نسخ قائمة مراجعة",
+                "description": "إنشاء نسخة من قائمة مراجعة موجودة مع أسئلتها",
+                "operationId": "duplicateChecklist",
+                "parameters": [
+                    {
+                        "name": "checklist",
+                        "in": "path",
+                        "description": "معرف القائمة الأصلية",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "new_name": {
+                                        "type": "string",
+                                        "example": "نسخة من قائمة النظافة"
+                                    },
+                                    "new_code": {
+                                        "type": "string",
+                                        "example": "CL-001-COPY"
+                                    },
+                                    "version": {
+                                        "type": "string",
+                                        "example": "1.0"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "تم نسخ القائمة بنجاح",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 2
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "نسخة من قائمة النظافة"
+                                                },
+                                                "code": {
+                                                    "type": "string",
+                                                    "example": "CL-001-COPY"
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "تم نسخ القائمة بنجاح"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "القائمة الأصلية غير موجودة"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/checklists/{checklist}/statistics": {
+            "get": {
+                "tags": [
+                    "Checklists"
+                ],
+                "summary": "عرض إحصائيات قائمة مراجعة",
+                "description": "استرجاع إحصائيات قائمة مراجعة (عدد الأسئلة، النقاط، إلخ)",
+                "operationId": "getChecklistStatistics",
+                "parameters": [
+                    {
+                        "name": "checklist",
+                        "in": "path",
+                        "description": "معرف القائمة",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "إحصائيات القائمة",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "total_questions": {
+                                            "type": "integer",
+                                            "example": 25
+                                        },
+                                        "active_questions": {
+                                            "type": "integer",
+                                            "example": 20
+                                        },
+                                        "required_questions": {
+                                            "type": "integer",
+                                            "example": 15
+                                        },
+                                        "critical_questions": {
+                                            "type": "integer",
+                                            "example": 5
+                                        },
+                                        "total_max_score": {
+                                            "type": "integer",
+                                            "example": 250
+                                        },
+                                        "average_weight": {
+                                            "type": "number",
+                                            "format": "float",
+                                            "example": 4.2
+                                        },
+                                        "question_types": {
+                                            "type": "object",
+                                            "additionalProperties": {
+                                                "type": "integer"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "القائمة غير موجودة"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/v1/companies": {
             "get": {
                 "tags": [
@@ -1969,6 +2944,1973 @@
                     },
                     "404": {
                         "description": "الشركة غير موجودة"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/criterias": {
+            "get": {
+                "tags": [
+                    "Criterias"
+                ],
+                "summary": "عرض قائمة معايير التقييم",
+                "description": "استرجاع قائمة معايير التقييم مع إمكانية الفلترة والترتيب",
+                "operationId": "getCriterias",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "رقم الصفحة",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "عدد العناصر في الصفحة",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 15
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "بحث بالاسم أو الوصف",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "category",
+                        "in": "query",
+                        "description": "فلتر بالفئة",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "is_active",
+                        "in": "query",
+                        "description": "فلتر بالنشاط",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "name": "sort_by",
+                        "in": "query",
+                        "description": "ترتيب النتائج حسب",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "sort_order",
+                            "enum": [
+                                "name",
+                                "category",
+                                "weight",
+                                "sort_order",
+                                "created_at"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "sort_order",
+                        "in": "query",
+                        "description": "اتجاه الترتيب",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "asc",
+                            "enum": [
+                                "asc",
+                                "desc"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "include",
+                        "in": "query",
+                        "description": "العلاقات المطلوب تضمينها",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "ranges,creator"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "قائمة معايير التقييم",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "name": {
+                                                        "type": "string",
+                                                        "example": "النظافة العامة"
+                                                    },
+                                                    "category": {
+                                                        "type": "string",
+                                                        "example": "النظافة"
+                                                    },
+                                                    "weight": {
+                                                        "type": "number",
+                                                        "format": "float",
+                                                        "example": 20.5
+                                                    },
+                                                    "is_active": {
+                                                        "type": "boolean",
+                                                        "example": true
+                                                    },
+                                                    "sort_order": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string",
+                                                        "format": "date-time"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "links": {
+                                            "properties": {
+                                                "first": {
+                                                    "type": "string"
+                                                },
+                                                "last": {
+                                                    "type": "string"
+                                                },
+                                                "prev": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                },
+                                                "next": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "meta": {
+                                            "properties": {
+                                                "current_page": {
+                                                    "type": "integer"
+                                                },
+                                                "from": {
+                                                    "type": "integer",
+                                                    "nullable": true
+                                                },
+                                                "last_page": {
+                                                    "type": "integer"
+                                                },
+                                                "path": {
+                                                    "type": "string"
+                                                },
+                                                "per_page": {
+                                                    "type": "integer"
+                                                },
+                                                "to": {
+                                                    "type": "integer",
+                                                    "nullable": true
+                                                },
+                                                "total": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "غير مصرح به"
+                    },
+                    "403": {
+                        "description": "ممنوع الوصول"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Criterias"
+                ],
+                "summary": "إنشاء معيار تقييم جديد",
+                "description": "إنشاء معيار تقييم جديد مع نطاقات التقييم الخاصة به",
+                "operationId": "createCriteria",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "category",
+                                    "weight",
+                                    "ranges"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "النظافة العامة"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "تقييم مستوى النظافة في المنشأة"
+                                    },
+                                    "category": {
+                                        "type": "string",
+                                        "example": "النظافة"
+                                    },
+                                    "weight": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 20.5
+                                    },
+                                    "is_active": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "sort_order": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "ranges": {
+                                        "type": "array",
+                                        "items": {
+                                            "required": [
+                                                "name",
+                                                "min_score",
+                                                "max_score"
+                                            ],
+                                            "properties": {
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "ممتاز"
+                                                },
+                                                "min_score": {
+                                                    "type": "integer",
+                                                    "example": 90
+                                                },
+                                                "max_score": {
+                                                    "type": "integer",
+                                                    "example": 100
+                                                },
+                                                "color": {
+                                                    "type": "string",
+                                                    "example": "#28a745"
+                                                },
+                                                "description": {
+                                                    "type": "string",
+                                                    "example": "مستوى نظافة ممتاز"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "minItems": 1
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "تم إنشاء المعيار بنجاح",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "النظافة العامة"
+                                                },
+                                                "category": {
+                                                    "type": "string",
+                                                    "example": "النظافة"
+                                                },
+                                                "weight": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 20.5
+                                                },
+                                                "is_active": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "sort_order": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "ranges": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "name": {
+                                                                "type": "string",
+                                                                "example": "ممتاز"
+                                                            },
+                                                            "min_score": {
+                                                                "type": "integer",
+                                                                "example": 90
+                                                            },
+                                                            "max_score": {
+                                                                "type": "integer",
+                                                                "example": 100
+                                                            },
+                                                            "color": {
+                                                                "type": "string",
+                                                                "example": "#28a745"
+                                                            },
+                                                            "description": {
+                                                                "type": "string",
+                                                                "example": "مستوى نظافة ممتاز"
+                                                            },
+                                                            "created_at": {
+                                                                "type": "string",
+                                                                "format": "date-time"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "تم إنشاء المعيار بنجاح"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "بيانات غير صالحة",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "type": "object",
+                                            "additionalProperties": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/criterias/categories": {
+            "get": {
+                "tags": [
+                    "Criterias"
+                ],
+                "summary": "عرض فئات معايير التقييم",
+                "description": "استرجاع قائمة الفئات الفريدة لمعايير التقييم",
+                "operationId": "getCriteriaCategories",
+                "responses": {
+                    "200": {
+                        "description": "قائمة الفئات",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/criterias/{criteria}": {
+            "get": {
+                "tags": [
+                    "Criterias"
+                ],
+                "summary": "عرض تفاصيل معيار تقييم",
+                "description": "استرجاع تفاصيل معيار تقييم مع نطاقات التقييم الخاصة به",
+                "operationId": "getCriteria",
+                "parameters": [
+                    {
+                        "name": "criteria",
+                        "in": "path",
+                        "description": "معرف المعيار",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "include",
+                        "in": "query",
+                        "description": "العلاقات المطلوب تضمينها",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "ranges,creator"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "تفاصيل المعيار",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "النظافة العامة"
+                                                },
+                                                "description": {
+                                                    "type": "string",
+                                                    "example": "تقييم مستوى النظافة في المنشأة"
+                                                },
+                                                "category": {
+                                                    "type": "string",
+                                                    "example": "النظافة"
+                                                },
+                                                "weight": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 20.5
+                                                },
+                                                "is_active": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "sort_order": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "ranges": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "name": {
+                                                                "type": "string",
+                                                                "example": "ممتاز"
+                                                            },
+                                                            "min_score": {
+                                                                "type": "integer",
+                                                                "example": 90
+                                                            },
+                                                            "max_score": {
+                                                                "type": "integer",
+                                                                "example": 100
+                                                            },
+                                                            "color": {
+                                                                "type": "string",
+                                                                "example": "#28a745"
+                                                            },
+                                                            "description": {
+                                                                "type": "string",
+                                                                "example": "مستوى نظافة ممتاز"
+                                                            },
+                                                            "created_at": {
+                                                                "type": "string",
+                                                                "format": "date-time"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "المعيار غير موجود"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Criterias"
+                ],
+                "summary": "تحديث بيانات معيار تقييم",
+                "description": "تحديث بيانات معيار تقييم موجود",
+                "operationId": "updateCriteria",
+                "parameters": [
+                    {
+                        "name": "criteria",
+                        "in": "path",
+                        "description": "معرف المعيار",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "النظافة العامة (محدث)"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "تقييم مستوى النظافة في المنشأة - محدث"
+                                    },
+                                    "category": {
+                                        "type": "string",
+                                        "example": "النظافة والصحة"
+                                    },
+                                    "weight": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 25
+                                    },
+                                    "is_active": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "sort_order": {
+                                        "type": "integer",
+                                        "example": 2
+                                    },
+                                    "ranges": {
+                                        "type": "array",
+                                        "items": {
+                                            "required": [
+                                                "name",
+                                                "min_score",
+                                                "max_score"
+                                            ],
+                                            "properties": {
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "ممتاز"
+                                                },
+                                                "min_score": {
+                                                    "type": "integer",
+                                                    "example": 90
+                                                },
+                                                "max_score": {
+                                                    "type": "integer",
+                                                    "example": 100
+                                                },
+                                                "color": {
+                                                    "type": "string",
+                                                    "example": "#28a745"
+                                                },
+                                                "description": {
+                                                    "type": "string",
+                                                    "example": "مستوى نظافة ممتاز"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "minItems": 1
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "تم تحديث المعيار بنجاح",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "تم تحديث المعيار بنجاح"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "النظافة العامة (محدث)"
+                                                },
+                                                "category": {
+                                                    "type": "string",
+                                                    "example": "النظافة والصحة"
+                                                },
+                                                "weight": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 25
+                                                },
+                                                "is_active": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "sort_order": {
+                                                    "type": "integer",
+                                                    "example": 2
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "المعيار غير موجود"
+                    },
+                    "422": {
+                        "description": "بيانات غير صالحة"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Criterias"
+                ],
+                "summary": "حذف معيار تقييم",
+                "description": "حذف معيار تقييم مع نطاقات التقييم الخاصة به (حذف ناعم)",
+                "operationId": "deleteCriteria",
+                "parameters": [
+                    {
+                        "name": "criteria",
+                        "in": "path",
+                        "description": "معرف المعيار",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "force",
+                        "in": "query",
+                        "description": "حذف نهائي",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "default": false
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "تم حذف المعيار بنجاح",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "تم حذف المعيار بنجاح"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "النظافة العامة"
+                                                },
+                                                "is_active": {
+                                                    "type": "boolean",
+                                                    "example": false
+                                                },
+                                                "deleted_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2026-02-01T12:00:00Z",
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "المعيار غير موجود"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/criterias/{criteria}/restore": {
+            "post": {
+                "tags": [
+                    "Criterias"
+                ],
+                "summary": "استعادة معيار محذوف",
+                "description": "استعادة معيار تقييم تم حذفه (حذف ناعم)",
+                "operationId": "restoreCriteria",
+                "parameters": [
+                    {
+                        "name": "criteria",
+                        "in": "path",
+                        "description": "معرف المعيار",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "تم استعادة المعيار بنجاح",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "تم استعادة المعيار بنجاح"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "النظافة العامة"
+                                                },
+                                                "is_active": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "deleted_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": null,
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "المعيار غير موجود"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/criterias/{criteria}/evaluate": {
+            "get": {
+                "tags": [
+                    "Criterias"
+                ],
+                "summary": "تقييم درجة بناء على معيار",
+                "description": "تحديد نطاق التقييم المناسب لدرجة معينة بناء على معيار معين",
+                "operationId": "evaluateCriteriaScore",
+                "parameters": [
+                    {
+                        "name": "criteria",
+                        "in": "path",
+                        "description": "معرف المعيار",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "score",
+                        "in": "query",
+                        "description": "الدرجة المراد تقييمها",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "maximum": 100,
+                            "minimum": 0,
+                            "example": 85
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "نتيجة التقييم",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "criteria_id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "criteria_name": {
+                                            "type": "string",
+                                            "example": "النظافة العامة"
+                                        },
+                                        "score": {
+                                            "type": "integer",
+                                            "example": 85
+                                        },
+                                        "range_id": {
+                                            "type": "integer",
+                                            "example": 3
+                                        },
+                                        "range_name": {
+                                            "type": "string",
+                                            "example": "جيد جداً"
+                                        },
+                                        "range_color": {
+                                            "type": "string",
+                                            "example": "#17a2b8"
+                                        },
+                                        "range_description": {
+                                            "type": "string",
+                                            "example": "مستوى نظافة جيد جداً"
+                                        },
+                                        "weighted_score": {
+                                            "type": "number",
+                                            "format": "float",
+                                            "example": 17
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "المعيار غير موجود"
+                    },
+                    "400": {
+                        "description": "الدرجة خارج النطاق"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/checklists/{checklist}/questions": {
+            "get": {
+                "tags": [
+                    "Questions"
+                ],
+                "summary": "عرض أسئلة قائمة مراجعة",
+                "description": "استرجاع قائمة أسئلة قائمة مراجعة معينة",
+                "operationId": "getChecklistQuestions",
+                "parameters": [
+                    {
+                        "name": "checklist",
+                        "in": "path",
+                        "description": "معرف القائمة",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "is_active",
+                        "in": "query",
+                        "description": "فلتر بالنشاط",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "name": "is_critical",
+                        "in": "query",
+                        "description": "فلتر بالأسئلة الحرجة",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "description": "فلتر بنوع السؤال",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "yes_no",
+                                "scale_1_5",
+                                "scale_1_10",
+                                "multiple_choice",
+                                "text",
+                                "file",
+                                "date",
+                                "number"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "sort_by",
+                        "in": "query",
+                        "description": "ترتيب النتائج حسب",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "sort_order",
+                            "enum": [
+                                "sort_order",
+                                "weight",
+                                "max_score",
+                                "created_at"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "sort_order",
+                        "in": "query",
+                        "description": "اتجاه الترتيب",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "asc",
+                            "enum": [
+                                "asc",
+                                "desc"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "include",
+                        "in": "query",
+                        "description": "العلاقات المطلوب تضمينها",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "criteria,checklist"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "قائمة أسئلة القائمة",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "question_text": {
+                                                        "type": "string",
+                                                        "example": "هل المكان نظيف بشكل عام؟"
+                                                    },
+                                                    "type": {
+                                                        "type": "string",
+                                                        "example": "yes_no"
+                                                    },
+                                                    "weight": {
+                                                        "type": "integer",
+                                                        "example": 5
+                                                    },
+                                                    "max_score": {
+                                                        "type": "integer",
+                                                        "example": 10
+                                                    },
+                                                    "is_required": {
+                                                        "type": "boolean",
+                                                        "example": true
+                                                    },
+                                                    "is_critical": {
+                                                        "type": "boolean",
+                                                        "example": false
+                                                    },
+                                                    "sort_order": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string",
+                                                        "format": "date-time"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "القائمة غير موجودة"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Questions"
+                ],
+                "summary": "إضافة سؤال جديد",
+                "description": "إضافة سؤال جديد إلى قائمة مراجعة",
+                "operationId": "createQuestion",
+                "parameters": [
+                    {
+                        "name": "checklist",
+                        "in": "path",
+                        "description": "معرف القائمة",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "question_text",
+                                    "type",
+                                    "weight",
+                                    "max_score"
+                                ],
+                                "properties": {
+                                    "criteria_id": {
+                                        "type": "integer",
+                                        "example": 1,
+                                        "nullable": true
+                                    },
+                                    "question_text": {
+                                        "type": "string",
+                                        "example": "هل المكان نظيف بشكل عام؟"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "تقييم النظافة العامة للمكان"
+                                    },
+                                    "help_text": {
+                                        "type": "string",
+                                        "example": "ركز على النظافة العامة وليس التفاصيل"
+                                    },
+                                    "type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "yes_no",
+                                            "scale_1_5",
+                                            "scale_1_10",
+                                            "multiple_choice",
+                                            "text",
+                                            "file",
+                                            "date",
+                                            "number"
+                                        ],
+                                        "example": "yes_no"
+                                    },
+                                    "options": {
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "value": {
+                                                    "type": "string",
+                                                    "example": "نعم"
+                                                },
+                                                "score": {
+                                                    "type": "integer",
+                                                    "example": 10
+                                                },
+                                                "description": {
+                                                    "type": "string",
+                                                    "example": "نعم، المكان نظيف"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "nullable": true
+                                    },
+                                    "correct_answer": {
+                                        "type": "string",
+                                        "example": "نعم",
+                                        "nullable": true
+                                    },
+                                    "weight": {
+                                        "type": "integer",
+                                        "example": 5
+                                    },
+                                    "max_score": {
+                                        "type": "integer",
+                                        "example": 10
+                                    },
+                                    "passing_score": {
+                                        "type": "integer",
+                                        "example": 6,
+                                        "nullable": true
+                                    },
+                                    "is_required": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "is_critical": {
+                                        "type": "boolean",
+                                        "example": false
+                                    },
+                                    "has_attachment": {
+                                        "type": "boolean",
+                                        "example": false
+                                    },
+                                    "attachment_instructions": {
+                                        "type": "string",
+                                        "example": "ارفع صورة للمكان",
+                                        "nullable": true
+                                    },
+                                    "sort_order": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "is_active": {
+                                        "type": "boolean",
+                                        "example": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "تم إضافة السؤال بنجاح",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "question_text": {
+                                                    "type": "string",
+                                                    "example": "هل المكان نظيف بشكل عام؟"
+                                                },
+                                                "type": {
+                                                    "type": "string",
+                                                    "example": "yes_no"
+                                                },
+                                                "weight": {
+                                                    "type": "integer",
+                                                    "example": 5
+                                                },
+                                                "max_score": {
+                                                    "type": "integer",
+                                                    "example": 10
+                                                },
+                                                "is_required": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "checklist_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "تم إضافة السؤال بنجاح"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "بيانات غير صالحة"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/checklists/{checklist}/questions/types": {
+            "get": {
+                "tags": [
+                    "Questions"
+                ],
+                "summary": "عرض أنواع الأسئلة المتاحة",
+                "description": "استرجاع قائمة أنواع الأسئلة المتاحة مع وصفها",
+                "operationId": "getQuestionTypes",
+                "parameters": [
+                    {
+                        "name": "checklist",
+                        "in": "path",
+                        "description": "معرف القائمة",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "أنواع الأسئلة",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "value": {
+                                                        "type": "string",
+                                                        "example": "yes_no"
+                                                    },
+                                                    "label": {
+                                                        "type": "string",
+                                                        "example": "نعم/لا"
+                                                    },
+                                                    "description": {
+                                                        "type": "string",
+                                                        "example": "سؤال بإجابة نعم أو لا"
+                                                    },
+                                                    "has_options": {
+                                                        "type": "boolean",
+                                                        "example": false
+                                                    },
+                                                    "has_correct_answer": {
+                                                        "type": "boolean",
+                                                        "example": false
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/checklists/{checklist}/questions/{question}": {
+            "get": {
+                "tags": [
+                    "Questions"
+                ],
+                "summary": "عرض تفاصيل سؤال",
+                "description": "استرجاع تفاصيل سؤال معين",
+                "operationId": "getQuestion",
+                "parameters": [
+                    {
+                        "name": "checklist",
+                        "in": "path",
+                        "description": "معرف القائمة",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "question",
+                        "in": "path",
+                        "description": "معرف السؤال",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "include",
+                        "in": "query",
+                        "description": "العلاقات المطلوب تضمينها",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "criteria,checklist"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "تفاصيل السؤال",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "question_text": {
+                                                    "type": "string",
+                                                    "example": "هل المكان نظيف بشكل عام؟"
+                                                },
+                                                "description": {
+                                                    "type": "string",
+                                                    "example": "تقييم النظافة العامة للمكان"
+                                                },
+                                                "help_text": {
+                                                    "type": "string",
+                                                    "example": "ركز على النظافة العامة وليس التفاصيل"
+                                                },
+                                                "type": {
+                                                    "type": "string",
+                                                    "example": "yes_no"
+                                                },
+                                                "weight": {
+                                                    "type": "integer",
+                                                    "example": 5
+                                                },
+                                                "max_score": {
+                                                    "type": "integer",
+                                                    "example": 10
+                                                },
+                                                "passing_score": {
+                                                    "type": "integer",
+                                                    "example": 6
+                                                },
+                                                "is_required": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "is_critical": {
+                                                    "type": "boolean",
+                                                    "example": false
+                                                },
+                                                "checklist_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "السؤال غير موجود"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Questions"
+                ],
+                "summary": "تحديث بيانات سؤال",
+                "description": "تحديث بيانات سؤال موجود",
+                "operationId": "updateQuestion",
+                "parameters": [
+                    {
+                        "name": "checklist",
+                        "in": "path",
+                        "description": "معرف القائمة",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "question",
+                        "in": "path",
+                        "description": "معرف السؤال",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "criteria_id": {
+                                        "type": "integer",
+                                        "example": 1,
+                                        "nullable": true
+                                    },
+                                    "question_text": {
+                                        "type": "string",
+                                        "example": "هل المكان نظيف بشكل عام؟ (محدث)"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "تقييم النظافة العامة للمكان - محدث"
+                                    },
+                                    "help_text": {
+                                        "type": "string",
+                                        "example": "ركز على النظافة العامة وليس التفاصيل - محدث"
+                                    },
+                                    "type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "yes_no",
+                                            "scale_1_5",
+                                            "scale_1_10",
+                                            "multiple_choice",
+                                            "text",
+                                            "file",
+                                            "date",
+                                            "number"
+                                        ],
+                                        "example": "yes_no"
+                                    },
+                                    "options": {
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "value": {
+                                                    "type": "string",
+                                                    "example": "نعم"
+                                                },
+                                                "score": {
+                                                    "type": "integer",
+                                                    "example": 10
+                                                },
+                                                "description": {
+                                                    "type": "string",
+                                                    "example": "نعم، المكان نظيف"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "nullable": true
+                                    },
+                                    "correct_answer": {
+                                        "type": "string",
+                                        "example": "نعم",
+                                        "nullable": true
+                                    },
+                                    "weight": {
+                                        "type": "integer",
+                                        "example": 6
+                                    },
+                                    "max_score": {
+                                        "type": "integer",
+                                        "example": 12
+                                    },
+                                    "passing_score": {
+                                        "type": "integer",
+                                        "example": 8,
+                                        "nullable": true
+                                    },
+                                    "is_required": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "is_critical": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "has_attachment": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "attachment_instructions": {
+                                        "type": "string",
+                                        "example": "ارفع صورة للمكان من زوايا مختلفة",
+                                        "nullable": true
+                                    },
+                                    "sort_order": {
+                                        "type": "integer",
+                                        "example": 2
+                                    },
+                                    "is_active": {
+                                        "type": "boolean",
+                                        "example": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "تم تحديث السؤال بنجاح",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "تم تحديث السؤال بنجاح"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "question_text": {
+                                                    "type": "string",
+                                                    "example": "هل المكان نظيف بشكل عام؟ (محدث)"
+                                                },
+                                                "type": {
+                                                    "type": "string",
+                                                    "example": "yes_no"
+                                                },
+                                                "weight": {
+                                                    "type": "integer",
+                                                    "example": 6
+                                                },
+                                                "max_score": {
+                                                    "type": "integer",
+                                                    "example": 12
+                                                },
+                                                "is_critical": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "checklist_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "السؤال غير موجود"
+                    },
+                    "422": {
+                        "description": "بيانات غير صالحة"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Questions"
+                ],
+                "summary": "حذف سؤال",
+                "description": "حذف سؤال معين (حذف ناعم)",
+                "operationId": "deleteQuestion",
+                "parameters": [
+                    {
+                        "name": "checklist",
+                        "in": "path",
+                        "description": "معرف القائمة",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "question",
+                        "in": "path",
+                        "description": "معرف السؤال",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "تم حذف السؤال بنجاح",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "تم حذف السؤال بنجاح"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "question_text": {
+                                                    "type": "string",
+                                                    "example": "هل المكان نظيف بشكل عام؟"
+                                                },
+                                                "checklist_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "is_active": {
+                                                    "type": "boolean",
+                                                    "example": false
+                                                },
+                                                "deleted_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2026-02-01T12:00:00Z",
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "السؤال غير موجود"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/checklists/{checklist}/questions/{question}/restore": {
+            "post": {
+                "tags": [
+                    "Questions"
+                ],
+                "summary": "استعادة سؤال محذوف",
+                "description": "استعادة سؤال تم حذفه (حذف ناعم)",
+                "operationId": "restoreQuestion",
+                "parameters": [
+                    {
+                        "name": "checklist",
+                        "in": "path",
+                        "description": "معرف القائمة",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "question",
+                        "in": "path",
+                        "description": "معرف السؤال",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "تم استعادة السؤال بنجاح",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "تم استعادة السؤال بنجاح"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "question_text": {
+                                                    "type": "string",
+                                                    "example": "هل المكان نظيف بشكل عام؟"
+                                                },
+                                                "checklist_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "is_active": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "deleted_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": null,
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "السؤال غير موجود"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/checklists/{checklist}/questions/reorder": {
+            "put": {
+                "tags": [
+                    "Questions"
+                ],
+                "summary": "إعادة ترتيب الأسئلة",
+                "description": "إعادة ترتيب أسئلة قائمة مراجعة",
+                "operationId": "reorderQuestions",
+                "parameters": [
+                    {
+                        "name": "checklist",
+                        "in": "path",
+                        "description": "معرف القائمة",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "questions_order"
+                                ],
+                                "properties": {
+                                    "questions_order": {
+                                        "type": "array",
+                                        "items": {
+                                            "required": [
+                                                "id",
+                                                "sort_order"
+                                            ],
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "sort_order": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "تم إعادة الترتيب بنجاح",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "تم إعادة ترتيب الأسئلة بنجاح"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "بيانات غير صالحة"
                     }
                 },
                 "security": [
@@ -2944,6 +5886,18 @@
         {
             "name": "Branches",
             "description": "إدارة فروع الشركات"
+        },
+        {
+            "name": "Criterias",
+            "description": "إدارة معايير التقيمات"
+        },
+        {
+            "name": "Checklists",
+            "description": "إدارة قوائم المراجعة"
+        },
+        {
+            "name": "Questions",
+            "description": "إدارة اسئلة قوائم المراجعة"
         }
     ]
 }

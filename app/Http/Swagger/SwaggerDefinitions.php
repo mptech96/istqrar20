@@ -41,6 +41,11 @@ use OpenApi\Attributes as OA;
 )]
 
 #[OA\Tag(
+    name: "Criterias",
+    description: "إدارة معايير التقيمات"
+)]
+
+#[OA\Tag(
     name: "Visits",
     description: "إدارة الزيارات والتقييمات"
 )]
@@ -48,6 +53,11 @@ use OpenApi\Attributes as OA;
 #[OA\Tag(
     name: "Checklists",
     description: "إدارة قوائم المراجعة"
+)]
+
+#[OA\Tag(
+    name: "Questions",
+    description: "إدارة اسئلة قوائم المراجعة"
 )]
 
 #[OA\SecurityScheme(
