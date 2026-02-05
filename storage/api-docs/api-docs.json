@@ -5639,6 +5639,2509 @@
                     }
                 }
             }
+        },
+        "/api/v1/visits": {
+            "get": {
+                "tags": [
+                    "Visits"
+                ],
+                "summary": "عرض الزيارات",
+                "description": "استرجاع قائمة الزيارات مع إمكانية الفلترة والترتيب",
+                "operationId": "getVisits",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "رقم الصفحة",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "عدد العناصر في الصفحة",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 15
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "بحث في الملاحظات",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "branch_id",
+                        "in": "query",
+                        "description": "فلتر بمعرف الفرع",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "auditor_id",
+                        "in": "query",
+                        "description": "فلتر بمعرف المراقب",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "checklist_id",
+                        "in": "query",
+                        "description": "فلتر بمعرف قائمة المراجعة",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "فلتر بحالة الزيارة",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "draft",
+                                "scheduled",
+                                "in_progress",
+                                "completed",
+                                "cancelled",
+                                "under_review",
+                                "approved",
+                                "rejected"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "category",
+                        "in": "query",
+                        "description": "فلتر بفئة الزيارة",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "A",
+                                "B",
+                                "C",
+                                "D",
+                                "F"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "from_date",
+                        "in": "query",
+                        "description": "من تاريخ",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "to_date",
+                        "in": "query",
+                        "description": "إلى تاريخ",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "sort_by",
+                        "in": "query",
+                        "description": "ترتيب النتائج حسب",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "created_at",
+                            "enum": [
+                                "scheduled_date",
+                                "visit_date",
+                                "total_score",
+                                "percentage",
+                                "created_at"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "sort_order",
+                        "in": "query",
+                        "description": "اتجاه الترتيب",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "desc",
+                            "enum": [
+                                "asc",
+                                "desc"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "include",
+                        "in": "query",
+                        "description": "العلاقات المطلوب تضمينها",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "branch,auditor,checklist,questions"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "قائمة الزيارات",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "branch_id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "auditor_id": {
+                                                        "type": "integer",
+                                                        "example": 2
+                                                    },
+                                                    "checklist_id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "scheduled_date": {
+                                                        "type": "string",
+                                                        "format": "date",
+                                                        "example": "2026-02-10"
+                                                    },
+                                                    "scheduled_time": {
+                                                        "type": "string",
+                                                        "example": "09:00"
+                                                    },
+                                                    "actual_start_time": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": "2026-02-10T09:05:00Z"
+                                                    },
+                                                    "actual_end_time": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": "2026-02-10T10:15:00Z"
+                                                    },
+                                                    "visit_date": {
+                                                        "type": "string",
+                                                        "format": "date",
+                                                        "example": "2026-02-10"
+                                                    },
+                                                    "status": {
+                                                        "type": "string",
+                                                        "example": "completed"
+                                                    },
+                                                    "status_text": {
+                                                        "type": "string",
+                                                        "example": "مكتملة"
+                                                    },
+                                                    "total_score": {
+                                                        "type": "number",
+                                                        "format": "float",
+                                                        "example": 85.5
+                                                    },
+                                                    "percentage": {
+                                                        "type": "number",
+                                                        "format": "float",
+                                                        "example": 85.5
+                                                    },
+                                                    "category": {
+                                                        "type": "string",
+                                                        "example": "B"
+                                                    },
+                                                    "category_text": {
+                                                        "type": "string",
+                                                        "example": "جيد جداً (80% - 89%)"
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": "2026-02-05T10:30:00Z"
+                                                    },
+                                                    "branch": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "name": {
+                                                                "type": "string",
+                                                                "example": "الفرع الرئيسي"
+                                                            },
+                                                            "code": {
+                                                                "type": "string",
+                                                                "example": "BR-001"
+                                                            }
+                                                        },
+                                                        "type": "object",
+                                                        "nullable": true
+                                                    },
+                                                    "auditor": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 2
+                                                            },
+                                                            "name": {
+                                                                "type": "string",
+                                                                "example": "أحمد محمد"
+                                                            },
+                                                            "email": {
+                                                                "type": "string",
+                                                                "example": "ahmed@example.com"
+                                                            }
+                                                        },
+                                                        "type": "object",
+                                                        "nullable": true
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "links": {
+                                            "properties": {
+                                                "first": {
+                                                    "type": "string",
+                                                    "example": "http://example.com/api/v1/visits?page=1"
+                                                },
+                                                "last": {
+                                                    "type": "string",
+                                                    "example": "http://example.com/api/v1/visits?page=5"
+                                                },
+                                                "prev": {
+                                                    "type": "string",
+                                                    "example": "http://example.com/api/v1/visits?page=1",
+                                                    "nullable": true
+                                                },
+                                                "next": {
+                                                    "type": "string",
+                                                    "example": "http://example.com/api/v1/visits?page=3",
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "meta": {
+                                            "properties": {
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "example": 2
+                                                },
+                                                "from": {
+                                                    "type": "integer",
+                                                    "example": 16
+                                                },
+                                                "last_page": {
+                                                    "type": "integer",
+                                                    "example": 5
+                                                },
+                                                "path": {
+                                                    "type": "string",
+                                                    "example": "http://example.com/api/v1/visits"
+                                                },
+                                                "per_page": {
+                                                    "type": "integer",
+                                                    "example": 15
+                                                },
+                                                "to": {
+                                                    "type": "integer",
+                                                    "example": 30
+                                                },
+                                                "total": {
+                                                    "type": "integer",
+                                                    "example": 72
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "غير مصرح به",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "غير مصرح به"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Visits"
+                ],
+                "summary": "إنشاء زيارة جديدة",
+                "description": "إنشاء زيارة جديدة مع تحديد الفرع والمراقب وقائمة المراجعة\n        <br>\n        استخدم نقطة \n        <br>\n        /api/v1/visits/create\n        <br>\n        لعرض بيانات الفروع والمراقبين وقوائم المراجعة\n        ",
+                "operationId": "createVisit",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "branch_id",
+                                    "auditor_id",
+                                    "checklist_id",
+                                    "scheduled_date"
+                                ],
+                                "properties": {
+                                    "branch_id": {
+                                        "description": "معرف الفرع",
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "auditor_id": {
+                                        "description": "معرف المراقب",
+                                        "type": "integer",
+                                        "example": 2
+                                    },
+                                    "checklist_id": {
+                                        "description": "معرف قائمة المراجعة",
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "scheduled_date": {
+                                        "description": "التاريخ المحدد",
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2026-02-10"
+                                    },
+                                    "scheduled_time": {
+                                        "description": "الوقت المحدد",
+                                        "type": "string",
+                                        "format": "time",
+                                        "example": "09:00"
+                                    },
+                                    "estimated_duration": {
+                                        "description": "المدة المقدرة بالدقائق",
+                                        "type": "integer",
+                                        "example": 60
+                                    },
+                                    "internal_notes": {
+                                        "description": "ملاحظات داخلية",
+                                        "type": "string",
+                                        "example": "ملاحظات داخلية للزيارة"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "تم إنشاء الزيارة",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "branch_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "auditor_id": {
+                                                    "type": "integer",
+                                                    "example": 2
+                                                },
+                                                "checklist_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "scheduled_date": {
+                                                    "type": "string",
+                                                    "format": "date",
+                                                    "example": "2026-02-10"
+                                                },
+                                                "scheduled_time": {
+                                                    "type": "string",
+                                                    "example": "09:00"
+                                                },
+                                                "estimated_duration": {
+                                                    "type": "integer",
+                                                    "example": 60
+                                                },
+                                                "status": {
+                                                    "type": "string",
+                                                    "example": "scheduled"
+                                                },
+                                                "status_text": {
+                                                    "type": "string",
+                                                    "example": "مجدولة"
+                                                },
+                                                "max_possible_score": {
+                                                    "type": "integer",
+                                                    "example": 100
+                                                },
+                                                "internal_notes": {
+                                                    "type": "string",
+                                                    "example": "ملاحظات داخلية للزيارة"
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2026-02-05T10:30:00Z"
+                                                },
+                                                "branch": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "name": {
+                                                            "type": "string",
+                                                            "example": "الفرع الرئيسي"
+                                                        },
+                                                        "code": {
+                                                            "type": "string",
+                                                            "example": "BR-001"
+                                                        }
+                                                    },
+                                                    "type": "object",
+                                                    "nullable": true
+                                                },
+                                                "auditor": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer",
+                                                            "example": 2
+                                                        },
+                                                        "name": {
+                                                            "type": "string",
+                                                            "example": "أحمد محمد"
+                                                        },
+                                                        "email": {
+                                                            "type": "string",
+                                                            "example": "ahmed@example.com"
+                                                        }
+                                                    },
+                                                    "type": "object",
+                                                    "nullable": true
+                                                },
+                                                "checklist": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "name": {
+                                                            "type": "string",
+                                                            "example": "قائمة مراجعة النظافة"
+                                                        },
+                                                        "code": {
+                                                            "type": "string",
+                                                            "example": "CL-001"
+                                                        },
+                                                        "total_score": {
+                                                            "type": "integer",
+                                                            "example": 100
+                                                        },
+                                                        "passing_score": {
+                                                            "type": "integer",
+                                                            "example": 70
+                                                        }
+                                                    },
+                                                    "type": "object",
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "تم إنشاء الزيارة بنجاح"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "بيانات غير صالحة",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "بيانات غير صالحة"
+                                        },
+                                        "errors": {
+                                            "type": "object",
+                                            "additionalProperties": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "string",
+                                                    "example": "حقل التاريخ المحدد مطلوب"
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "غير مصرح به",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "غير مصرح به"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/visits/calendar": {
+            "get": {
+                "tags": [
+                    "Visits"
+                ],
+                "summary": "عرض زيارات التقويم",
+                "description": "استرجاع الزيارات بصيغة مناسبة للتقويم",
+                "operationId": "getVisitsCalendar",
+                "parameters": [
+                    {
+                        "name": "month",
+                        "in": "query",
+                        "description": "الشهر (YYYY-MM)",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "date",
+                            "example": "2026-02"
+                        }
+                    },
+                    {
+                        "name": "auditor_id",
+                        "in": "query",
+                        "description": "فلتر بمعرف المراقب",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "branch_id",
+                        "in": "query",
+                        "description": "فلتر بمعرف الفرع",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "زيارات التقويم",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "title": {
+                                                        "type": "string",
+                                                        "example": "الفرع الرئيسي - أحمد محمد"
+                                                    },
+                                                    "start": {
+                                                        "type": "string",
+                                                        "example": "2026-02-10T09:00:00"
+                                                    },
+                                                    "end": {
+                                                        "type": "string",
+                                                        "example": "2026-02-10T10:00:00"
+                                                    },
+                                                    "color": {
+                                                        "type": "string",
+                                                        "example": "#3498db"
+                                                    },
+                                                    "extendedProps": {
+                                                        "properties": {
+                                                            "branch_name": {
+                                                                "type": "string",
+                                                                "example": "الفرع الرئيسي"
+                                                            },
+                                                            "auditor_name": {
+                                                                "type": "string",
+                                                                "example": "أحمد محمد"
+                                                            },
+                                                            "checklist_name": {
+                                                                "type": "string",
+                                                                "example": "قائمة مراجعة النظافة"
+                                                            },
+                                                            "status": {
+                                                                "type": "string",
+                                                                "example": "scheduled"
+                                                            },
+                                                            "status_text": {
+                                                                "type": "string",
+                                                                "example": "مجدولة"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "month": {
+                                            "type": "string",
+                                            "example": "2026-02"
+                                        },
+                                        "month_name": {
+                                            "type": "string",
+                                            "example": "فبراير 2026"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "غير مصرح به",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "غير مصرح به"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/visits/create": {
+            "get": {
+                "tags": [
+                    "Visits"
+                ],
+                "summary": "بيانات انشاء زيارة",
+                "description": "عرض الفروع والمراقبين والقوائم",
+                "operationId": "getBranchesAuditorsChecklists",
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "branches": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "name": {
+                                                        "type": "string",
+                                                        "example": "فرع 1"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "auditors": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "name": {
+                                                        "type": "string",
+                                                        "example": "محمد"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "checklists": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "name": {
+                                                        "type": "string",
+                                                        "example": "قائمة 1"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/visits/{visit}": {
+            "get": {
+                "tags": [
+                    "Visits"
+                ],
+                "summary": "عرض تفاصيل زيارة",
+                "description": "استرجاع تفاصيل زيارة معينة مع علاقاتها",
+                "operationId": "getVisit",
+                "parameters": [
+                    {
+                        "name": "visit",
+                        "in": "path",
+                        "description": "معرف الزيارة",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "include",
+                        "in": "query",
+                        "description": "العلاقات المطلوب تضمينها",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "branch,auditor,checklist,questions,attachments"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "تفاصيل الزيارة",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "branch_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "auditor_id": {
+                                                    "type": "integer",
+                                                    "example": 2
+                                                },
+                                                "checklist_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "scheduled_date": {
+                                                    "type": "string",
+                                                    "format": "date",
+                                                    "example": "2026-02-10"
+                                                },
+                                                "scheduled_time": {
+                                                    "type": "string",
+                                                    "example": "09:00"
+                                                },
+                                                "actual_start_time": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2026-02-10T09:05:00Z"
+                                                },
+                                                "actual_end_time": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2026-02-10T10:15:00Z"
+                                                },
+                                                "visit_date": {
+                                                    "type": "string",
+                                                    "format": "date",
+                                                    "example": "2026-02-10"
+                                                },
+                                                "completed_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2026-02-10T10:20:00Z"
+                                                },
+                                                "estimated_duration": {
+                                                    "type": "integer",
+                                                    "example": 60
+                                                },
+                                                "actual_duration": {
+                                                    "type": "integer",
+                                                    "example": 70
+                                                },
+                                                "total_score": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 85.5
+                                                },
+                                                "max_possible_score": {
+                                                    "type": "integer",
+                                                    "example": 100
+                                                },
+                                                "percentage": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 85.5
+                                                },
+                                                "category": {
+                                                    "type": "string",
+                                                    "example": "B"
+                                                },
+                                                "category_text": {
+                                                    "type": "string",
+                                                    "example": "جيد جداً (80% - 89%)"
+                                                },
+                                                "status": {
+                                                    "type": "string",
+                                                    "example": "completed"
+                                                },
+                                                "status_text": {
+                                                    "type": "string",
+                                                    "example": "مكتملة"
+                                                },
+                                                "approved_by": {
+                                                    "type": "integer",
+                                                    "example": 3
+                                                },
+                                                "approved_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2026-02-10T14:30:00Z"
+                                                },
+                                                "rejection_reason": {
+                                                    "type": "string",
+                                                    "example": "سبب الرفض إذا كان موجوداً"
+                                                },
+                                                "auditor_notes": {
+                                                    "type": "string",
+                                                    "example": "ملاحظات المراقب"
+                                                },
+                                                "branch_feedback": {
+                                                    "type": "string",
+                                                    "example": "ملاحظات الفرع"
+                                                },
+                                                "internal_notes": {
+                                                    "type": "string",
+                                                    "example": "ملاحظات داخلية"
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2026-02-05T10:30:00Z"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2026-02-10T14:30:00Z"
+                                                },
+                                                "branch": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "name": {
+                                                            "type": "string",
+                                                            "example": "الفرع الرئيسي"
+                                                        },
+                                                        "code": {
+                                                            "type": "string",
+                                                            "example": "BR-001"
+                                                        },
+                                                        "address": {
+                                                            "type": "string",
+                                                            "example": "شارع الملك فهد، الرياض"
+                                                        },
+                                                        "phone": {
+                                                            "type": "string",
+                                                            "example": "+966112345678"
+                                                        },
+                                                        "email": {
+                                                            "type": "string",
+                                                            "example": "main@branch.com"
+                                                        },
+                                                        "manager_name": {
+                                                            "type": "string",
+                                                            "example": "محمد أحمد"
+                                                        }
+                                                    },
+                                                    "type": "object",
+                                                    "nullable": true
+                                                },
+                                                "auditor": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer",
+                                                            "example": 2
+                                                        },
+                                                        "name": {
+                                                            "type": "string",
+                                                            "example": "أحمد محمد"
+                                                        },
+                                                        "email": {
+                                                            "type": "string",
+                                                            "example": "ahmed@example.com"
+                                                        },
+                                                        "phone": {
+                                                            "type": "string",
+                                                            "example": "+966501234567"
+                                                        },
+                                                        "role": {
+                                                            "type": "string",
+                                                            "example": "مراقب"
+                                                        },
+                                                        "department": {
+                                                            "type": "string",
+                                                            "example": "مراقبة الجودة"
+                                                        }
+                                                    },
+                                                    "type": "object",
+                                                    "nullable": true
+                                                },
+                                                "checklist": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "name": {
+                                                            "type": "string",
+                                                            "example": "قائمة مراجعة النظافة"
+                                                        },
+                                                        "code": {
+                                                            "type": "string",
+                                                            "example": "CL-001"
+                                                        },
+                                                        "description": {
+                                                            "type": "string",
+                                                            "example": "قائمة مراجعة شاملة للنظافة"
+                                                        },
+                                                        "total_score": {
+                                                            "type": "integer",
+                                                            "example": 100
+                                                        },
+                                                        "passing_score": {
+                                                            "type": "integer",
+                                                            "example": 70
+                                                        },
+                                                        "time_estimate": {
+                                                            "type": "integer",
+                                                            "example": 60
+                                                        },
+                                                        "is_active": {
+                                                            "type": "boolean",
+                                                            "example": true
+                                                        }
+                                                    },
+                                                    "type": "object",
+                                                    "nullable": true
+                                                },
+                                                "approver": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer",
+                                                            "example": 3
+                                                        },
+                                                        "name": {
+                                                            "type": "string",
+                                                            "example": "سالم علي"
+                                                        },
+                                                        "email": {
+                                                            "type": "string",
+                                                            "example": "salem@example.com"
+                                                        },
+                                                        "role": {
+                                                            "type": "string",
+                                                            "example": "مشرف"
+                                                        }
+                                                    },
+                                                    "type": "object",
+                                                    "nullable": true
+                                                },
+                                                "questions": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "question_text": {
+                                                                "type": "string",
+                                                                "example": "هل المكان نظيف بشكل عام؟"
+                                                            },
+                                                            "type": {
+                                                                "type": "string",
+                                                                "example": "yes_no"
+                                                            },
+                                                            "weight": {
+                                                                "type": "integer",
+                                                                "example": 5
+                                                            },
+                                                            "max_score": {
+                                                                "type": "integer",
+                                                                "example": 10
+                                                            },
+                                                            "is_required": {
+                                                                "type": "boolean",
+                                                                "example": true
+                                                            },
+                                                            "is_critical": {
+                                                                "type": "boolean",
+                                                                "example": false
+                                                            },
+                                                            "sort_order": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "created_at": {
+                                                                "type": "string",
+                                                                "format": "date-time"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    },
+                                                    "nullable": true
+                                                },
+                                                "attachments": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "original_name": {
+                                                                "type": "string",
+                                                                "example": "صورة_الفرع.jpg"
+                                                            },
+                                                            "file_url": {
+                                                                "type": "string",
+                                                                "example": "http://example.com/storage/attachments/uuid.jpg"
+                                                            },
+                                                            "file_type": {
+                                                                "type": "string",
+                                                                "example": "image"
+                                                            },
+                                                            "file_type_label": {
+                                                                "type": "string",
+                                                                "example": "صورة"
+                                                            },
+                                                            "file_size": {
+                                                                "type": "integer",
+                                                                "example": 2048576
+                                                            },
+                                                            "title": {
+                                                                "type": "string",
+                                                                "example": "صورة للفرع الرئيسي"
+                                                            },
+                                                            "description": {
+                                                                "type": "string",
+                                                                "example": "صورة توضح حالة الفرع"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    },
+                                                    "nullable": true
+                                                },
+                                                "answers_count": {
+                                                    "type": "integer",
+                                                    "example": 15
+                                                },
+                                                "completed_answers_count": {
+                                                    "type": "integer",
+                                                    "example": 15
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "الزيارة غير موجودة",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "الزيارة غير موجودة"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "غير مصرح به",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "غير مصرح به"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Visits"
+                ],
+                "summary": "تحديث بيانات زيارة",
+                "description": "تحديث بيانات زيارة موجودة",
+                "operationId": "updateVisit",
+                "parameters": [
+                    {
+                        "name": "visit",
+                        "in": "path",
+                        "description": "معرف الزيارة",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "scheduled_date": {
+                                        "description": "التاريخ المحدد",
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2026-02-12"
+                                    },
+                                    "scheduled_time": {
+                                        "description": "الوقت المحدد",
+                                        "type": "string",
+                                        "format": "time",
+                                        "example": "10:00"
+                                    },
+                                    "estimated_duration": {
+                                        "description": "المدة المقدرة بالدقائق",
+                                        "type": "integer",
+                                        "example": 75
+                                    },
+                                    "auditor_notes": {
+                                        "description": "ملاحظات المراقب",
+                                        "type": "string",
+                                        "example": "ملاحظات المراقب المحدثة"
+                                    },
+                                    "branch_feedback": {
+                                        "description": "ملاحظات الفرع",
+                                        "type": "string",
+                                        "example": "ملاحظات الفرع المحدثة"
+                                    },
+                                    "internal_notes": {
+                                        "description": "ملاحظات داخلية",
+                                        "type": "string",
+                                        "example": "ملاحظات داخلية محدثة"
+                                    },
+                                    "status": {
+                                        "description": "حالة الزيارة",
+                                        "type": "string",
+                                        "enum": [
+                                            "draft",
+                                            "scheduled",
+                                            "in_progress",
+                                            "completed",
+                                            "cancelled",
+                                            "under_review",
+                                            "approved",
+                                            "rejected"
+                                        ],
+                                        "example": "under_review"
+                                    },
+                                    "rejection_reason": {
+                                        "description": "سبب الرفض",
+                                        "type": "string",
+                                        "example": "سبب الرفض"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "تم تحديث الزيارة",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "branch_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "auditor_id": {
+                                                    "type": "integer",
+                                                    "example": 2
+                                                },
+                                                "checklist_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "scheduled_date": {
+                                                    "type": "string",
+                                                    "format": "date",
+                                                    "example": "2026-02-12"
+                                                },
+                                                "scheduled_time": {
+                                                    "type": "string",
+                                                    "example": "10:00"
+                                                },
+                                                "status": {
+                                                    "type": "string",
+                                                    "example": "under_review"
+                                                },
+                                                "status_text": {
+                                                    "type": "string",
+                                                    "example": "قيد المراجعة"
+                                                },
+                                                "total_score": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 90
+                                                },
+                                                "percentage": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 90
+                                                },
+                                                "category": {
+                                                    "type": "string",
+                                                    "example": "A"
+                                                },
+                                                "category_text": {
+                                                    "type": "string",
+                                                    "example": "ممتاز (90% فما فوق)"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2026-02-05T14:45:00Z"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "تم تحديث الزيارة بنجاح"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "الزيارة غير موجودة",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "الزيارة غير موجودة"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "بيانات غير صالحة",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "بيانات غير صالحة"
+                                        },
+                                        "errors": {
+                                            "type": "object",
+                                            "additionalProperties": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "string",
+                                                    "example": "حقل الحالة غير صالح"
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "غير مصرح به",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "غير مصرح به"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Visits"
+                ],
+                "summary": "حذف زيارة",
+                "description": "حذف زيارة (حذف ناعم)",
+                "operationId": "deleteVisit",
+                "parameters": [
+                    {
+                        "name": "visit",
+                        "in": "path",
+                        "description": "معرف الزيارة",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "تم حذف الزيارة",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "branch_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "auditor_id": {
+                                                    "type": "integer",
+                                                    "example": 2
+                                                },
+                                                "status": {
+                                                    "type": "string",
+                                                    "example": "cancelled"
+                                                },
+                                                "status_text": {
+                                                    "type": "string",
+                                                    "example": "ملغاة"
+                                                },
+                                                "deleted_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2026-02-05T15:00:00Z"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "تم حذف الزيارة بنجاح"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "الزيارة غير موجودة",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "الزيارة غير موجودة"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "غير مصرح به",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "غير مصرح به"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/visits/{visit}/restore": {
+            "post": {
+                "tags": [
+                    "Visits"
+                ],
+                "summary": "استعادة زيارة محذوفة",
+                "description": "استعادة زيارة تم حذفها (حذف ناعم)",
+                "operationId": "restoreVisit",
+                "parameters": [
+                    {
+                        "name": "visit",
+                        "in": "path",
+                        "description": "معرف الزيارة",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "تم استعادة الزيارة",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "branch_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "auditor_id": {
+                                                    "type": "integer",
+                                                    "example": 2
+                                                },
+                                                "status": {
+                                                    "type": "string",
+                                                    "example": "scheduled"
+                                                },
+                                                "status_text": {
+                                                    "type": "string",
+                                                    "example": "مجدولة"
+                                                },
+                                                "deleted_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": null
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "تم استعادة الزيارة بنجاح"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "الزيارة غير موجودة",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "الزيارة غير موجودة"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "غير مصرح به",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "غير مصرح به"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/visits/{visit}/start": {
+            "post": {
+                "tags": [
+                    "Visits"
+                ],
+                "summary": "بدء الزيارة",
+                "description": "تسجيل وقت بدء الزيارة الفعلي",
+                "operationId": "startVisit",
+                "parameters": [
+                    {
+                        "name": "visit",
+                        "in": "path",
+                        "description": "معرف الزيارة",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "تم بدء الزيارة",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "status": {
+                                                    "type": "string",
+                                                    "example": "in_progress"
+                                                },
+                                                "status_text": {
+                                                    "type": "string",
+                                                    "example": "قيد التنفيذ"
+                                                },
+                                                "actual_start_time": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2026-02-10T09:05:00Z"
+                                                },
+                                                "visit_date": {
+                                                    "type": "string",
+                                                    "format": "date",
+                                                    "example": "2026-02-10"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2026-02-10T09:05:00Z"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "تم بدء الزيارة بنجاح"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "لا يمكن بدء الزيارة",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "لا يمكن بدء الزيارة في حالتها الحالية"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "الزيارة غير موجودة",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "الزيارة غير موجودة"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "غير مصرح به",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "غير مصرح به"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/visits/{visit}/complete": {
+            "post": {
+                "tags": [
+                    "Visits"
+                ],
+                "summary": "إنهاء الزيارة",
+                "description": "تسجيل وقت انتهاء الزيارة وحساب المدة الفعلية",
+                "operationId": "completeVisit",
+                "parameters": [
+                    {
+                        "name": "visit",
+                        "in": "path",
+                        "description": "معرف الزيارة",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "auditor_notes": {
+                                        "description": "ملاحظات المراقب",
+                                        "type": "string",
+                                        "example": "تمت الزيارة بنجاح"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "تم إنهاء الزيارة",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "status": {
+                                                    "type": "string",
+                                                    "example": "completed"
+                                                },
+                                                "status_text": {
+                                                    "type": "string",
+                                                    "example": "مكتملة"
+                                                },
+                                                "actual_end_time": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2026-02-10T10:15:00Z"
+                                                },
+                                                "completed_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2026-02-10T10:15:00Z"
+                                                },
+                                                "actual_duration": {
+                                                    "type": "integer",
+                                                    "example": 70
+                                                },
+                                                "total_score": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 85.5
+                                                },
+                                                "percentage": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 85.5
+                                                },
+                                                "category": {
+                                                    "type": "string",
+                                                    "example": "B"
+                                                },
+                                                "category_text": {
+                                                    "type": "string",
+                                                    "example": "جيد جداً (80% - 89%)"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2026-02-10T10:15:00Z"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "تم إنهاء الزيارة بنجاح"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "لا يمكن إنهاء الزيارة",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "لا يمكن إنهاء الزيارة إلا إذا كانت قيد التنفيذ"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "الزيارة غير موجودة",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "الزيارة غير موجودة"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "بيانات غير صالحة",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "بيانات غير صالحة"
+                                        },
+                                        "errors": {
+                                            "type": "object",
+                                            "additionalProperties": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "string",
+                                                    "example": "حقل الفئة غير صالح"
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "غير مصرح به",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "غير مصرح به"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/visits/auditor/{auditorId}": {
+            "get": {
+                "tags": [
+                    "Visits"
+                ],
+                "summary": "عرض زيارات مراقب",
+                "description": "استرجاع جميع زيارات مراقب معين مع إحصائيات",
+                "operationId": "getAuditorVisits",
+                "parameters": [
+                    {
+                        "name": "auditorId",
+                        "in": "path",
+                        "description": "معرف المراقب",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 2
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "فلتر بحالة الزيارة",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "draft",
+                                "scheduled",
+                                "in_progress",
+                                "completed",
+                                "cancelled",
+                                "under_review",
+                                "approved",
+                                "rejected"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "from_date",
+                        "in": "query",
+                        "description": "من تاريخ",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "to_date",
+                        "in": "query",
+                        "description": "إلى تاريخ",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "زيارات المراقب",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "branch_id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "checklist_id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "scheduled_date": {
+                                                        "type": "string",
+                                                        "format": "date",
+                                                        "example": "2026-02-10"
+                                                    },
+                                                    "status": {
+                                                        "type": "string",
+                                                        "example": "completed"
+                                                    },
+                                                    "status_text": {
+                                                        "type": "string",
+                                                        "example": "مكتملة"
+                                                    },
+                                                    "total_score": {
+                                                        "type": "number",
+                                                        "format": "float",
+                                                        "example": 85.5
+                                                    },
+                                                    "percentage": {
+                                                        "type": "number",
+                                                        "format": "float",
+                                                        "example": 85.5
+                                                    },
+                                                    "category": {
+                                                        "type": "string",
+                                                        "example": "B"
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": "2026-02-05T10:30:00Z"
+                                                    },
+                                                    "branch": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "name": {
+                                                                "type": "string",
+                                                                "example": "الفرع الرئيسي"
+                                                            },
+                                                            "code": {
+                                                                "type": "string",
+                                                                "example": "BR-001"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    },
+                                                    "checklist": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "name": {
+                                                                "type": "string",
+                                                                "example": "قائمة مراجعة النظافة"
+                                                            },
+                                                            "code": {
+                                                                "type": "string",
+                                                                "example": "CL-001"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "auditor": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 2
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "أحمد محمد"
+                                                },
+                                                "email": {
+                                                    "type": "string",
+                                                    "example": "ahmed@example.com"
+                                                },
+                                                "phone": {
+                                                    "type": "string",
+                                                    "example": "+966501234567"
+                                                },
+                                                "role": {
+                                                    "type": "string",
+                                                    "example": "مراقب"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "statistics": {
+                                            "properties": {
+                                                "total_visits": {
+                                                    "type": "integer",
+                                                    "example": 25
+                                                },
+                                                "completed_visits": {
+                                                    "type": "integer",
+                                                    "example": 15
+                                                },
+                                                "in_progress_visits": {
+                                                    "type": "integer",
+                                                    "example": 3
+                                                },
+                                                "scheduled_visits": {
+                                                    "type": "integer",
+                                                    "example": 5
+                                                },
+                                                "cancelled_visits": {
+                                                    "type": "integer",
+                                                    "example": 2
+                                                },
+                                                "average_score": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 82.5
+                                                },
+                                                "average_percentage": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 82.5
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "المراقب غير موجود",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "المراقب غير موجود"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "غير مصرح به",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "غير مصرح به"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/visits/branch/{branchId}": {
+            "get": {
+                "tags": [
+                    "Visits"
+                ],
+                "summary": "عرض زيارات فرع",
+                "description": "استرجاع جميع زيارات فرع معين مع إحصائيات",
+                "operationId": "getBranchVisits",
+                "parameters": [
+                    {
+                        "name": "branchId",
+                        "in": "path",
+                        "description": "معرف الفرع",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "فلتر بحالة الزيارة",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "draft",
+                                "scheduled",
+                                "in_progress",
+                                "completed",
+                                "cancelled",
+                                "under_review",
+                                "approved",
+                                "rejected"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "from_date",
+                        "in": "query",
+                        "description": "من تاريخ",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "to_date",
+                        "in": "query",
+                        "description": "إلى تاريخ",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "زيارات الفرع",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "auditor_id": {
+                                                        "type": "integer",
+                                                        "example": 2
+                                                    },
+                                                    "checklist_id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "scheduled_date": {
+                                                        "type": "string",
+                                                        "format": "date",
+                                                        "example": "2026-02-10"
+                                                    },
+                                                    "status": {
+                                                        "type": "string",
+                                                        "example": "completed"
+                                                    },
+                                                    "status_text": {
+                                                        "type": "string",
+                                                        "example": "مكتملة"
+                                                    },
+                                                    "total_score": {
+                                                        "type": "number",
+                                                        "format": "float",
+                                                        "example": 85.5
+                                                    },
+                                                    "percentage": {
+                                                        "type": "number",
+                                                        "format": "float",
+                                                        "example": 85.5
+                                                    },
+                                                    "category": {
+                                                        "type": "string",
+                                                        "example": "B"
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": "2026-02-05T10:30:00Z"
+                                                    },
+                                                    "auditor": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 2
+                                                            },
+                                                            "name": {
+                                                                "type": "string",
+                                                                "example": "أحمد محمد"
+                                                            },
+                                                            "email": {
+                                                                "type": "string",
+                                                                "example": "ahmed@example.com"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    },
+                                                    "checklist": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "name": {
+                                                                "type": "string",
+                                                                "example": "قائمة مراجعة النظافة"
+                                                            },
+                                                            "code": {
+                                                                "type": "string",
+                                                                "example": "CL-001"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "branch": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "الفرع الرئيسي"
+                                                },
+                                                "code": {
+                                                    "type": "string",
+                                                    "example": "BR-001"
+                                                },
+                                                "address": {
+                                                    "type": "string",
+                                                    "example": "شارع الملك فهد، الرياض"
+                                                },
+                                                "phone": {
+                                                    "type": "string",
+                                                    "example": "+966112345678"
+                                                },
+                                                "email": {
+                                                    "type": "string",
+                                                    "example": "main@branch.com"
+                                                },
+                                                "manager_name": {
+                                                    "type": "string",
+                                                    "example": "محمد أحمد"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "statistics": {
+                                            "properties": {
+                                                "total_visits": {
+                                                    "type": "integer",
+                                                    "example": 42
+                                                },
+                                                "average_score": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 78.3
+                                                },
+                                                "average_percentage": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 78.3
+                                                },
+                                                "category_distribution": {
+                                                    "properties": {
+                                                        "A": {
+                                                            "type": "integer",
+                                                            "example": 8
+                                                        },
+                                                        "B": {
+                                                            "type": "integer",
+                                                            "example": 15
+                                                        },
+                                                        "C": {
+                                                            "type": "integer",
+                                                            "example": 12
+                                                        },
+                                                        "D": {
+                                                            "type": "integer",
+                                                            "example": 5
+                                                        },
+                                                        "F": {
+                                                            "type": "integer",
+                                                            "example": 2
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "status_distribution": {
+                                                    "properties": {
+                                                        "completed": {
+                                                            "type": "integer",
+                                                            "example": 25
+                                                        },
+                                                        "in_progress": {
+                                                            "type": "integer",
+                                                            "example": 5
+                                                        },
+                                                        "scheduled": {
+                                                            "type": "integer",
+                                                            "example": 8
+                                                        },
+                                                        "approved": {
+                                                            "type": "integer",
+                                                            "example": 20
+                                                        },
+                                                        "rejected": {
+                                                            "type": "integer",
+                                                            "example": 3
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "الفرع غير موجود",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "الفرع غير موجود"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "غير مصرح به",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "غير مصرح به"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "tags": [
@@ -5669,6 +8172,10 @@
         {
             "name": "Questions",
             "description": "إدارة اسئلة قوائم المراجعة"
+        },
+        {
+            "name": "Visits",
+            "description": "إدارة الزيارات والتقييمات"
         }
     ]
 }

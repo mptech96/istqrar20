@@ -46,11 +46,6 @@ use OpenApi\Attributes as OA;
 )]
 
 #[OA\Tag(
-    name: "Visits",
-    description: "إدارة الزيارات والتقييمات"
-)]
-
-#[OA\Tag(
     name: "Checklists",
     description: "إدارة قوائم المراجعة"
 )]
@@ -59,6 +54,7 @@ use OpenApi\Attributes as OA;
     name: "Questions",
     description: "إدارة اسئلة قوائم المراجعة"
 )]
+
 /*
 #[OA\SecurityScheme(
     securityScheme: "bearerAuth",
@@ -67,4 +63,15 @@ use OpenApi\Attributes as OA;
     bearerFormat: "JWT"
 )]
 */
+
+#[OA\Tag(
+    name: "Visits",
+    description: "إدارة الزيارات والتقييمات"
+)]
+
+#[OA\Tag(
+    name: "Answers",
+    description: "إدارة اجابات اسئلة الزيارة"
+)]
+
 class SwaggerDefinitions{}

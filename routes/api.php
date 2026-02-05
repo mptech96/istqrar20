@@ -90,6 +90,30 @@ Route::namespace('App\Http\Controllers\V1')->group(function (){
             
         });
         
+        
+        Route::prefix('visits')->controller(VisitController::class)->group(function () {
+            Route::get('/', 'index');
+            Route::get('/calendar', 'calendar');
+            Route::get('/create', 'create');
+            Route::post('', 'store');
+            Route::put('/{visit}', 'update');
+            Route::get('/{visit}', 'show');
+            Route::delete('/{visit}', 'destroy');
+            Route::post('/{id}/restore', 'restore');
+            Route::post('/{visit}/start', 'start');
+            Route::get('auditor/{auditorId}', 'auditorVisits');
+            Route::get('branch/{branchId}', 'branchVisits');
+            Route::post('/{visit}/complete', 'complete');
+            //Route::get('/{visit}/statistics', 'statistics');
+            
+            Route::prefix('{visit}/questions')->group(function () {
+                Route::get('', 'questions');
+            });
+
+            
+        });
+
+        
         Route::get('/docs', function () {
             return redirect('/api/v1/documentation');
         });
