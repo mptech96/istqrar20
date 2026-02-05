@@ -8,6 +8,7 @@ use App\Models\V1\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use OpenApi\Attributes as OA;
+use Illuminate\Support\Facades\Cookie;
 
 class AuthController extends Controller
 {
@@ -77,22 +78,34 @@ class AuthController extends Controller
                 'email' => ['الحساب غير نشط.']
             ]);
         }
-
+        
+        $user->tokens()->delete();
+        
         $user->update([
             'last_login_at' => now(),
             'last_login_ip' => $request->ip()
         ]);
 
-        $token = $user->createToken("user-login")->plainTextToken;
+        $token = $user->createToken("auth_token")->plainTextToken;
 
         return response()->json([
             'success' => true,
             'data' => [
                 'user' => $user,
-                'token' => $token
+                //'token' => $token
             ],
             'message' => 'تم تسجيل الدخول بنجاح'
-        ]);
+        ])->withCookie(Cookie::make(
+                'auth_token',
+                encrypt($token),
+                60 * 24, // يوم واحد
+                null,    // path
+                null,    // domain
+                true,    // secure (HTTPS only)
+                true,    // httpOnly
+                false,   // raw
+                'strict' // sameSite
+            ));
     }
 
     // ------------------------ LOGOUT ------------------------
@@ -101,19 +114,20 @@ class AuthController extends Controller
         summary: "تسجيل الخروج",
         description: "إلغاء token المستخدم الحالي",
         tags: ["Authentication"],
-        security: [["bearerAuth" => []]],
+        security: [['bearerAuth' => []]],
         responses: [
             new OA\Response(response: 200, description: "تم تسجيل الخروج بنجاح")
         ]
     )]
     public function logout(Request $request)
     {
-        $request->user()->currentAccessToken()->delete();
-
+        $cookie = Cookie::forget('auth_token');
+        $request->user()->tokens()->delete();
         return response()->json([
             'success' => true,
             'message' => 'تم تسجيل الخروج بنجاح'
-        ]);
+        ])->withCookie($cookie);
+        //$request->user()->currentAccessToken()->delete();
     }
 
     // ------------------------ ME ------------------------
@@ -122,7 +136,7 @@ class AuthController extends Controller
         summary: "بيانات المستخدم الحالي",
         description: "الحصول على بيانات المستخدم المسجل دخوله",
         tags: ["Authentication"],
-        security: [["bearerAuth" => []]],
+        security: [['bearerAuth' => []]],
         responses: [
             new OA\Response(
                 response: 200,

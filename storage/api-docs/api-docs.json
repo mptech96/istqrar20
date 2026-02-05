@@ -422,12 +422,7 @@
                     "403": {
                         "description": "ممنوع الوصول"
                     }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
+                }
             },
             "post": {
                 "tags": [
@@ -624,12 +619,7 @@
                             }
                         }
                     }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
+                }
             }
         },
         "/api/v1/branches/{branch}": {
@@ -750,12 +740,7 @@
                     "404": {
                         "description": "الفرع غير موجود"
                     }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
+                }
             },
             "put": {
                 "tags": [
@@ -924,12 +909,7 @@
                     "422": {
                         "description": "بيانات غير صالحة"
                     }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
+                }
             },
             "delete": {
                 "tags": [
@@ -1011,12 +991,7 @@
                     "404": {
                         "description": "الفرع غير موجود"
                     }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
+                }
             }
         },
         "/api/v1/branches/{branch}/restore": {
@@ -1090,12 +1065,7 @@
                     "404": {
                         "description": "الفرع غير موجود"
                     }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
+                }
             }
         },
         "/api/v1/checklists": {
@@ -1316,12 +1286,7 @@
                     "401": {
                         "description": "غير مصرح به"
                     }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
+                }
             },
             "post": {
                 "tags": [
@@ -1449,12 +1414,7 @@
                     "422": {
                         "description": "بيانات غير صالحة"
                     }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
+                }
             }
         },
         "/api/v1/checklists/industry-types": {
@@ -1485,12 +1445,7 @@
                             }
                         }
                     }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
+                }
             }
         },
         "/api/v1/checklists/{checklist}": {
@@ -1596,12 +1551,7 @@
                     "404": {
                         "description": "القائمة غير موجودة"
                     }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
+                }
             },
             "put": {
                 "tags": [
@@ -1739,12 +1689,7 @@
                     "422": {
                         "description": "بيانات غير صالحة"
                     }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
+                }
             },
             "delete": {
                 "tags": [
@@ -1822,12 +1767,7 @@
                     "404": {
                         "description": "القائمة غير موجودة"
                     }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
+                }
             }
         },
         "/api/v1/checklists/{checklist}/restore": {
@@ -1897,12 +1837,7 @@
                     "404": {
                         "description": "القائمة غير موجودة"
                     }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
+                }
             }
         },
         "/api/v1/checklists/{checklist}/duplicate": {
@@ -1990,12 +1925,7 @@
                     "404": {
                         "description": "القائمة الأصلية غير موجودة"
                     }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
+                }
             }
         },
         "/api/v1/checklists/{checklist}/statistics": {
@@ -2065,12 +1995,7 @@
                     "404": {
                         "description": "القائمة غير موجودة"
                     }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
+                }
             }
         },
         "/api/v1/companies": {
@@ -2281,12 +2206,7 @@
                     "403": {
                         "description": "ممنوع الوصول"
                     }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
+                }
             },
             "post": {
                 "tags": [
@@ -2504,12 +2424,7 @@
                             }
                         }
                     }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
+                }
             }
         },
         "/api/v1/companies/{company}": {
@@ -2625,12 +2540,7 @@
                     "404": {
                         "description": "الشركة غير موجودة"
                     }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
+                }
             },
             "put": {
                 "tags": [
@@ -2779,12 +2689,7 @@
                     "404": {
                         "description": "الشركة غير موجودة"
                     }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
+                }
             },
             "delete": {
                 "tags": [
@@ -2866,12 +2771,7 @@
                     "404": {
                         "description": "الشركة غير موجودة"
                     }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
+                }
             }
         },
         "/api/v1/companies/{company}/restore": {
@@ -2945,12 +2845,7 @@
                     "404": {
                         "description": "الشركة غير موجودة"
                     }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
+                }
             }
         },
         "/api/v1/criterias": {
@@ -3154,12 +3049,7 @@
                     "403": {
                         "description": "ممنوع الوصول"
                     }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
+                }
             },
             "post": {
                 "tags": [
@@ -3356,12 +3246,7 @@
                             }
                         }
                     }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
+                }
             }
         },
         "/api/v1/criterias/categories": {
@@ -3391,12 +3276,7 @@
                             }
                         }
                     }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
+                }
             }
         },
         "/api/v1/criterias/{criteria}": {
@@ -3519,12 +3399,7 @@
                     "404": {
                         "description": "المعيار غير موجود"
                     }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
+                }
             },
             "put": {
                 "tags": [
@@ -3673,12 +3548,7 @@
                     "422": {
                         "description": "بيانات غير صالحة"
                     }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
+                }
             },
             "delete": {
                 "tags": [
@@ -3752,12 +3622,7 @@
                     "404": {
                         "description": "المعيار غير موجود"
                     }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
+                }
             }
         },
         "/api/v1/criterias/{criteria}/restore": {
@@ -3823,12 +3688,7 @@
                     "404": {
                         "description": "المعيار غير موجود"
                     }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
+                }
             }
         },
         "/api/v1/criterias/{criteria}/evaluate": {
@@ -3915,12 +3775,7 @@
                     "400": {
                         "description": "الدرجة خارج النطاق"
                     }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
+                }
             }
         },
         "/api/v1/checklists/{checklist}/questions": {
@@ -4080,12 +3935,7 @@
                     "404": {
                         "description": "القائمة غير موجودة"
                     }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
+                }
             },
             "post": {
                 "tags": [
@@ -4276,12 +4126,7 @@
                     "422": {
                         "description": "بيانات غير صالحة"
                     }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
+                }
             }
         },
         "/api/v1/checklists/{checklist}/questions/types": {
@@ -4345,12 +4190,7 @@
                             }
                         }
                     }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
+                }
             }
         },
         "/api/v1/checklists/{checklist}/questions/{question}": {
@@ -4458,12 +4298,7 @@
                     "404": {
                         "description": "السؤال غير موجود"
                     }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
+                }
             },
             "put": {
                 "tags": [
@@ -4661,12 +4496,7 @@
                     "422": {
                         "description": "بيانات غير صالحة"
                     }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
+                }
             },
             "delete": {
                 "tags": [
@@ -4744,12 +4574,7 @@
                     "404": {
                         "description": "السؤال غير موجود"
                     }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
+                }
             }
         },
         "/api/v1/checklists/{checklist}/questions/{question}/restore": {
@@ -4829,12 +4654,7 @@
                     "404": {
                         "description": "السؤال غير موجود"
                     }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
+                }
             }
         },
         "/api/v1/checklists/{checklist}/questions/reorder": {
@@ -4912,12 +4732,7 @@
                     "422": {
                         "description": "بيانات غير صالحة"
                     }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
+                }
             }
         },
         "/api/v1/users": {
@@ -5138,12 +4953,7 @@
                     "403": {
                         "description": "ممنوع الوصول"
                     }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
+                }
             },
             "post": {
                 "tags": [
@@ -5338,12 +5148,7 @@
                             }
                         }
                     }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
+                }
             }
         },
         "/api/v1/users/{user}": {
@@ -5429,12 +5234,7 @@
                     "404": {
                         "description": "المستخدم غير موجود"
                     }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
+                }
             },
             "put": {
                 "tags": [
@@ -5612,12 +5412,7 @@
                     "422": {
                         "description": "بيانات غير صالحة"
                     }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
+                }
             },
             "delete": {
                 "tags": [
@@ -5699,12 +5494,7 @@
                     "404": {
                         "description": "المستخدم غير موجود"
                     }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
+                }
             }
         },
         "/api/v1/users/{user}/restore": {
@@ -5778,12 +5568,7 @@
                     "404": {
                         "description": "المستخدم غير موجود"
                     }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
+                }
             }
         },
         "/api/v1/users/{user}/documents-expiry": {
@@ -5852,21 +5637,7 @@
                     "400": {
                         "description": "المستخدم ليس مراجعاً"
                     }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            }
-        }
-    },
-    "components": {
-        "securitySchemes": {
-            "bearerAuth": {
-                "type": "http",
-                "bearerFormat": "JWT",
-                "scheme": "bearer"
+                }
             }
         }
     },

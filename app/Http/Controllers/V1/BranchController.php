@@ -22,7 +22,7 @@ class BranchController extends Controller
         summary: 'عرض قائمة الفروع',
         description: 'استرجاع قائمة الفروع مع إمكانية الفلترة والترتيب',
         tags: ['Branches'],
-        security: [['bearerAuth' => []]],
+        //security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(
                 name: 'page',
@@ -219,7 +219,7 @@ class BranchController extends Controller
         summary: 'إنشاء فرع جديد مع مديره',
         description: 'إنشاء فرع جديد مع بيانات مدير الفرع المرتبط به',
         tags: ['Branches'],
-        security: [['bearerAuth' => []]],
+        //security: [['bearerAuth' => []]],
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\MediaType(
@@ -365,7 +365,7 @@ class BranchController extends Controller
         summary: 'عرض تفاصيل فرع',
         description: 'استرجاع تفاصيل فرع معين',
         tags: ['Branches'],
-        security: [['bearerAuth' => []]],
+        //security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(
                 name: 'branch',
@@ -434,7 +434,7 @@ class BranchController extends Controller
         summary: 'تحديث بيانات فرع',
         description: 'تحديث بيانات فرع موجود',
         tags: ['Branches'],
-        security: [['bearerAuth' => []]],
+        //security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(
                 name: 'branch',
@@ -550,7 +550,7 @@ class BranchController extends Controller
         summary: 'حذف فرع',
         description: 'حذف فرع معين (حذف ناعم)',
         tags: ['Branches'],
-        security: [['bearerAuth' => []]],
+        //security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(
                 name: 'branch',
@@ -627,7 +627,7 @@ class BranchController extends Controller
         summary: 'استعادة فرع محذوف',
         description: 'استعادة فرع تم حذفه (حذف ناعم)',
         tags: ['Branches'],
-        security: [['bearerAuth' => []]],
+        //security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(
                 name: 'branch',

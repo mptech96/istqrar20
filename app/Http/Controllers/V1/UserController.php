@@ -23,7 +23,7 @@ class UserController extends Controller
         summary: 'عرض قائمة المستخدمين',
         description: 'استرجاع قائمة المستخدمين مع إمكانية الفلترة والترتيب',
         tags: ['Users'],
-        security: [['bearerAuth' => []]],
+        //security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(
                 name: 'page',
@@ -202,7 +202,7 @@ class UserController extends Controller
         summary: 'إنشاء مستخدم جديد',
         description: 'إنشاء مستخدم جديد في النظام',
         tags: ['Users'],
-        security: [['bearerAuth' => []]],
+        //security: [['bearerAuth' => []]],
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\MediaType(
@@ -377,7 +377,7 @@ class UserController extends Controller
         summary: 'عرض تفاصيل مستخدم',
         description: 'استرجاع تفاصيل مستخدم معين',
         tags: ['Users'],
-        security: [['bearerAuth' => []]],
+        //security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(
                 name: 'user',
@@ -438,7 +438,7 @@ class UserController extends Controller
         summary: 'تحديث بيانات مستخدم',
         description: 'تحديث بيانات مستخدم موجود',
         tags: ['Users'],
-        security: [['bearerAuth' => []]],
+        //security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(
                 name: 'user',
@@ -640,7 +640,7 @@ class UserController extends Controller
         summary: 'حذف مستخدم',
         description: 'حذف مستخدم معين (حذف ناعم)',
         tags: ['Users'],
-        security: [['bearerAuth' => []]],
+        //security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(
                 name: 'user',
@@ -715,7 +715,7 @@ class UserController extends Controller
         summary: 'استعادة مستخدم محذوف',
         description: 'استعادة مستخدم تم حذفه (حذف ناعم)',
         tags: ['Users'],
-        security: [['bearerAuth' => []]],
+        //security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(
                 name: 'user',
@@ -771,7 +771,7 @@ class UserController extends Controller
         summary: 'عرض حالة صلاحية وثائق المراجع',
         description: 'عرض حالة صلاحية وثائق المراجع (شهادة البلدية، رخصة القيادة، الهوية)',
         tags: ['Users'],
-        security: [['bearerAuth' => []]],
+        //security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(
                 name: 'user',

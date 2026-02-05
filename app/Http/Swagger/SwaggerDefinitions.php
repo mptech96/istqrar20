@@ -59,12 +59,12 @@ use OpenApi\Attributes as OA;
     name: "Questions",
     description: "إدارة اسئلة قوائم المراجعة"
 )]
-
+/*
 #[OA\SecurityScheme(
     securityScheme: "bearerAuth",
     type: "http",
     scheme: "bearer",
     bearerFormat: "JWT"
 )]
-
+*/
 class SwaggerDefinitions{}
