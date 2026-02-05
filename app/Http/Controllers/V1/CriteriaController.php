@@ -688,7 +688,7 @@ class CriteriaController extends Controller
         ]);
     }
     
-    #[OA\Get(
+    #[OA\Post(
         path: '/api/v1/criterias/{criteria}/evaluate',
         operationId: 'evaluateCriteriaScore',
         summary: 'تقييم درجة بناء على معيار',

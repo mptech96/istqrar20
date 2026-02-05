@@ -3692,7 +3692,7 @@
             }
         },
         "/api/v1/criterias/{criteria}/evaluate": {
-            "get": {
+            "post": {
                 "tags": [
                     "Criterias"
                 ],
