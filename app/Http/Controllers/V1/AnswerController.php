@@ -351,10 +351,10 @@ class AnswerController extends Controller
             'corrective_deadline' => $request->input('corrective_deadline'),
             'correction_status' => $request->input('corrective_action') ? 'pending' : null,
         ]);
-        $attachments = [];
-        foreach ($request->input('attachments') as $attachment) {
-            //$attachments[] = __saveFile($attachment, base_path('public/uploads/attachments/'));
-        }
+        
+        /*foreach ($request->input('attachments') as $attachment) {
+            //$answer->attachments = __saveFile($attachment, base_path('public/uploads/attachments/'));
+        }*/
             
         $this->updateVisitStatistics($visit);
         
