@@ -55,14 +55,12 @@ use OpenApi\Attributes as OA;
     description: "إدارة اسئلة قوائم المراجعة"
 )]
 
-/*
 #[OA\SecurityScheme(
     securityScheme: "bearerAuth",
     type: "http",
     scheme: "bearer",
     bearerFormat: "JWT"
 )]
-*/
 
 #[OA\Tag(
     name: "Visits",

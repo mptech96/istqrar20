@@ -16,6 +16,1559 @@
         }
     ],
     "paths": {
+        "/api/v1/visits/{visit}/answers": {
+            "get": {
+                "tags": [
+                    "Answers"
+                ],
+                "summary": "عرض إجابات زيارة",
+                "description": "استرجاع جميع إجابات زيارة معينة مع إمكانية الفلترة",
+                "operationId": "getVisitAnswers",
+                "parameters": [
+                    {
+                        "name": "visit",
+                        "in": "path",
+                        "description": "معرف الزيارة",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "correction_status",
+                        "in": "query",
+                        "description": "فلتر بحالة التصحيح",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "pending",
+                                "in_progress",
+                                "completed",
+                                "verified",
+                                "waived"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "include",
+                        "in": "query",
+                        "description": "العلاقات المطلوب تضمينها",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "question,attachments"
+                        }
+                    },
+                    {
+                        "name": "overdue_only",
+                        "in": "query",
+                        "description": "عرض التصحيحات المتأخرة فقط",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "default": false
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "قائمة إجابات الزيارة",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "visit_id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "question_id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "answer_value": {
+                                                        "type": "string",
+                                                        "example": "نعم"
+                                                    },
+                                                    "score": {
+                                                        "type": "number",
+                                                        "format": "float",
+                                                        "example": 10
+                                                    },
+                                                    "max_score": {
+                                                        "type": "integer",
+                                                        "example": 10
+                                                    },
+                                                    "score_percentage": {
+                                                        "type": "number",
+                                                        "format": "float",
+                                                        "example": 100
+                                                    },
+                                                    "is_correct": {
+                                                        "type": "boolean",
+                                                        "example": true
+                                                    },
+                                                    "is_correct_text": {
+                                                        "type": "string",
+                                                        "example": "صحيح"
+                                                    },
+                                                    "comment": {
+                                                        "type": "string",
+                                                        "example": "تعليق على الإجابة"
+                                                    },
+                                                    "auditor_comment": {
+                                                        "type": "string",
+                                                        "example": "ملاحظات المراقب"
+                                                    },
+                                                    "corrective_action": {
+                                                        "type": "string",
+                                                        "example": "تحسين النظافة"
+                                                    },
+                                                    "corrective_deadline": {
+                                                        "type": "string",
+                                                        "format": "date",
+                                                        "example": "2026-02-20"
+                                                    },
+                                                    "correction_status": {
+                                                        "type": "string",
+                                                        "example": "pending"
+                                                    },
+                                                    "correction_status_text": {
+                                                        "type": "string",
+                                                        "example": "قيد الانتظار"
+                                                    },
+                                                    "is_overdue": {
+                                                        "type": "boolean",
+                                                        "example": false
+                                                    },
+                                                    "corrected_at": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": null
+                                                    },
+                                                    "verified_by": {
+                                                        "type": "integer",
+                                                        "example": null
+                                                    },
+                                                    "verified_at": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": null
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": "2026-02-10T09:15:00Z"
+                                                    },
+                                                    "question": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "question_text": {
+                                                                "type": "string",
+                                                                "example": "هل المكان نظيف بشكل عام؟"
+                                                            },
+                                                            "type": {
+                                                                "type": "string",
+                                                                "example": "yes_no"
+                                                            },
+                                                            "type_text": {
+                                                                "type": "string",
+                                                                "example": "نعم/لا"
+                                                            },
+                                                            "weight": {
+                                                                "type": "integer",
+                                                                "example": 5
+                                                            },
+                                                            "is_critical": {
+                                                                "type": "boolean",
+                                                                "example": false
+                                                            },
+                                                            "is_required": {
+                                                                "type": "boolean",
+                                                                "example": true
+                                                            }
+                                                        },
+                                                        "type": "object",
+                                                        "nullable": true
+                                                    },
+                                                    "attachments": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "integer",
+                                                                    "example": 1
+                                                                },
+                                                                "original_name": {
+                                                                    "type": "string",
+                                                                    "example": "صورة.jpg"
+                                                                },
+                                                                "file_url": {
+                                                                    "type": "string",
+                                                                    "example": "http://example.com/storage/attachments/uuid.jpg"
+                                                                },
+                                                                "file_type": {
+                                                                    "type": "string",
+                                                                    "example": "image"
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        },
+                                                        "nullable": true
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "statistics": {
+                                            "properties": {
+                                                "total_answers": {
+                                                    "type": "integer",
+                                                    "example": 15
+                                                },
+                                                "total_score": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 135.5
+                                                },
+                                                "max_possible_score": {
+                                                    "type": "integer",
+                                                    "example": 150
+                                                },
+                                                "average_score": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 9.03
+                                                },
+                                                "corrections_pending": {
+                                                    "type": "integer",
+                                                    "example": 3
+                                                },
+                                                "corrections_overdue": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "الزيارة غير موجودة",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "الزيارة غير موجودة"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "غير مصرح به",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "غير مصرح به"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Answers"
+                ],
+                "summary": "تسجيل إجابة جديدة",
+                "description": "تسجيل إجابة لسؤال في زيارة معينة",
+                "operationId": "createAnswer",
+                "parameters": [
+                    {
+                        "name": "visit",
+                        "in": "path",
+                        "description": "معرف الزيارة",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "question_id",
+                                    "answer_value"
+                                ],
+                                "properties": {
+                                    "question_id": {
+                                        "description": "معرف السؤال",
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "answer_value": {
+                                        "description": "قيمة الإجابة",
+                                        "type": "string",
+                                        "example": "نعم"
+                                    },
+                                    "score": {
+                                        "description": "الدرجة",
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 10
+                                    },
+                                    "comment": {
+                                        "description": "تعليق",
+                                        "type": "string",
+                                        "example": "تعليق على الإجابة"
+                                    },
+                                    "auditor_comment": {
+                                        "description": "تعليق المراقب",
+                                        "type": "string",
+                                        "example": "ملاحظات المراقب"
+                                    },
+                                    "corrective_action": {
+                                        "description": "الإجراء التصحيحي",
+                                        "type": "string",
+                                        "example": "الإجراء التصحيحي"
+                                    },
+                                    "corrective_deadline": {
+                                        "description": "موعد التصحيح",
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2026-02-20"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "تم تسجيل الإجابة",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "visit_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "question_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "answer_value": {
+                                                    "type": "string",
+                                                    "example": "نعم"
+                                                },
+                                                "score": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 10
+                                                },
+                                                "max_score": {
+                                                    "type": "integer",
+                                                    "example": 10
+                                                },
+                                                "is_correct": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "is_correct_text": {
+                                                    "type": "string",
+                                                    "example": "صحيح"
+                                                },
+                                                "comment": {
+                                                    "type": "string",
+                                                    "example": "تعليق على الإجابة"
+                                                },
+                                                "auditor_comment": {
+                                                    "type": "string",
+                                                    "example": "ملاحظات المراقب"
+                                                },
+                                                "corrective_action": {
+                                                    "type": "string",
+                                                    "example": "الإجراء التصحيحي"
+                                                },
+                                                "corrective_deadline": {
+                                                    "type": "string",
+                                                    "format": "date",
+                                                    "example": "2026-02-20"
+                                                },
+                                                "correction_status": {
+                                                    "type": "string",
+                                                    "example": "pending"
+                                                },
+                                                "correction_status_text": {
+                                                    "type": "string",
+                                                    "example": "قيد الانتظار"
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2026-02-10T09:15:00Z"
+                                                },
+                                                "question": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "question_text": {
+                                                            "type": "string",
+                                                            "example": "هل المكان نظيف بشكل عام؟"
+                                                        },
+                                                        "type": {
+                                                            "type": "string",
+                                                            "example": "yes_no"
+                                                        },
+                                                        "type_text": {
+                                                            "type": "string",
+                                                            "example": "نعم/لا"
+                                                        },
+                                                        "max_score": {
+                                                            "type": "integer",
+                                                            "example": 10
+                                                        },
+                                                        "weight": {
+                                                            "type": "integer",
+                                                            "example": 5
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "تم تسجيل الإجابة بنجاح"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "بيانات غير صالحة",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "بيانات غير صالحة"
+                                        },
+                                        "errors": {
+                                            "type": "object",
+                                            "additionalProperties": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "string",
+                                                    "example": "حقل قيمة الإجابة مطلوب"
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "الزيارة أو السؤال غير موجود",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "الزيارة غير موجودة"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "غير مصرح به",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "غير مصرح به"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/visits/{visit}/answers/{answer}": {
+            "get": {
+                "tags": [
+                    "Answers"
+                ],
+                "summary": "عرض تفاصيل إجابة",
+                "description": "استرجاع تفاصيل إجابة معينة مع علاقاتها",
+                "operationId": "getAnswer",
+                "parameters": [
+                    {
+                        "name": "visit",
+                        "in": "path",
+                        "description": "معرف الزيارة",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "answer",
+                        "in": "path",
+                        "description": "معرف الإجابة",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "include",
+                        "in": "query",
+                        "description": "العلاقات المطلوب تضمينها",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "question,attachments,verifier"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "تفاصيل الإجابة",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "visit_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "question_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "answer_value": {
+                                                    "type": "string",
+                                                    "example": "نعم"
+                                                },
+                                                "score": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 10
+                                                },
+                                                "max_score": {
+                                                    "type": "integer",
+                                                    "example": 10
+                                                },
+                                                "score_percentage": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 100
+                                                },
+                                                "is_correct": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "is_correct_text": {
+                                                    "type": "string",
+                                                    "example": "صحيح"
+                                                },
+                                                "comment": {
+                                                    "type": "string",
+                                                    "example": "تعليق على الإجابة"
+                                                },
+                                                "auditor_comment": {
+                                                    "type": "string",
+                                                    "example": "ملاحظات المراقب"
+                                                },
+                                                "corrective_action": {
+                                                    "type": "string",
+                                                    "example": "تحسين النظافة"
+                                                },
+                                                "corrective_deadline": {
+                                                    "type": "string",
+                                                    "format": "date",
+                                                    "example": "2026-02-20"
+                                                },
+                                                "is_overdue": {
+                                                    "type": "boolean",
+                                                    "example": false
+                                                },
+                                                "correction_status": {
+                                                    "type": "string",
+                                                    "example": "pending"
+                                                },
+                                                "correction_status_text": {
+                                                    "type": "string",
+                                                    "example": "قيد الانتظار"
+                                                },
+                                                "corrected_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": null
+                                                },
+                                                "verified_by": {
+                                                    "type": "integer",
+                                                    "example": null
+                                                },
+                                                "verified_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": null
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2026-02-10T09:15:00Z"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2026-02-10T09:15:00Z"
+                                                },
+                                                "question": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "question_text": {
+                                                            "type": "string",
+                                                            "example": "هل المكان نظيف بشكل عام؟"
+                                                        },
+                                                        "description": {
+                                                            "type": "string",
+                                                            "example": "تقييم النظافة العامة للمكان"
+                                                        },
+                                                        "help_text": {
+                                                            "type": "string",
+                                                            "example": "ركز على النظافة العامة وليس التفاصيل"
+                                                        },
+                                                        "type": {
+                                                            "type": "string",
+                                                            "example": "yes_no"
+                                                        },
+                                                        "type_text": {
+                                                            "type": "string",
+                                                            "example": "نعم/لا"
+                                                        },
+                                                        "weight": {
+                                                            "type": "integer",
+                                                            "example": 5
+                                                        },
+                                                        "max_score": {
+                                                            "type": "integer",
+                                                            "example": 10
+                                                        },
+                                                        "passing_score": {
+                                                            "type": "integer",
+                                                            "example": 6
+                                                        },
+                                                        "is_required": {
+                                                            "type": "boolean",
+                                                            "example": true
+                                                        },
+                                                        "is_critical": {
+                                                            "type": "boolean",
+                                                            "example": false
+                                                        },
+                                                        "has_attachment": {
+                                                            "type": "boolean",
+                                                            "example": false
+                                                        },
+                                                        "sort_order": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "is_active": {
+                                                            "type": "boolean",
+                                                            "example": true
+                                                        }
+                                                    },
+                                                    "type": "object",
+                                                    "nullable": true
+                                                },
+                                                "visit": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "branch_id": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "auditor_id": {
+                                                            "type": "integer",
+                                                            "example": 2
+                                                        },
+                                                        "status": {
+                                                            "type": "string",
+                                                            "example": "completed"
+                                                        },
+                                                        "status_text": {
+                                                            "type": "string",
+                                                            "example": "مكتملة"
+                                                        },
+                                                        "total_score": {
+                                                            "type": "number",
+                                                            "format": "float",
+                                                            "example": 85.5
+                                                        },
+                                                        "percentage": {
+                                                            "type": "number",
+                                                            "format": "float",
+                                                            "example": 85.5
+                                                        }
+                                                    },
+                                                    "type": "object",
+                                                    "nullable": true
+                                                },
+                                                "attachments": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "original_name": {
+                                                                "type": "string",
+                                                                "example": "صورة.jpg"
+                                                            },
+                                                            "file_url": {
+                                                                "type": "string",
+                                                                "example": "http://example.com/storage/attachments/uuid.jpg"
+                                                            },
+                                                            "file_type": {
+                                                                "type": "string",
+                                                                "example": "image"
+                                                            },
+                                                            "file_size": {
+                                                                "type": "integer",
+                                                                "example": 2048576
+                                                            },
+                                                            "title": {
+                                                                "type": "string",
+                                                                "example": "صورة للمكان"
+                                                            },
+                                                            "description": {
+                                                                "type": "string",
+                                                                "example": "صورة توضح حالة النظافة"
+                                                            },
+                                                            "created_at": {
+                                                                "type": "string",
+                                                                "format": "date-time",
+                                                                "example": "2026-02-10T09:20:00Z"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    },
+                                                    "nullable": true
+                                                },
+                                                "verifier": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer",
+                                                            "example": 3
+                                                        },
+                                                        "name": {
+                                                            "type": "string",
+                                                            "example": "سالم علي"
+                                                        },
+                                                        "email": {
+                                                            "type": "string",
+                                                            "example": "salem@example.com"
+                                                        },
+                                                        "role": {
+                                                            "type": "string",
+                                                            "example": "مشرف"
+                                                        }
+                                                    },
+                                                    "type": "object",
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "الإجابة غير موجودة أو لا تنتمي إلى الزيارة",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "الإجابة لا تنتمي إلى هذه الزيارة"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "غير مصرح به",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "غير مصرح به"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Answers"
+                ],
+                "summary": "تحديث بيانات إجابة",
+                "description": "تحديث بيانات إجابة موجودة",
+                "operationId": "updateAnswer",
+                "parameters": [
+                    {
+                        "name": "visit",
+                        "in": "path",
+                        "description": "معرف الزيارة",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "answer",
+                        "in": "path",
+                        "description": "معرف الإجابة",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "answer_value": {
+                                        "description": "قيمة الإجابة",
+                                        "type": "string",
+                                        "example": "لا"
+                                    },
+                                    "score": {
+                                        "description": "الدرجة",
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 0
+                                    },
+                                    "comment": {
+                                        "description": "تعليق",
+                                        "type": "string",
+                                        "example": "تعليق محدث"
+                                    },
+                                    "auditor_comment": {
+                                        "description": "تعليق المراقب",
+                                        "type": "string",
+                                        "example": "ملاحظات المراقب المحدثة"
+                                    },
+                                    "corrective_action": {
+                                        "description": "الإجراء التصحيحي",
+                                        "type": "string",
+                                        "example": "الإجراء التصحيحي المحدث"
+                                    },
+                                    "corrective_deadline": {
+                                        "description": "موعد التصحيح",
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2026-02-25"
+                                    },
+                                    "correction_status": {
+                                        "description": "حالة التصحيح",
+                                        "type": "string",
+                                        "enum": [
+                                            "pending",
+                                            "in_progress",
+                                            "completed",
+                                            "verified",
+                                            "waived"
+                                        ],
+                                        "example": "completed"
+                                    },
+                                    "verified_by": {
+                                        "description": "معرف الشخص الذي قام بالتحقق",
+                                        "type": "integer",
+                                        "example": 3
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "تم تحديث الإجابة",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "answer_value": {
+                                                    "type": "string",
+                                                    "example": "لا"
+                                                },
+                                                "score": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 0
+                                                },
+                                                "comment": {
+                                                    "type": "string",
+                                                    "example": "تعليق محدث"
+                                                },
+                                                "auditor_comment": {
+                                                    "type": "string",
+                                                    "example": "ملاحظات المراقب المحدثة"
+                                                },
+                                                "corrective_action": {
+                                                    "type": "string",
+                                                    "example": "الإجراء التصحيحي المحدث"
+                                                },
+                                                "corrective_deadline": {
+                                                    "type": "string",
+                                                    "format": "date",
+                                                    "example": "2026-02-25"
+                                                },
+                                                "correction_status": {
+                                                    "type": "string",
+                                                    "example": "completed"
+                                                },
+                                                "correction_status_text": {
+                                                    "type": "string",
+                                                    "example": "مكتمل"
+                                                },
+                                                "corrected_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2026-02-10T14:30:00Z"
+                                                },
+                                                "verified_by": {
+                                                    "type": "integer",
+                                                    "example": 3
+                                                },
+                                                "verified_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2026-02-10T14:30:00Z"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2026-02-10T14:30:00Z"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "تم تحديث الإجابة بنجاح"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "الإجابة غير موجودة أو لا تنتمي إلى الزيارة",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "الإجابة لا تنتمي إلى هذه الزيارة"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "بيانات غير صالحة",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "بيانات غير صالحة"
+                                        },
+                                        "errors": {
+                                            "type": "object",
+                                            "additionalProperties": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "string",
+                                                    "example": "حقل حالة التصحيح غير صالح"
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "غير مصرح به",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "غير مصرح به"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Answers"
+                ],
+                "summary": "حذف إجابة",
+                "description": "حذف إجابة (حذف ناعم)",
+                "operationId": "deleteAnswer",
+                "parameters": [
+                    {
+                        "name": "visit",
+                        "in": "path",
+                        "description": "معرف الزيارة",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "answer",
+                        "in": "path",
+                        "description": "معرف الإجابة",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "تم حذف الإجابة",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "visit_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "question_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "deleted_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2026-02-10T15:00:00Z"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "تم حذف الإجابة بنجاح"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "الإجابة غير موجودة أو لا تنتمي إلى الزيارة",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "الإجابة لا تنتمي إلى هذه الزيارة"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "غير مصرح به",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "غير مصرح به"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/visits/{visit}/answers/{answer}/restore": {
+            "post": {
+                "tags": [
+                    "Answers"
+                ],
+                "summary": "استعادة إجابة محذوفة",
+                "description": "استعادة إجابة تم حذفها (حذف ناعم)",
+                "operationId": "restoreAnswer",
+                "parameters": [
+                    {
+                        "name": "visit",
+                        "in": "path",
+                        "description": "معرف الزيارة",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "answer",
+                        "in": "path",
+                        "description": "معرف الإجابة",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "تم استعادة الإجابة",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "visit_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "question_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "answer_value": {
+                                                    "type": "string",
+                                                    "example": "نعم"
+                                                },
+                                                "score": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 10
+                                                },
+                                                "deleted_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": null
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2026-02-10T15:30:00Z"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "تم استعادة الإجابة بنجاح"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "الإجابة غير موجودة",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "الإجابة غير موجودة"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "غير مصرح به",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "غير مصرح به"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/visits/{visit}/answers/bulk": {
+            "post": {
+                "tags": [
+                    "Answers"
+                ],
+                "summary": "تسجيل إجابات جماعية",
+                "description": "تسجيل مجموعة من الإجابات دفعة واحدة",
+                "operationId": "bulkCreateAnswers",
+                "parameters": [
+                    {
+                        "name": "visit",
+                        "in": "path",
+                        "description": "معرف الزيارة",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "answers"
+                                ],
+                                "properties": {
+                                    "answers": {
+                                        "description": "قائمة الإجابات",
+                                        "type": "array",
+                                        "items": {
+                                            "required": [
+                                                "question_id",
+                                                "answer_value"
+                                            ],
+                                            "properties": {
+                                                "question_id": {
+                                                    "description": "معرف السؤال",
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "answer_value": {
+                                                    "description": "قيمة الإجابة",
+                                                    "type": "string",
+                                                    "example": "نعم"
+                                                },
+                                                "score": {
+                                                    "description": "الدرجة",
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 10
+                                                },
+                                                "comment": {
+                                                    "description": "تعليق",
+                                                    "type": "string",
+                                                    "example": "تعليق"
+                                                },
+                                                "auditor_comment": {
+                                                    "description": "تعليق المراقب",
+                                                    "type": "string",
+                                                    "example": "ملاحظات المراقب"
+                                                },
+                                                "corrective_action": {
+                                                    "description": "الإجراء التصحيحي",
+                                                    "type": "string",
+                                                    "example": "تحسين النظافة"
+                                                },
+                                                "corrective_deadline": {
+                                                    "description": "موعد التصحيح",
+                                                    "type": "string",
+                                                    "format": "date",
+                                                    "example": "2026-02-20"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "تم تسجيل الإجابات",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "question_id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "answer_value": {
+                                                        "type": "string",
+                                                        "example": "نعم"
+                                                    },
+                                                    "score": {
+                                                        "type": "number",
+                                                        "format": "float",
+                                                        "example": 10
+                                                    },
+                                                    "max_score": {
+                                                        "type": "integer",
+                                                        "example": 10
+                                                    },
+                                                    "is_correct": {
+                                                        "type": "boolean",
+                                                        "example": true
+                                                    },
+                                                    "comment": {
+                                                        "type": "string",
+                                                        "example": "تعليق"
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": "2026-02-10T09:15:00Z"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "تم تسجيل الإجابات بنجاح"
+                                        },
+                                        "statistics": {
+                                            "properties": {
+                                                "total_created": {
+                                                    "type": "integer",
+                                                    "example": 5
+                                                },
+                                                "total_score": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 45
+                                                },
+                                                "average_score": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 9
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "بيانات غير صالحة",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "بيانات غير صالحة"
+                                        },
+                                        "errors": {
+                                            "type": "object",
+                                            "additionalProperties": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "string",
+                                                    "example": "حقل قائمة الإجابات مطلوب"
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "الزيارة غير موجودة",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "الزيارة غير موجودة"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "غير مصرح به",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "غير مصرح به"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/auth/login": {
             "post": {
                 "tags": [
@@ -7595,6 +9148,91 @@
                 }
             }
         },
+        "/api/v1/visits/{visit}/questions": {
+            "get": {
+                "tags": [
+                    "Visits"
+                ],
+                "summary": "اسئلة الزيارة",
+                "description": "عرض اسئلة الزيارة",
+                "operationId": "submitVisit",
+                "parameters": [
+                    {
+                        "name": "visit",
+                        "in": "path",
+                        "description": "معرف الزيارة",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "اسئلة الزيارة",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "question": {
+                                                    "type": "string",
+                                                    "example": "under_review"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "questions"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "الزيارة غير موجودة",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "الزيارة غير موجودة"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "غير مصرح به",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "غير مصرح به"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/visits/auditor/{auditorId}": {
             "get": {
                 "tags": [
@@ -8144,6 +9782,15 @@
             }
         }
     },
+    "components": {
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "bearerFormat": "JWT",
+                "scheme": "bearer"
+            }
+        }
+    },
     "tags": [
         {
             "name": "Authentication",
@@ -8176,6 +9823,10 @@
         {
             "name": "Visits",
             "description": "إدارة الزيارات والتقييمات"
+        },
+        {
+            "name": "Answers",
+            "description": "إدارة اجابات اسئلة الزيارة"
         }
     ]
 }

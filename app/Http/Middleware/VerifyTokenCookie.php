@@ -18,7 +18,8 @@ class VerifyTokenCookie
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $token = $request->cookie('auth_token');
+
+        $token = $request->cookie('auth_token') ?? $request->bearerToken();
         
         if ($token) {
             

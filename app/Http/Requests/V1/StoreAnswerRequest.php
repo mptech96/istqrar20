@@ -14,7 +14,6 @@ class StoreAnswerRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'visit_id' => ['required', 'exists:visits,id'],
             'question_id' => ['required', 'exists:questions,id'],
             'answer_value' => ['required'],
             'score' => ['nullable', 'numeric', 'min:0'],

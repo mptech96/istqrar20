@@ -109,7 +109,17 @@ Route::namespace('App\Http\Controllers\V1')->group(function (){
             Route::prefix('{visit}/questions')->group(function () {
                 Route::get('', 'questions');
             });
-
+            
+            Route::prefix('{visit}/answers')->controller(AnswerController::class)->group(function () {
+                Route::get('', 'index');
+                Route::post('', 'store');
+                Route::get('/{answer}', 'show');
+                Route::put('/{answer}', 'update');
+                Route::delete('/{answer}', 'destroy');
+                Route::post('/{id}/restore', 'restore');
+                Route::post('bulk', 'bulkStore');
+            });
+            
             
         });
 

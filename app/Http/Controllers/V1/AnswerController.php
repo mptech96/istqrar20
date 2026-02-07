@@ -11,13 +11,13 @@ use App\Models\V1\Answer;
 use App\Models\V1\Visit;
 use App\Models\V1\Question;
 use Illuminate\Http\Request;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 use OpenApi\Attributes as OA;
 
 class AnswerController extends Controller
 {
-    /*
+    
     #[OA\Get(
         path: '/api/v1/visits/{visit}/answers',
         operationId: 'getVisitAnswers',
@@ -159,7 +159,7 @@ class AnswerController extends Controller
             ),
         ]
     )]
-    public function index(Visit $visit, Request $request): JsonResponse
+    public function index(Visit $visit, Request $request)
     {
         $query = $visit->answers();
         
@@ -323,8 +323,19 @@ class AnswerController extends Controller
             ),
         ]
     )]
-    public function store(Visit $visit, StoreAnswerRequest $request): JsonResponse
+    public function store(Visit $visit, StoreAnswerRequest $request)
     {
+        
+        if ($visit->actual_start_time) {
+            $endTime = Carbon::parse($visit->actual_start_time)
+            ->addMinutes($visit->estimated_duration);
+            if ($endTime->isPast()){
+                return response()->json([
+                    'message' => __tr('The evaluation period has ended.')
+                ], 400);
+            }
+        }
+        
         $question = Question::findOrFail($request->input('question_id'));
         
         $answer = Answer::create([
@@ -340,7 +351,11 @@ class AnswerController extends Controller
             'corrective_deadline' => $request->input('corrective_deadline'),
             'correction_status' => $request->input('corrective_action') ? 'pending' : null,
         ]);
-        
+        $attachments = [];
+        foreach ($request->input('attachments') as $attachment) {
+            //$attachments[] = __saveFile($attachment, base_path('public/uploads/attachments/'));
+        }
+            
         $this->updateVisitStatistics($visit);
         
         return response()->json([
@@ -502,7 +517,7 @@ class AnswerController extends Controller
             ),
         ]
     )]
-    public function show(Visit $visit, Answer $answer, Request $request): JsonResponse
+    public function show(Visit $visit, Answer $answer, Request $request)
     {
         if ($answer->visit_id !== $visit->id) {
             return response()->json([
@@ -642,8 +657,18 @@ class AnswerController extends Controller
             ),
         ]
     )]
-    public function update(UpdateAnswerRequest $request, Visit $visit, Answer $answer): JsonResponse
+    public function update(UpdateAnswerRequest $request, Visit $visit, Answer $answer)
     {
+        if ($visit->actual_start_time) {
+            $endTime = Carbon::parse($visit->actual_start_time)
+            ->addMinutes($visit->estimated_duration);
+            if ($endTime->isPast()){
+                return response()->json([
+                    'message' => __tr('The evaluation period has ended.')
+                ], 400);
+            }
+        }
+        
         if ($answer->visit_id !== $visit->id) {
             return response()->json([
                 'message' => 'الإجابة لا تنتمي إلى هذه الزيارة'
@@ -739,7 +764,7 @@ class AnswerController extends Controller
             ),
         ]
     )]
-    public function destroy(Visit $visit, Answer $answer): JsonResponse
+    public function destroy(Visit $visit, Answer $answer)
     {
         if ($answer->visit_id !== $visit->id) {
             return response()->json([
@@ -826,7 +851,7 @@ class AnswerController extends Controller
             ),
         ]
     )]
-    public function restore(Visit $visit, $answerId): JsonResponse
+    public function restore(Visit $visit, $answerId)
     {
         $answer = Answer::withTrashed()
             ->where('visit_id', $visit->id)
@@ -842,7 +867,7 @@ class AnswerController extends Controller
             'message' => 'تم استعادة الإجابة بنجاح'
         ]);
     }
-    
+    /*
     #[OA\Post(
         path: '/api/v1/visits/{visit}/answers/{answer}/verify',
         operationId: 'verifyAnswerCorrection',
@@ -930,7 +955,7 @@ class AnswerController extends Controller
             ),
         ]
     )]
-    public function verify(Visit $visit, Answer $answer, Request $request): JsonResponse
+    public function verify(Visit $visit, Answer $answer, Request $request)
     {
         if ($answer->visit_id !== $visit->id) {
             return response()->json([
@@ -1034,7 +1059,7 @@ class AnswerController extends Controller
             ),
         ]
     )]
-    public function waive(Visit $visit, Answer $answer, Request $request): JsonResponse
+    public function waive(Visit $visit, Answer $answer, Request $request)
     {
         if ($answer->visit_id !== $visit->id) {
             return response()->json([
@@ -1054,7 +1079,7 @@ class AnswerController extends Controller
             'message' => 'تم الإعفاء من التصحيح بنجاح'
         ]);
     }
-    
+    */
     #[OA\Post(
         path: '/api/v1/visits/{visit}/answers/bulk',
         operationId: 'bulkCreateAnswers',
@@ -1175,25 +1200,53 @@ class AnswerController extends Controller
             ),
         ]
     )]
-    public function bulkStore(Visit $visit, BulkAnswerRequest $request): JsonResponse
+    public function bulkStore(Visit $visit, BulkAnswerRequest $request)
     {
+        
+        if (!$visit->actual_start_time) {
+            $endTime = Carbon::parse($visit->actual_start_time)
+            ->addMinutes($visit->estimated_duration);
+            if ($endTime->isPast()){
+                return response()->json([
+                    'message' => __tr('The evaluation period has ended.')
+                ], 400);
+            }
+        }
+        
         return DB::transaction(function () use ($visit, $request) {
-            $answers = [];
-            $questions = Question::whereIn('id', collect($request->input('answers'))->pluck('question_id'))->get()->keyBy('id');
+            // استخراج جميع question_id من الإجابات
+            $questionIds = array_column($request->input('answers', []), 'question_id');
             
-            foreach ($request->input('answers') as $answerData) {
-                $question = $questions[$answerData['question_id']] ?? null;
-                if (!$question) {
+            // جلب الأسئلة المرتبطة بالزيارة من قاعدة البيانات
+            $questions = $visit->questions()
+                ->whereIn('questions.id', $questionIds)
+                ->get()
+                ->keyBy('id');
+            
+            $answers = [];
+            
+            foreach ($request->input('answers', []) as $answerData) {
+                // التحقق من وجود السؤال
+                if (!isset($questions[$answerData['question_id']])) {
                     continue;
                 }
                 
+                $question = $questions[$answerData['question_id']];
+                
+                // حساب إذا كانت الإجابة صحيحة
+                $isCorrect = $this->checkIfCorrect($question, $answerData['answer_value'] ?? null);
+                
+                // حساب النقاط إذا لم تكن موجودة
+                $score = $answerData['score'] ?? 0;
+                
+                // إنشاء الإجابة
                 $answer = Answer::create([
                     'visit_id' => $visit->id,
                     'question_id' => $answerData['question_id'],
-                    'answer_value' => $answerData['answer_value'],
-                    'score' => $answerData['score'] ?? 0,
+                    'answer_value' => $answerData['answer_value'] ?? null,
+                    'score' => $score,
                     'max_score' => $question->max_score,
-                    'is_correct' => $this->checkIfCorrect($question, $answerData['answer_value']),
+                    'is_correct' => $isCorrect,
                     'comment' => $answerData['comment'] ?? null,
                     'auditor_comment' => $answerData['auditor_comment'] ?? null,
                     'corrective_action' => $answerData['corrective_action'] ?? null,
@@ -1204,23 +1257,46 @@ class AnswerController extends Controller
                 $answers[] = $answer;
             }
             
+            // تحديث إحصائيات الزيارة
             $this->updateVisitStatistics($visit);
             
+            // حساب الإحصائيات
             $totalScore = collect($answers)->sum('score');
+            $totalMaxScore = collect($answers)->sum('max_score');
             $averageScore = count($answers) > 0 ? $totalScore / count($answers) : 0;
+            $percentageScore = $totalMaxScore > 0 ? ($totalScore / $totalMaxScore) * 100 : 0;
+            
+            // تحويل المصفوفة إلى collection ثم تحميل العلاقة
+            $answersCollection = collect($answers);
+            
+            // تحميل العلاقة للسؤال لكل إجابة
+            // الطريقة الأولى: باستخدام load() على كل نموذج
+            foreach ($answers as $answer) {
+                $answer->load('question');
+            }
+            
+            // الطريقة الثانية: تحميل جماعي باستخدام with()
+            $answersWithQuestions = Answer::whereIn('id', $answersCollection->pluck('id'))
+                ->with('question')
+                ->get();
             
             return response()->json([
-                'data' => AnswerResource::collection(collect($answers)->load(['question'])),
+                'success' => true,
+                'data' => AnswerResource::collection($answersWithQuestions), // استخدام $answersWithQuestions هنا
                 'message' => 'تم تسجيل الإجابات بنجاح',
                 'statistics' => [
                     'total_created' => count($answers),
                     'total_score' => $totalScore,
+                    'total_max_score' => $totalMaxScore,
                     'average_score' => round($averageScore, 2),
+                    'percentage_score' => round($percentageScore, 2),
+                    'correct_answers' => collect($answers)->where('is_correct', true)->count(),
+                    'incorrect_answers' => collect($answers)->where('is_correct', false)->count(),
                 ],
             ], 201);
         });
     }
-    
+    /*
     #[OA\Get(
         path: '/api/v1/visits/{visit}/answers/corrections',
         operationId: 'getCorrections',
@@ -1331,7 +1407,8 @@ class AnswerController extends Controller
             ),
         ]
     )]
-    public function corrections(Visit $visit, Request $request): JsonResponse
+    */
+    public function corrections(Visit $visit, Request $request)
     {
         $query = $visit->answers()->whereNotNull('corrective_action');
         
@@ -1428,5 +1505,5 @@ class AnswerController extends Controller
         if ($percentage >= 60) return 'D';
         return 'F';
     }
-    */
+    
 }

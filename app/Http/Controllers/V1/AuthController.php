@@ -86,18 +86,18 @@ class AuthController extends Controller
             'last_login_ip' => $request->ip()
         ]);
 
-        $token = $user->createToken("auth_token")->plainTextToken;
+        $token = encrypt($user->createToken("auth_token")->plainTextToken);
 
         return response()->json([
             'success' => true,
             'data' => [
                 'user' => $user,
-                //'token' => $token
+                'token' => $token
             ],
             'message' => 'تم تسجيل الدخول بنجاح'
         ])->withCookie(Cookie::make(
                 'auth_token',
-                encrypt($token),
+                $token,
                 60 * 24, // يوم واحد
                 null,    // path
                 null,    // domain

@@ -12,7 +12,7 @@ class AnswerResource extends JsonResource
         return [
             'id' => $this->id,
             'visit_id' => $this->visit_id,
-            'question_id' => $this->question_id,
+            'question' => $this->question->question_text,
             
             // الإجابة
             'answer_value' => $this->answer_value,
@@ -43,9 +43,9 @@ class AnswerResource extends JsonResource
             'deleted_at' => $this->deleted_at?->format('Y-m-d | h:i:s A'),
             
             // العلاقات
-            'visit' => new VisitResource($this->whenLoaded('visit')),
-            'question' => new QuestionResource($this->whenLoaded('question')),
-            'verifier' => new UserResource($this->whenLoaded('verifier')),
+            //'visit' => new VisitResource($this->whenLoaded('visit')),
+            //'question' => new QuestionResource($this->whenLoaded('question')),
+            //'verifier' => new UserResource($this->whenLoaded('verifier')),
             'attachments' => AttachmentResource::collection($this->whenLoaded('attachments')),
         ];
     }

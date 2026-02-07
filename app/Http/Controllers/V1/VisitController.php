@@ -10,6 +10,7 @@ use App\Http\Requests\V1\CompleteVisitRequest;
 use App\Http\Requests\V1\ApproveVisitRequest;
 use App\Http\Requests\V1\RejectVisitRequest;
 use App\Http\Resources\V1\VisitResource;
+use App\Http\Resources\V1\QuestionResource;
 use App\Models\V1\Visit;
 use App\Models\V1\Branch;
 use App\Models\V1\Checklist;
@@ -1175,6 +1176,17 @@ class VisitController extends Controller
     )]
     public function start(Visit $visit)
     {
+        
+        if ($visit->actual_start_time) {
+            $endTime = Carbon::parse($visit->actual_start_time)
+            ->addMinutes($visit->estimated_duration);
+            if ($endTime->isPast()){
+                return response()->json([
+                    'message' => __tr('The evaluation period has ended.')
+                ], 400);
+            }
+        }
+        
         if (!in_array($visit->status, ['scheduled', 'draft'])) {
             return response()->json([
                 'message' => 'لا يمكن بدء الزيارة في حالتها الحالية'
@@ -1338,6 +1350,68 @@ class VisitController extends Controller
             'data' => new VisitResource($visit),
             'message' => 'تم إنهاء الزيارة بنجاح'
         ]);
+    }
+    #[OA\Get(
+        path: '/api/v1/visits/{visit}/questions',
+        operationId: 'submitVisit',
+        summary: 'اسئلة الزيارة',
+        description: 'عرض اسئلة الزيارة',
+        tags: ['Visits'],
+        //security: [['bearerAuth' => []]],
+        parameters: [
+            new OA\Parameter(
+                name: 'visit',
+                description: 'معرف الزيارة',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(type: 'integer', example: 1)
+            ),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'اسئلة الزيارة',
+                content: new OA\JsonContent(
+                    type: 'object',
+                    properties: [
+                        new OA\Property(
+                            property: 'data',
+                            type: 'object',
+                            properties: [
+                                new OA\Property(property: 'id', type: 'integer', example: 1),
+                                new OA\Property(property: 'question', type: 'string', example: 'under_review'),
+                            ]
+                        ),
+                        new OA\Property(property: 'message', type: 'string', example: 'questions'),
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 404,
+                description: 'الزيارة غير موجودة',
+                content: new OA\JsonContent(
+                    type: 'object',
+                    properties: [
+                        new OA\Property(property: 'message', type: 'string', example: 'الزيارة غير موجودة'),
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 401,
+                description: 'غير مصرح به',
+                content: new OA\JsonContent(
+                    type: 'object',
+                    properties: [
+                        new OA\Property(property: 'message', type: 'string', example: 'غير مصرح به'),
+                    ]
+                )
+            ),
+        ]
+    )]
+
+    public function questions(Visit $visit)
+    {
+        return QuestionResource::collection($visit->questions()->paginate(request()->query('per_page', config('settings.per_page')), ['*'], 'page', request()->query('page', 1)));
     }
     
     /*
