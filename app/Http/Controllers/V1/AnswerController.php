@@ -8,11 +8,17 @@ use App\Http\Requests\V1\UpdateAnswerRequest;
 use App\Http\Requests\V1\BulkAnswerRequest;
 use App\Http\Resources\V1\AnswerResource;
 use App\Models\V1\Answer;
+use App\Models\V1\Attachment;
 use App\Models\V1\Visit;
 use App\Models\V1\Question;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\File;
+use Intervention\Image\ImageManager;
+use Intervention\Image\Drivers\Gd\Driver;
+use Illuminate\Support\Str;
 use OpenApi\Attributes as OA;
 
 class AnswerController extends Controller
@@ -236,6 +242,7 @@ class AnswerController extends Controller
                     new OA\Property(property: 'auditor_comment', type: 'string', example: 'ملاحظات المراقب', description: 'تعليق المراقب'),
                     new OA\Property(property: 'corrective_action', type: 'string', example: 'الإجراء التصحيحي', description: 'الإجراء التصحيحي'),
                     new OA\Property(property: 'corrective_deadline', type: 'string', format: 'date', example: '2026-02-20', description: 'موعد التصحيح'),
+                    new OA\Property(property: 'attachments', type: 'file', format: 'binary', example: [], description: 'مرفقات الاجابة'),
                 ]
             )
         ),
@@ -325,7 +332,6 @@ class AnswerController extends Controller
     )]
     public function store(Visit $visit, StoreAnswerRequest $request)
     {
-        
         if ($visit->actual_start_time) {
             $endTime = Carbon::parse($visit->actual_start_time)
             ->addMinutes($visit->estimated_duration);
@@ -338,7 +344,12 @@ class AnswerController extends Controller
         
         $question = Question::findOrFail($request->input('question_id'));
         
-        $answer = Answer::create([
+        $answer = Answer::firstOrCreate(
+            [
+            'visit_id' => $visit->id,
+            'question_id' => $request->input('question_id')
+            ],
+            [
             'visit_id' => $visit->id,
             'question_id' => $request->input('question_id'),
             'answer_value' => $request->input('answer_value'),
@@ -352,10 +363,59 @@ class AnswerController extends Controller
             'correction_status' => $request->input('corrective_action') ? 'pending' : null,
         ]);
         
-        /*foreach ($request->input('attachments') as $attachment) {
-            //$answer->attachments = __saveFile($attachment, base_path('public/uploads/attachments/'));
-        }*/
+        $manager = new ImageManager(new Driver());
+        
+        foreach ($request->file('attachments') ?? [] as $file) {
+        
+            $mimeType  = $file->getClientMimeType();
+            $size      = $file->getSize();
+            $extension = $file->getClientOriginalExtension();
+            $original  = $file->getClientOriginalName();
+        
             
+            $width = null;
+            $height = null;
+            if (str_starts_with($mimeType, 'image/')) {
+                $image  = $manager->read($file->path());
+                $width  = $image->width();
+                $height = $image->height();
+            }
+            
+            $file_name = __saveFile($file, base_path('public/uploads/attachments/'));
+        
+            Attachment::create([
+                // الربط الديناميكي
+                'entity_type'   => get_class($answer),
+                'entity_id'     => $answer->id,
+        
+                // الملف
+                'original_name' => $original,
+                'file_name'     => $file_name,
+                'file_path'     => base_path('public/uploads/attachments/' . $file_name),
+                'file_url'      => asset('uploads/attachments/' . $file_name),
+        
+                // المواصفات
+                'file_type'     => Str::startsWith($mimeType, 'image/') ? 'image' : 'file',
+                'mime_type'     => $mimeType,
+                'file_size'     => $size,
+                'file_extension'=> $extension,
+        
+                // للصور
+                'width'         => $width,
+                'height'        => $height,
+        
+                // المالك
+                //'uploaded_by'   => Auth::id(),
+                'uploaded_by'   => 1,
+                'upload_source' => 'web',
+        
+                // الحالة
+                'is_public'     => 0,
+                'is_active'     => 1,
+            ]);
+
+        }
+        
         $this->updateVisitStatistics($visit);
         
         return response()->json([
@@ -576,14 +636,16 @@ class AnswerController extends Controller
                     new OA\Property(property: 'auditor_comment', type: 'string', example: 'ملاحظات المراقب المحدثة', description: 'تعليق المراقب'),
                     new OA\Property(property: 'corrective_action', type: 'string', example: 'الإجراء التصحيحي المحدث', description: 'الإجراء التصحيحي'),
                     new OA\Property(property: 'corrective_deadline', type: 'string', format: 'date', example: '2026-02-25', description: 'موعد التصحيح'),
+                    new OA\Property(property: 'attachments', type: 'file', format: 'binary', example: [], description: 'مرفقات الاجابة'),
+                    /*
                     new OA\Property(
                         property: 'correction_status',
                         type: 'string',
                         example: 'completed',
                         description: 'حالة التصحيح',
                         enum: ['pending', 'in_progress', 'completed', 'verified', 'waived']
-                    ),
-                    new OA\Property(property: 'verified_by', type: 'integer', example: 3, description: 'معرف الشخص الذي قام بالتحقق'),
+                    ),*/
+                    //new OA\Property(property: 'verified_by', type: 'integer', example: 3, description: 'معرف الشخص الذي قام بالتحقق'),
                 ]
             )
         ),
@@ -674,7 +736,6 @@ class AnswerController extends Controller
                 'message' => 'الإجابة لا تنتمي إلى هذه الزيارة'
             ], 404);
         }
-        
         $updateData = $request->only([
             'answer_value', 'score', 'comment', 'auditor_comment',
             'corrective_action', 'corrective_deadline', 'correction_status', 'verified_by'
@@ -689,6 +750,59 @@ class AnswerController extends Controller
         }
         
         $answer->update($updateData);
+        
+        $manager = new ImageManager(new Driver());
+        
+        foreach ($request->file('attachments') ?? [] as $file) {
+        
+            $mimeType  = $file->getClientMimeType();
+            $size      = $file->getSize();
+            $extension = $file->getClientOriginalExtension();
+            $original  = $file->getClientOriginalName();
+        
+            
+            $width = null;
+            $height = null;
+            if (str_starts_with($mimeType, 'image/')) {
+                $image  = $manager->read($file->path());
+                $width  = $image->width();
+                $height = $image->height();
+            }
+            
+            $file_name = __saveFile($file, base_path('public/uploads/attachments/'));
+        
+            Attachment::create([
+                // الربط الديناميكي
+                'entity_type'   => get_class($answer),
+                'entity_id'     => $answer->id,
+        
+                // الملف
+                'original_name' => $original,
+                'file_name'     => $file_name,
+                'file_path'     => base_path('public/uploads/attachments/' . $file_name),
+                'file_url'      => asset('uploads/attachments/' . $file_name),
+        
+                // المواصفات
+                'file_type'     => Str::startsWith($mimeType, 'image/') ? 'image' : 'file',
+                'mime_type'     => $mimeType,
+                'file_size'     => $size,
+                'file_extension'=> $extension,
+        
+                // للصور
+                'width'         => $width,
+                'height'        => $height,
+        
+                // المالك
+                //'uploaded_by'   => Auth::id(),
+                'uploaded_by'   => 1,
+                'upload_source' => 'web',
+        
+                // الحالة
+                'is_public'     => 0,
+                'is_active'     => 1,
+            ]);
+
+        }
         
         $this->updateVisitStatistics($visit);
         

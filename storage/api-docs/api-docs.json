@@ -368,6 +368,12 @@
                                         "type": "string",
                                         "format": "date",
                                         "example": "2026-02-20"
+                                    },
+                                    "attachments": {
+                                        "description": "مرفقات الاجابة",
+                                        "type": "file",
+                                        "format": "binary",
+                                        "example": []
                                     }
                                 },
                                 "type": "object"
@@ -962,22 +968,11 @@
                                         "format": "date",
                                         "example": "2026-02-25"
                                     },
-                                    "correction_status": {
-                                        "description": "حالة التصحيح",
-                                        "type": "string",
-                                        "enum": [
-                                            "pending",
-                                            "in_progress",
-                                            "completed",
-                                            "verified",
-                                            "waived"
-                                        ],
-                                        "example": "completed"
-                                    },
-                                    "verified_by": {
-                                        "description": "معرف الشخص الذي قام بالتحقق",
-                                        "type": "integer",
-                                        "example": 3
+                                    "attachments": {
+                                        "description": "مرفقات الاجابة",
+                                        "type": "file",
+                                        "format": "binary",
+                                        "example": []
                                     }
                                 },
                                 "type": "object"

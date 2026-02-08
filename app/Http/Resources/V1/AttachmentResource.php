@@ -11,8 +11,8 @@ class AttachmentResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'entity_type' => $this->entity_type,
-            'entity_id' => $this->entity_id,
+            //'entity_type' => $this->entity_type,
+            //'entity_id' => $this->entity_id,
             
             // معلومات الملف
             'original_name' => $this->original_name,
