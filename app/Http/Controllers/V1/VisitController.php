@@ -2399,9 +2399,12 @@ class VisitController extends Controller
     )]
     public function visitAnalysis(Visit $visit)
     {
-        return response()->json([
-            //'data' => $visit->analysis,
-            'data' => new VisitAnalysisResource($visit->analysis),
-        ]);
+        $analysis = $visit->analysis()->first();
+        if($analysis){
+            return response()->json([
+                'data' => new VisitAnalysisResource($analysis),
+            ]);
+        }
+        return 'not found';
     }
 }
