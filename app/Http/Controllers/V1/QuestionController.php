@@ -267,7 +267,14 @@ class QuestionController extends Controller
         path: '/api/v1/checklists/{checklist}/questions',
         operationId: 'createQuestion',
         summary: 'إضافة سؤال جديد',
-        description: 'إضافة سؤال جديد إلى قائمة مراجعة',
+        description: 'إضافة سؤال جديد إلى قائمة مراجعة
+        <br>
+        استخدم نقطة 
+        <br>
+        /api/v1/questions/create
+        <br>
+        لعرض بيانات القوائم والتقييمات
+        ',
         tags: ['Questions'],
         //security: [['bearerAuth' => []]],
         parameters: [
@@ -386,6 +393,55 @@ class QuestionController extends Controller
         ], 201);
     }
     
+    #[OA\Get(
+        path: '/api/v1/questions/create',
+        operationId: 'getriteriasChecklists',
+        summary: 'بيانات انشاء سؤال',
+        description: 'عرض القوائم والتقييمات',
+        tags: ['Questions'],
+        //security: [['bearerAuth' => []]],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: '',
+                content: new OA\JsonContent(
+                    type: 'object',
+                    properties: [
+                        new OA\Property(
+                            property: 'criterias',
+                            type: 'array',
+                            items: new OA\Items(
+                                type: 'object',
+                                properties: [
+                                    new OA\Property(property: 'id', type: 'integer', example: 1),
+                                    new OA\Property(property: 'name', type: 'string', example: 'الجودة'),
+                                ]
+                            )
+                        ),
+                        new OA\Property(
+                            property: 'checklists',
+                            type: 'array',
+                            items: new OA\Items(
+                                type: 'object',
+                                properties: [
+                                    new OA\Property(property: 'id', type: 'integer', example: 1),
+                                    new OA\Property(property: 'name', type: 'string', example: 'قائمة 1'),
+                                ]
+                            )
+                        )
+
+                    ]
+                )
+            ),
+        ]
+    )]
+    public function create()
+    {
+        return response()->json([
+            'criterias' => Criteria::select(['id', 'name'])->get(),
+            'checklists' => Checklist::select(['id', 'name'])->get(),
+        ]);
+    }
     #[OA\Get(
         path: '/api/v1/checklists/{checklist}/questions/{question}',
         operationId: 'getQuestion',

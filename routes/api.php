@@ -90,7 +90,10 @@ Route::namespace('App\Http\Controllers\V1')->group(function (){
             
         });
         
-        
+        Route::prefix('/questions')->controller(QuestionController::class)->group(function () {
+            Route::get('create', 'create');
+        });
+
         Route::prefix('visits')->controller(VisitController::class)->group(function () {
             Route::get('/', 'index');
             Route::get('/calendar', 'calendar');

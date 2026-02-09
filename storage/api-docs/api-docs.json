@@ -5490,7 +5490,7 @@
                     "Questions"
                 ],
                 "summary": "إضافة سؤال جديد",
-                "description": "إضافة سؤال جديد إلى قائمة مراجعة",
+                "description": "إضافة سؤال جديد إلى قائمة مراجعة\n        <br>\n        استخدم نقطة \n        <br>\n        /api/v1/questions/create\n        <br>\n        لعرض بيانات القوائم والتقييمات\n        ",
                 "operationId": "createQuestion",
                 "parameters": [
                     {
@@ -5727,6 +5727,62 @@
                                                     "has_correct_answer": {
                                                         "type": "boolean",
                                                         "example": false
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/questions/create": {
+            "get": {
+                "tags": [
+                    "Questions"
+                ],
+                "summary": "بيانات انشاء سؤال",
+                "description": "عرض القوائم والتقييمات",
+                "operationId": "getriteriasChecklists",
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "criterias": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "name": {
+                                                        "type": "string",
+                                                        "example": "الجودة"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "checklists": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "name": {
+                                                        "type": "string",
+                                                        "example": "قائمة 1"
                                                     }
                                                 },
                                                 "type": "object"
