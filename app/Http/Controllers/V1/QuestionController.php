@@ -273,7 +273,7 @@ class QuestionController extends Controller
         <br>
         /api/v1/questions/create
         <br>
-        لعرض بيانات القوائم والتقييمات
+        لعرض بيانات القوائم والتقييمات ونوع السؤال
         ',
         tags: ['Questions'],
         //security: [['bearerAuth' => []]],
@@ -428,6 +428,14 @@ class QuestionController extends Controller
                                     new OA\Property(property: 'name', type: 'string', example: 'قائمة 1'),
                                 ]
                             )
+                        ),
+                        new OA\Property(
+                            property: 'types',
+                            type: 'array',
+                            example: ['yes_no', 'scale_1_5', 'scale_1_10', 'multiple_choice', 'text', 'file', 'date', 'number'],
+                            items: new OA\Items(
+                                type: 'string'
+                            )
                         )
 
                     ]
@@ -440,6 +448,7 @@ class QuestionController extends Controller
         return response()->json([
             'criterias' => Criteria::select(['id', 'name'])->get(),
             'checklists' => Checklist::select(['id', 'name'])->get(),
+            'type' => ['yes_no', 'scale_1_5', 'scale_1_10', 'multiple_choice', 'text', 'file', 'date', 'number'],
         ]);
     }
     #[OA\Get(

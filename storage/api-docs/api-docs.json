@@ -5490,7 +5490,7 @@
                     "Questions"
                 ],
                 "summary": "إضافة سؤال جديد",
-                "description": "إضافة سؤال جديد إلى قائمة مراجعة\n        <br>\n        استخدم نقطة \n        <br>\n        /api/v1/questions/create\n        <br>\n        لعرض بيانات القوائم والتقييمات\n        ",
+                "description": "إضافة سؤال جديد إلى قائمة مراجعة\n        <br>\n        استخدم نقطة \n        <br>\n        /api/v1/questions/create\n        <br>\n        لعرض بيانات القوائم والتقييمات ونوع السؤال\n        ",
                 "operationId": "createQuestion",
                 "parameters": [
                     {
@@ -5787,6 +5787,22 @@
                                                 },
                                                 "type": "object"
                                             }
+                                        },
+                                        "types": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            },
+                                            "example": [
+                                                "yes_no",
+                                                "scale_1_5",
+                                                "scale_1_10",
+                                                "multiple_choice",
+                                                "text",
+                                                "file",
+                                                "date",
+                                                "number"
+                                            ]
                                         }
                                     },
                                     "type": "object"
