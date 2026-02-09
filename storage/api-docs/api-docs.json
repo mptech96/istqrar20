@@ -9847,6 +9847,75 @@
                     }
                 }
             }
+        },
+        "/api/v1/visits/{visit}/analysis": {
+            "get": {
+                "tags": [
+                    "Visits"
+                ],
+                "summary": "عرض تحليل الزيارة",
+                "description": "استرجاع تفاصيل تحليل زيارة معينة",
+                "operationId": "getVisitAnalysis",
+                "parameters": [
+                    {
+                        "name": "visit",
+                        "in": "path",
+                        "description": "معرف الزيارة",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "تحليل الزيارة",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "analysis": {
+                                                        "type": "integer",
+                                                        "example": 2
+                                                    },
+                                                    "branch": {
+                                                        "type": "string",
+                                                        "example": "فرع 1"
+                                                    },
+                                                    "auditor": {
+                                                        "type": "string",
+                                                        "example": "احمد"
+                                                    },
+                                                    "company": {
+                                                        "type": "string",
+                                                        "example": "شركة 1"
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": "2026-02-05 02:00:00 AM"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "components": {

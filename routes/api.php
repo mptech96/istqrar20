@@ -101,6 +101,7 @@ Route::namespace('App\Http\Controllers\V1')->group(function (){
             Route::post('', 'store');
             Route::put('/{visit}', 'update');
             Route::get('/{visit}', 'show');
+            Route::get('/{visit}/analysis', 'visitAnalysis');
             Route::delete('/{visit}', 'destroy');
             Route::post('/{id}/restore', 'restore');
             Route::post('/{visit}/start', 'start');

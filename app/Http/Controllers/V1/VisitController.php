@@ -10,6 +10,7 @@ use App\Http\Requests\V1\CompleteVisitRequest;
 use App\Http\Requests\V1\ApproveVisitRequest;
 use App\Http\Requests\V1\RejectVisitRequest;
 use App\Http\Resources\V1\VisitResource;
+use App\Http\Resources\V1\VisitAnalysisResource;
 use App\Http\Resources\V1\QuestionResource;
 use App\Models\V1\Visit;
 use App\Models\V1\Branch;
@@ -19,6 +20,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use App\Services\V1\Analysis\VisitAnalysisService;
 use OpenApi\Attributes as OA;
 
 class VisitController extends Controller
@@ -1324,32 +1326,41 @@ class VisitController extends Controller
     )]
     public function complete(Visit $visit, CompleteVisitRequest $request)
     {
-        if ($visit->status !== 'in_progress') {
+        //$visit->update(['status' => 'in_progress',]);
+
+        return DB::transaction(function () use ($visit, $request) {
+            if ($visit->status !== 'in_progress') {
+                return response()->json([
+                    'message' => 'لا يمكن إنهاء الزيارة إلا إذا كانت قيد التنفيذ'
+                ], 400);
+            }
+            
+            $visit->update([
+                'status' => 'completed',
+                'actual_end_time' => now(),
+                'completed_at' => now(),
+                'auditor_notes' => $request->input('auditor_notes', $visit->auditor_notes),
+                //'total_score' => $request->input('total_score', $visit->total_score),
+                //'percentage' => $request->input('percentage', $visit->percentage),
+                //'category' => $request->input('category', $visit->category),
+            ]);
+            
+            // حساب المدة الفعلية
+            if ($visit->actual_start_time) {
+                $duration = $visit->actual_start_time->diffInMinutes($visit->actual_end_time);
+                $visit->update(['actual_duration' => $duration]);
+            }
+            
+            (new VisitAnalysisService)->generate($visit);
+            
+            //return \App\Models\V1\VisitAnalysis::get();
+            
             return response()->json([
-                'message' => 'لا يمكن إنهاء الزيارة إلا إذا كانت قيد التنفيذ'
-            ], 400);
-        }
+                'data' => new VisitResource($visit),
+                'message' => 'تم إنهاء الزيارة بنجاح'
+            ]);
+        });
         
-        $visit->update([
-            'status' => 'completed',
-            'actual_end_time' => now(),
-            'completed_at' => now(),
-            'auditor_notes' => $request->input('auditor_notes', $visit->auditor_notes),
-            //'total_score' => $request->input('total_score', $visit->total_score),
-            //'percentage' => $request->input('percentage', $visit->percentage),
-            //'category' => $request->input('category', $visit->category),
-        ]);
-        
-        // حساب المدة الفعلية
-        if ($visit->actual_start_time) {
-            $duration = $visit->actual_start_time->diffInMinutes($visit->actual_end_time);
-            $visit->update(['actual_duration' => $duration]);
-        }
-        
-        return response()->json([
-            'data' => new VisitResource($visit),
-            'message' => 'تم إنهاء الزيارة بنجاح'
-        ]);
     }
     #[OA\Get(
         path: '/api/v1/visits/{visit}/questions',
@@ -2340,5 +2351,57 @@ class VisitController extends Controller
             'rejected' => '#e74c3c', // أحمر
             default => '#bdc3c7', // رمادي فاتح
         };
+    }
+    
+    
+    #[OA\Get(
+        path: '/api/v1/visits/{visit}/analysis',
+        operationId: 'getVisitAnalysis',
+        summary: 'عرض تحليل الزيارة',
+        description: 'استرجاع تفاصيل تحليل زيارة معينة',
+        tags: ['Visits'],
+        //security: [['bearerAuth' => []]],
+        parameters: [
+            new OA\Parameter(
+                name: 'visit',
+                description: 'معرف الزيارة',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(type: 'integer', example: 1)
+            ),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'تحليل الزيارة',
+                content: new OA\JsonContent(
+                    type: 'object',
+                    properties: [
+                        new OA\Property(
+                            property: 'data',
+                            type: 'array',
+                            items: new OA\Items(
+                                type: 'object',
+                                properties: [
+                                    new OA\Property(property: 'id', type: 'integer', example: 1),
+                                    new OA\Property(property: 'analysis', type: 'integer', example: 2),
+                                    new OA\Property(property: 'branch', type: 'string', example: 'فرع 1'),
+                                    new OA\Property(property: 'auditor', type: 'string', example: 'احمد'),
+                                    new OA\Property(property: 'company', type: 'string', example: 'شركة 1'),
+                                    new OA\Property(property: 'created_at', type: 'string', format: 'date-time', example: '2026-02-05 02:00:00 AM'),
+                                ]
+                            )
+                        ),
+                    ]
+                )
+            ),
+        ]
+    )]
+    public function visitAnalysis(Visit $visit)
+    {
+        return response()->json([
+            //'data' => $visit->analysis,
+            'data' => new VisitAnalysisResource($visit->analysis),
+        ]);
     }
 }

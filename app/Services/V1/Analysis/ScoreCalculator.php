@@ -2,6 +2,8 @@
 
 namespace App\Services\V1\Analysis;
 
+use App\Models\V1\Visit;
+
 class ScoreCalculator
 {
     public function __construct(private Visit $visit) {}

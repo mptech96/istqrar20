@@ -59,6 +59,11 @@ class Visit extends Model
     {
         return $this->belongsTo(User::class, 'auditor_id');
     }
+    
+    public function analysis()
+    {
+        return $this->hasOne(VisitAnalysis::class, 'visit_id');
+    }
 
     public function checklist()
     {
