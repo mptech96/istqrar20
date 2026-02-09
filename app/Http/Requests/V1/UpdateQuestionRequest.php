@@ -17,6 +17,7 @@ class UpdateQuestionRequest extends FormRequest
 
         $rules = [
             // Question data
+            'criteria_id' => ['nullable', 'exists:criterias,id'],
             'question_text' => ['sometimes', 'string'],
             'description' => ['nullable', 'string'],
             'help_text' => ['nullable', 'string'],

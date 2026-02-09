@@ -7,6 +7,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use App\Models\V1\Attachment;
+use Illuminate\Support\Facades\Auth;
+use Intervention\Image\ImageManager;
+use Intervention\Image\Drivers\Gd\Driver;
+use Illuminate\Support\Str;
 
 if (!function_exists('__tr')) {
 
@@ -223,4 +228,64 @@ if (!function_exists('__tr')) {
         return $normalizedTranslations[$normalizedKey];
     }
 
+}
+
+if (! function_exists('saveAttachment')) {
+    
+    function saveAttachment($file, $object)
+    {
+        try {
+            $manager = new ImageManager(new Driver());
+            
+            $mimeType  = $file->getClientMimeType();
+            $size      = $file->getSize();
+            $extension = $file->getClientOriginalExtension();
+            $original  = $file->getClientOriginalName();
+        
+            
+            $width = null;
+            $height = null;
+            if (str_starts_with($mimeType, 'image/')) {
+                $image  = $manager->read($file->path());
+                $width  = $image->width();
+                $height = $image->height();
+            }
+            
+            $file_name = __saveFile($file, base_path('public/uploads/attachments/'));
+        
+            Attachment::create([
+                // الربط الديناميكي
+                'entity_type'   => get_class($object),
+                'entity_id'     => $object->id,
+        
+                // الملف
+                'original_name' => $original,
+                'file_name'     => $file_name,
+                'file_path'     => base_path('public/uploads/attachments/' . $file_name),
+                'file_url'      => asset('uploads/attachments/' . $file_name),
+        
+                // المواصفات
+                'file_type'     => Str::startsWith($mimeType, 'image/') ? 'image' : 'file',
+                'mime_type'     => $mimeType,
+                'file_size'     => $size,
+                'file_extension'=> $extension,
+        
+                // للصور
+                'width'         => $width,
+                'height'        => $height,
+        
+                // المالك
+                //'uploaded_by'   => Auth::id(),
+                'uploaded_by'   => 1,
+                'upload_source' => 'web',
+        
+                // الحالة
+                'is_public'     => 0,
+                'is_active'     => 1,
+            ]);
+
+
+        } catch (\Exception $e) {}
+    }
+    
 }

@@ -16,7 +16,7 @@ class StoreQuestionRequest extends FormRequest
         $rules = [
             // Question data
             //'checklist_id' => ['required', 'exists:checklists,id'],
-            'criteria_id' => ['nullable', 'exists:criterias,id'],
+            'criteria_id' => ['required', 'exists:criterias,id'],
             
             'question_text' => ['required', 'string'],
             'description' => ['nullable', 'string'],

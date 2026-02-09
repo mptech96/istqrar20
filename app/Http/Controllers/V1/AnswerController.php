@@ -8,17 +8,11 @@ use App\Http\Requests\V1\UpdateAnswerRequest;
 use App\Http\Requests\V1\BulkAnswerRequest;
 use App\Http\Resources\V1\AnswerResource;
 use App\Models\V1\Answer;
-use App\Models\V1\Attachment;
 use App\Models\V1\Visit;
 use App\Models\V1\Question;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\File;
-use Intervention\Image\ImageManager;
-use Intervention\Image\Drivers\Gd\Driver;
-use Illuminate\Support\Str;
 use OpenApi\Attributes as OA;
 
 class AnswerController extends Controller
@@ -363,57 +357,8 @@ class AnswerController extends Controller
             'correction_status' => $request->input('corrective_action') ? 'pending' : null,
         ]);
         
-        $manager = new ImageManager(new Driver());
-        
         foreach ($request->file('attachments') ?? [] as $file) {
-        
-            $mimeType  = $file->getClientMimeType();
-            $size      = $file->getSize();
-            $extension = $file->getClientOriginalExtension();
-            $original  = $file->getClientOriginalName();
-        
-            
-            $width = null;
-            $height = null;
-            if (str_starts_with($mimeType, 'image/')) {
-                $image  = $manager->read($file->path());
-                $width  = $image->width();
-                $height = $image->height();
-            }
-            
-            $file_name = __saveFile($file, base_path('public/uploads/attachments/'));
-        
-            Attachment::create([
-                // الربط الديناميكي
-                'entity_type'   => get_class($answer),
-                'entity_id'     => $answer->id,
-        
-                // الملف
-                'original_name' => $original,
-                'file_name'     => $file_name,
-                'file_path'     => base_path('public/uploads/attachments/' . $file_name),
-                'file_url'      => asset('uploads/attachments/' . $file_name),
-        
-                // المواصفات
-                'file_type'     => Str::startsWith($mimeType, 'image/') ? 'image' : 'file',
-                'mime_type'     => $mimeType,
-                'file_size'     => $size,
-                'file_extension'=> $extension,
-        
-                // للصور
-                'width'         => $width,
-                'height'        => $height,
-        
-                // المالك
-                //'uploaded_by'   => Auth::id(),
-                'uploaded_by'   => 1,
-                'upload_source' => 'web',
-        
-                // الحالة
-                'is_public'     => 0,
-                'is_active'     => 1,
-            ]);
-
+            saveAttachment($file, $answer);
         }
         
         $this->updateVisitStatistics($visit);
@@ -751,57 +696,8 @@ class AnswerController extends Controller
         
         $answer->update($updateData);
         
-        $manager = new ImageManager(new Driver());
-        
         foreach ($request->file('attachments') ?? [] as $file) {
-        
-            $mimeType  = $file->getClientMimeType();
-            $size      = $file->getSize();
-            $extension = $file->getClientOriginalExtension();
-            $original  = $file->getClientOriginalName();
-        
-            
-            $width = null;
-            $height = null;
-            if (str_starts_with($mimeType, 'image/')) {
-                $image  = $manager->read($file->path());
-                $width  = $image->width();
-                $height = $image->height();
-            }
-            
-            $file_name = __saveFile($file, base_path('public/uploads/attachments/'));
-        
-            Attachment::create([
-                // الربط الديناميكي
-                'entity_type'   => get_class($answer),
-                'entity_id'     => $answer->id,
-        
-                // الملف
-                'original_name' => $original,
-                'file_name'     => $file_name,
-                'file_path'     => base_path('public/uploads/attachments/' . $file_name),
-                'file_url'      => asset('uploads/attachments/' . $file_name),
-        
-                // المواصفات
-                'file_type'     => Str::startsWith($mimeType, 'image/') ? 'image' : 'file',
-                'mime_type'     => $mimeType,
-                'file_size'     => $size,
-                'file_extension'=> $extension,
-        
-                // للصور
-                'width'         => $width,
-                'height'        => $height,
-        
-                // المالك
-                //'uploaded_by'   => Auth::id(),
-                'uploaded_by'   => 1,
-                'upload_source' => 'web',
-        
-                // الحالة
-                'is_public'     => 0,
-                'is_active'     => 1,
-            ]);
-
+            saveAttachment($file, $answer);
         }
         
         $this->updateVisitStatistics($visit);
@@ -1589,35 +1485,83 @@ class AnswerController extends Controller
         return $answerValue === $question->correct_answer;
     }
     
+    private function determineCategoryFromCriteria(Visit $visit): string
+    {
+        // جلب الإجابات مع الأسئلة والمعايير
+        $answers = $visit->answers()
+            ->with('question.criteria')
+            ->get()
+            ->filter(fn ($a) => $a->question && $a->question->criteria);
+    
+        if ($answers->isEmpty()) {
+            return 'N/A';
+        }
+    
+        // تجميع حسب المعيار
+        $grouped = $answers->groupBy(fn ($a) => $a->question->criteria->id);
+    
+        $weightedScore = 0;
+        $totalWeight = 0;
+    
+        foreach ($grouped as $criteriaId => $criteriaAnswers) {
+            $criteria = $criteriaAnswers->first()->question->criteria;
+    
+            $criteriaScore = $criteriaAnswers->sum('score');
+            $criteriaMax = $criteriaAnswers->sum('max_score');
+    
+            if ($criteriaMax <= 0) {
+                continue;
+            }
+    
+            $percentage = ($criteriaScore / $criteriaMax) * 100;
+    
+            // تطبيق وزن المعيار
+            $weightedScore += $percentage * $criteria->weight;
+            $totalWeight += $criteria->weight;
+        }
+    
+        if ($totalWeight == 0) {
+            return 'N/A';
+        }
+    
+        $finalPercentage = $weightedScore / $totalWeight;
+    
+        return $this->resolveCategoryFromRanges($finalPercentage);
+    }
+    
     private function updateVisitStatistics(Visit $visit): void
     {
-        $answers = $visit->answers;
-        
+        $answers = $visit->answers()->with('question')->get();
+    
         if ($answers->isEmpty()) {
             return;
         }
-        
+    
         $totalScore = $answers->sum('score');
         $maxPossibleScore = $answers->sum('max_score');
-        $percentage = $maxPossibleScore > 0 ? ($totalScore / $maxPossibleScore) * 100 : 0;
-        
-        $category = $this->determineCategory($percentage);
-        
+        $percentage = $maxPossibleScore > 0
+            ? ($totalScore / $maxPossibleScore) * 100
+            : 0;
+    
+        $category = $this->determineCategoryFromCriteria($visit);
+    
         $visit->update([
             'total_score' => $totalScore,
             'max_possible_score' => $maxPossibleScore,
-            'percentage' => $percentage,
+            'percentage' => round($percentage, 2),
             'category' => $category,
         ]);
     }
     
-    private function determineCategory(float $percentage): string
+    private function resolveCategoryFromRanges(float $percentage): string
     {
-        if ($percentage >= 90) return 'A';
-        if ($percentage >= 80) return 'B';
-        if ($percentage >= 70) return 'C';
-        if ($percentage >= 60) return 'D';
-        return 'F';
+        $range = DB::table('criteria_ranges')
+            ->where('min_score', '<=', $percentage)
+            ->where('max_score', '>=', $percentage)
+            ->orderBy('min_score')
+            ->first();
+    
+        return $range ? $range->name : 'Unclassified';
     }
     
 }
