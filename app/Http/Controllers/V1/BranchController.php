@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\V1\StoreBranchRequest;
 use App\Http\Requests\V1\UpdateBranchRequest;
 use App\Http\Resources\V1\BranchResource;
+use App\Http\Resources\V1\StatisticResource;
 use App\Models\V1\Branch;
 use App\Models\V1\Company;
 use App\Models\V1\User;
@@ -679,4 +680,52 @@ class BranchController extends Controller
             'message' => 'تم استعادة الفرع بنجاح'
         ]);
     }
+    
+    #[OA\Get(
+        path: '/api/v1/branches/{branch}/statistics',
+        operationId: 'getBranchStatistics',
+        summary: 'عرض إحصايات فرع',
+        description: 'استرجاع تفاصيل إحصايات فرع معين',
+        tags: ['Branches'],
+        //security: [['bearerAuth' => []]],
+        parameters: [
+            new OA\Parameter(
+                name: 'branch',
+                description: 'معرف فرع',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(type: 'integer', example: 1)
+            ),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'إحصايات الفرع',
+                content: new OA\JsonContent(
+                    type: 'object',
+                    properties: [
+                        new OA\Property(
+                            property: 'data',
+                            type: 'array',
+                            items: new OA\Items(
+                                type: 'object',
+                                properties: [
+                                    new OA\Property(property: 'id', type: 'integer', example: 1),
+                                    new OA\Property(property: 'record_date', type: 'string', format: 'date-time', example: '2026-02-05 02:00:00 AM'),
+                                    new OA\Property(property: 'metric_name', type: 'string', example: 'total_visits'),
+                                    new OA\Property(property: 'metric_value', type: 'float', example: 10.00),
+                                    new OA\Property(property: 'period_type', type: 'string', example: 'daily'),
+                                ]
+                            )
+                        ),
+                    ]
+                )
+            ),
+        ]
+    )]
+    public function statistics(Branch $branch)
+    {
+        return StatisticResource::collection($branch->statistics);
+    }
+    
 }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\V1\CompanyRequest;
 use App\Http\Resources\V1\CompanyResource;
+use App\Http\Resources\V1\StatisticResource;
 use App\Models\V1\Company;
 use App\Models\V1\User;
 use Illuminate\Http\Request;
@@ -618,5 +619,52 @@ class CompanyController extends Controller
         $company = Company::withTrashed()->findOrFail($id);
         $company->restore();
         return new CompanyResource($company);
+    }
+    
+    #[OA\Get(
+        path: '/api/v1/companies/{company}/statistics',
+        operationId: 'getCompanyStatistics',
+        summary: 'عرض إحصايات الشركات',
+        description: 'استرجاع تفاصيل إحصايات شركة معينة',
+        tags: ['Companies'],
+        //security: [['bearerAuth' => []]],
+        parameters: [
+            new OA\Parameter(
+                name: 'company',
+                description: 'معرف الشركة',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(type: 'integer', example: 1)
+            ),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'إحصايات الشركة',
+                content: new OA\JsonContent(
+                    type: 'object',
+                    properties: [
+                        new OA\Property(
+                            property: 'data',
+                            type: 'array',
+                            items: new OA\Items(
+                                type: 'object',
+                                properties: [
+                                    new OA\Property(property: 'id', type: 'integer', example: 1),
+                                    new OA\Property(property: 'record_date', type: 'string', format: 'date-time', example: '2026-02-05 02:00:00 AM'),
+                                    new OA\Property(property: 'metric_name', type: 'string', example: 'total_visits'),
+                                    new OA\Property(property: 'metric_value', type: 'float', example: 10.00),
+                                    new OA\Property(property: 'period_type', type: 'string', example: 'daily'),
+                                ]
+                            )
+                        ),
+                    ]
+                )
+            ),
+        ]
+    )]
+    public function statistics(Company $company)
+    {
+        return StatisticResource::collection($company->statistics);
     }
 }

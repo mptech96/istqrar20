@@ -20,6 +20,8 @@ Route::namespace('App\Http\Controllers\V1')->group(function (){
             Route::get('/{company}', 'show');
             Route::delete('/{company}', 'destroy');
             Route::post('/{id}/restore', 'restore');
+            Route::get('/{company}/statistics', 'statistics');
+
         });
         
         Route::prefix('branches')->controller(BranchController::class)->group(function () {
@@ -30,6 +32,7 @@ Route::namespace('App\Http\Controllers\V1')->group(function (){
             Route::get('/{branch}', 'show');
             Route::delete('/{branch}', 'destroy');
             Route::post('/{id}/restore', 'restore');
+            Route::get('/{branch}/statistics', 'statistics');
         });
         
         Route::prefix('users')->controller(UserController::class)->group(function () {
@@ -41,6 +44,7 @@ Route::namespace('App\Http\Controllers\V1')->group(function (){
             Route::get('/{user}', 'show');
             Route::delete('/{user}', 'destroy');
             Route::post('/{id}/restore', 'restore');
+            Route::get('/{user}/statistics', 'statistics');
         });
         
         Route::prefix('auth')->controller(AuthController::class)->group(function () {

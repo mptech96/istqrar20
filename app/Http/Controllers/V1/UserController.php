@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\V1\StoreUserRequest;
 use App\Http\Requests\V1\UpdateUserRequest;
 use App\Http\Resources\V1\UserResource;
+use App\Http\Resources\V1\StatisticResource;
 use App\Models\V1\User;
 use App\Models\V1\Company;
 use App\Models\V1\Branch;
@@ -827,5 +828,52 @@ class UserController extends Controller
             'license_days_left' => $user->license_expiry ? $now->diffInDays($user->license_expiry, false) : null,
             'id_days_left' => $user->id_expiry ? $now->diffInDays($user->id_expiry, false) : null,
         ]);
+    }
+    
+    #[OA\Get(
+        path: '/api/v1/users/{user}/statistics',
+        operationId: 'getUserStatistics',
+        summary: 'عرض إحصايات المراقبين',
+        description: 'استرجاع تفاصيل إحصايات مراقب معين',
+        tags: ['Users'],
+        //security: [['bearerAuth' => []]],
+        parameters: [
+            new OA\Parameter(
+                name: 'user',
+                description: 'معرف المراقب',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(type: 'integer', example: 1)
+            ),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'إحصايات المراقب',
+                content: new OA\JsonContent(
+                    type: 'object',
+                    properties: [
+                        new OA\Property(
+                            property: 'data',
+                            type: 'array',
+                            items: new OA\Items(
+                                type: 'object',
+                                properties: [
+                                    new OA\Property(property: 'id', type: 'integer', example: 1),
+                                    new OA\Property(property: 'record_date', type: 'string', format: 'date-time', example: '2026-02-05 02:00:00 AM'),
+                                    new OA\Property(property: 'metric_name', type: 'string', example: 'total_visits'),
+                                    new OA\Property(property: 'metric_value', type: 'float', example: 10.00),
+                                    new OA\Property(property: 'period_type', type: 'string', example: 'daily'),
+                                ]
+                            )
+                        ),
+                    ]
+                )
+            ),
+        ]
+    )]
+    public function statistics(User $user)
+    {
+        return StatisticResource::collection($user->statistics);
     }
 }

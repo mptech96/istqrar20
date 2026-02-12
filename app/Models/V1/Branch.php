@@ -50,7 +50,12 @@ class Branch extends Model
     {
         return $this->hasMany(Visit::class);
     }
-
+    
+    public function statistics()
+    {
+        return $this->hasMany(Statistic::class, 'branch_id');
+    }
+    
     /**
      * علاقة الفرع بالمستخدمين
      */

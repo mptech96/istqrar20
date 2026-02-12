@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use App\Services\V1\Analysis\VisitAnalysisService;
+use App\Services\V1\Statistics\SyncEnterpriseStatisticsEngine;
 use OpenApi\Attributes as OA;
 
 class VisitController extends Controller
@@ -1351,7 +1352,8 @@ class VisitController extends Controller
                 $visit->update(['actual_duration' => $duration]);
             }
             
-            (new VisitAnalysisService)->generate($visit);
+            app(VisitAnalysisService::class)->generate($visit);
+            app(SyncEnterpriseStatisticsEngine::class)->updateFromVisit($visit);
             
             //return \App\Models\V1\VisitAnalysis::get();
             
@@ -2399,7 +2401,7 @@ class VisitController extends Controller
     )]
     public function visitAnalysis(Visit $visit)
     {
-        $analysis = $visit->analysis()->first();
+        $analysis = $visit->analysis;
         if($analysis){
             return response()->json([
                 'data' => new VisitAnalysisResource($analysis),

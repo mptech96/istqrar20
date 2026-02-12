@@ -54,7 +54,12 @@ class Company extends Model
     {
         return $this->hasManyThrough(Visit::class, Branch::class);
     }
-
+    
+        public function statistics()
+    {
+        return $this->hasMany(Statistic::class, 'company_id');
+    }
+    
     /**
      * Accessor لمتوسط الأداء
      */

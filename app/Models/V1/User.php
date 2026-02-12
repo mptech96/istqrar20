@@ -77,7 +77,12 @@ class User extends Authenticatable
     {
         return $this->belongsTo(User::class, 'created_by');
     }
-
+    
+    public function statistics()
+    {
+        return $this->hasMany(Statistic::class, 'auditor_id');
+    }
+    
     public function managedBranch()
     {
         return $this->hasOne(Branch::class, 'manager_user_id');

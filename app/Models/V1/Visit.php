@@ -54,6 +54,14 @@ class Visit extends Model
     {
         return $this->belongsTo(Branch::class);
     }
+    
+    public function company()
+    {
+        return $this->hasOneDeepFromRelations(
+            $this->branch(),     
+            (new Branch)->company()
+        );
+    }
 
     public function auditor()
     {

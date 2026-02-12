@@ -2616,6 +2616,72 @@
                 }
             }
         },
+        "/api/v1/branches/{branch}/statistics": {
+            "get": {
+                "tags": [
+                    "Branches"
+                ],
+                "summary": "عرض إحصايات فرع",
+                "description": "استرجاع تفاصيل إحصايات فرع معين",
+                "operationId": "getBranchStatistics",
+                "parameters": [
+                    {
+                        "name": "branch",
+                        "in": "path",
+                        "description": "معرف فرع",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "إحصايات الفرع",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "record_date": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": "2026-02-05 02:00:00 AM"
+                                                    },
+                                                    "metric_name": {
+                                                        "type": "string",
+                                                        "example": "total_visits"
+                                                    },
+                                                    "metric_value": {
+                                                        "type": "number",
+                                                        "format": "float",
+                                                        "example": 10
+                                                    },
+                                                    "period_type": {
+                                                        "type": "string",
+                                                        "example": "daily"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/checklists": {
             "get": {
                 "tags": [
@@ -4392,6 +4458,72 @@
                     },
                     "404": {
                         "description": "الشركة غير موجودة"
+                    }
+                }
+            }
+        },
+        "/api/v1/companies/{company}/statistics": {
+            "get": {
+                "tags": [
+                    "Companies"
+                ],
+                "summary": "عرض إحصايات الشركات",
+                "description": "استرجاع تفاصيل إحصايات شركة معينة",
+                "operationId": "getCompanyStatistics",
+                "parameters": [
+                    {
+                        "name": "company",
+                        "in": "path",
+                        "description": "معرف الشركة",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "إحصايات الشركة",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "record_date": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": "2026-02-05 02:00:00 AM"
+                                                    },
+                                                    "metric_name": {
+                                                        "type": "string",
+                                                        "example": "total_visits"
+                                                    },
+                                                    "metric_value": {
+                                                        "type": "number",
+                                                        "format": "float",
+                                                        "example": 10
+                                                    },
+                                                    "period_type": {
+                                                        "type": "string",
+                                                        "example": "daily"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -7256,6 +7388,72 @@
                     },
                     "400": {
                         "description": "المستخدم ليس مراجعاً"
+                    }
+                }
+            }
+        },
+        "/api/v1/users/{user}/statistics": {
+            "get": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "عرض إحصايات المراقبين",
+                "description": "استرجاع تفاصيل إحصايات مراقب معين",
+                "operationId": "getUserStatistics",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "path",
+                        "description": "معرف المراقب",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "إحصايات المراقب",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "record_date": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": "2026-02-05 02:00:00 AM"
+                                                    },
+                                                    "metric_name": {
+                                                        "type": "string",
+                                                        "example": "total_visits"
+                                                    },
+                                                    "metric_value": {
+                                                        "type": "number",
+                                                        "format": "float",
+                                                        "example": 10
+                                                    },
+                                                    "period_type": {
+                                                        "type": "string",
+                                                        "example": "daily"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     }
                 }
             }
