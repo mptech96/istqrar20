@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Route;
 
 // Public Routes
 
-Route::namespace('App\Http\Controllers\V1')->group(function (){
+Route::namespace('App\Http\Controllers\V1')->middleware(['throttle:60,1', 'api'])->group(function (){
     Route::prefix('v1')->group(function () {
         Route::middleware('token.cookie')->group(function () {
             // Authentication
@@ -28,7 +28,7 @@ Route::namespace('App\Http\Controllers\V1')->group(function (){
             Route::prefix('branches')->controller(BranchController::class)->group(function () {
                 Route::get('/', 'index');
                 Route::get('/create', 'create')->middleware(['user.role:company_admin']);
-                Route::post('/', 'store');
+                Route::post('/', 'store')->middleware(['user.role:company_admin']);
                 Route::put('/{branch}', 'update')->middleware(['user.role:company_admin']);
                 Route::get('/{branch}', 'show');
                 Route::delete('/{branch}', 'destroy')->middleware(['user.role:company_admin']);
@@ -48,7 +48,7 @@ Route::namespace('App\Http\Controllers\V1')->group(function (){
                 Route::get('/{user}/statistics', 'statistics');
             });
             
-            Route::prefix('criterias')->controller(CriteriaController::class)->group(function () {
+            Route::prefix('criterias')->middleware(['user.role:super_admin'])->controller(CriteriaController::class)->group(function () {
                 Route::get('/', 'index');
                 Route::get('/categories', 'categories');
                 Route::post('/', 'store');
@@ -59,7 +59,7 @@ Route::namespace('App\Http\Controllers\V1')->group(function (){
                 Route::post('/{criteria}/evaluate', 'evaluate');
             });
             
-            Route::prefix('checklists')->controller(ChecklistController::class)->group(function () {
+            Route::prefix('checklists')->middleware(['user.role:super_admin'])->controller(ChecklistController::class)->group(function () {
                 Route::get('/', 'index');
                 Route::get('{checklist}', 'show');
                 Route::post('/', 'store');
@@ -96,17 +96,17 @@ Route::namespace('App\Http\Controllers\V1')->group(function (){
             Route::prefix('visits')->controller(VisitController::class)->group(function () {
                 Route::get('/', 'index');
                 Route::get('/calendar', 'calendar');
-                Route::get('/create', 'create');
-                Route::post('', 'store');
-                Route::put('/{visit}', 'update');
+                Route::get('/create', 'create')->middleware(['user.role:super_admin']);
+                Route::post('', 'store')->middleware(['user.role:super_admin']);
+                Route::put('/{visit}', 'update')->middleware(['user.role:super_admin']);
                 Route::get('/{visit}', 'show');
                 Route::get('/{visit}/analysis', 'visitAnalysis');
-                Route::delete('/{visit}', 'destroy');
-                Route::post('/{id}/restore', 'restore');
-                Route::post('/{visit}/start', 'start');
+                Route::delete('/{visit}', 'destroy')->middleware(['user.role:super_admin']);
+                Route::post('/{id}/restore', 'restore')->middleware(['user.role:super_admin']);
+                Route::post('/{visit}/start', 'start')->middleware(['user.role:auditor']);
                 Route::get('auditor/{auditorId}', 'auditorVisits');
                 Route::get('branch/{branchId}', 'branchVisits');
-                Route::post('/{visit}/complete', 'complete');
+                Route::post('/{visit}/complete', 'complete')->middleware(['user.role:auditor']);
                 //Route::get('/{visit}/statistics', 'statistics');
                 
                 Route::prefix('{visit}/questions')->group(function () {
@@ -115,12 +115,12 @@ Route::namespace('App\Http\Controllers\V1')->group(function (){
                 
                 Route::prefix('{visit}/answers')->controller(AnswerController::class)->group(function () {
                     Route::get('', 'index');
-                    Route::post('', 'store');
+                    Route::post('', 'store')->middleware(['user.role:super_admin']);
                     Route::get('/{answer}', 'show');
-                    Route::put('/{answer}', 'update');
-                    Route::delete('/{answer}', 'destroy');
-                    Route::post('/{id}/restore', 'restore');
-                    Route::post('bulk', 'bulkStore');
+                    Route::put('/{answer}', 'update')->middleware(['user.role:super_admin']);
+                    Route::delete('/{answer}', 'destroy')->middleware(['user.role:super_admin']);
+                    Route::post('/{id}/restore', 'restore')->middleware(['user.role:super_admin']);
+                    Route::post('bulk', 'bulkStore')->middleware(['user.role:super_admin']);
                 });
                 
                 
