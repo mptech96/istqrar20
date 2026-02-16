@@ -72,7 +72,7 @@ class User extends Authenticatable
                 
                 if($user->role === 'company_admin') {
                     $builder->where('id', $user->id)
-                        ->orWhere('company_id', $user->company->id);
+                        ->orWhere('company_id', $user->company_id);
                 }
                 elseif($user->role === 'branch_manager') {
                     $builder->where('id', $user->id);
