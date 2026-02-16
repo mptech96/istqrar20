@@ -1,5 +1,6 @@
 {
     "not found": "Not Found",
     "the evaluation period has ended.": "The evaluation period has ended.",
-    "questions": "questions"
+    "questions": "questions",
+    "the user must be of the following role: super_admin": "The user must be of the following role: super_admin"
 }

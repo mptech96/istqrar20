@@ -32,7 +32,7 @@ class VisitController extends Controller
         summary: 'عرض الزيارات',
         description: 'استرجاع قائمة الزيارات مع إمكانية الفلترة والترتيب',
         tags: ['Visits'],
-        //security: [['bearerAuth' => []]],
+        security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(
                 name: 'page',
@@ -292,7 +292,7 @@ class VisitController extends Controller
         summary: 'عرض زيارات التقويم',
         description: 'استرجاع الزيارات بصيغة مناسبة للتقويم',
         tags: ['Visits'],
-        //security: [['bearerAuth' => []]],
+        security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(
                 name: 'month',
@@ -422,7 +422,7 @@ class VisitController extends Controller
         summary: 'بيانات انشاء زيارة',
         description: 'عرض الفروع والمراقبين والقوائم',
         tags: ['Visits'],
-        //security: [['bearerAuth' => []]],
+        security: [['bearerAuth' => []]],
         responses: [
             new OA\Response(
                 response: 200,
@@ -492,7 +492,7 @@ class VisitController extends Controller
         لعرض بيانات الفروع والمراقبين وقوائم المراجعة
         ',
         tags: ['Visits'],
-        //security: [['bearerAuth' => []]],
+        security: [['bearerAuth' => []]],
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\JsonContent(
@@ -626,7 +626,7 @@ class VisitController extends Controller
         summary: 'عرض تفاصيل زيارة',
         description: 'استرجاع تفاصيل زيارة معينة مع علاقاتها',
         tags: ['Visits'],
-        //security: [['bearerAuth' => []]],
+        security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(
                 name: 'visit',
@@ -827,7 +827,7 @@ class VisitController extends Controller
         summary: 'تحديث بيانات زيارة',
         description: 'تحديث بيانات زيارة موجودة',
         tags: ['Visits'],
-        //security: [['bearerAuth' => []]],
+        security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(
                 name: 'visit',
@@ -961,7 +961,7 @@ class VisitController extends Controller
         summary: 'حذف زيارة',
         description: 'حذف زيارة (حذف ناعم)',
         tags: ['Visits'],
-        //security: [['bearerAuth' => []]],
+        security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(
                 name: 'visit',
@@ -1032,7 +1032,7 @@ class VisitController extends Controller
         summary: 'استعادة زيارة محذوفة',
         description: 'استعادة زيارة تم حذفها (حذف ناعم)',
         tags: ['Visits'],
-        //security: [['bearerAuth' => []]],
+        security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(
                 name: 'visit',
@@ -1104,7 +1104,7 @@ class VisitController extends Controller
         summary: 'بدء الزيارة',
         description: 'تسجيل وقت بدء الزيارة الفعلي',
         tags: ['Visits'],
-        //security: [['bearerAuth' => []]],
+        security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(
                 name: 'visit',
@@ -1219,7 +1219,7 @@ class VisitController extends Controller
         summary: 'إنهاء الزيارة',
         description: 'تسجيل وقت انتهاء الزيارة وحساب المدة الفعلية',
         tags: ['Visits'],
-        //security: [['bearerAuth' => []]],
+        security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(
                 name: 'visit',
@@ -1370,7 +1370,7 @@ class VisitController extends Controller
         summary: 'اسئلة الزيارة',
         description: 'عرض اسئلة الزيارة',
         tags: ['Visits'],
-        //security: [['bearerAuth' => []]],
+        security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(
                 name: 'visit',
@@ -1434,7 +1434,7 @@ class VisitController extends Controller
         summary: 'رفع الزيارة للمراجعة',
         description: 'رفع الزيارة المكتملة للمراجعة والاعتماد',
         tags: ['Visits'],
-        //security: [['bearerAuth' => []]],
+        security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(
                 name: 'visit',
@@ -1521,7 +1521,7 @@ class VisitController extends Controller
         summary: 'اعتماد الزيارة',
         description: 'اعتماد الزيارة بعد المراجعة',
         tags: ['Visits'],
-        //security: [['bearerAuth' => []]],
+        security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(
                 name: 'visit',
@@ -1624,7 +1624,7 @@ class VisitController extends Controller
         summary: 'رفض الزيارة',
         description: 'رفض الزيارة بعد المراجعة',
         tags: ['Visits'],
-        //security: [['bearerAuth' => []]],
+        security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(
                 name: 'visit',
@@ -1741,7 +1741,7 @@ class VisitController extends Controller
         summary: 'إلغاء الزيارة',
         description: 'إلغاء زيارة مجدولة أو قيد التنفيذ',
         tags: ['Visits'],
-        //security: [['bearerAuth' => []]],
+        security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(
                 name: 'visit',
@@ -1840,7 +1840,7 @@ class VisitController extends Controller
         summary: 'عرض إحصائيات الزيارة',
         description: 'استرجاع إحصائيات مفصلة عن زيارة معينة',
         tags: ['Visits'],
-        //security: [['bearerAuth' => []]],
+        security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(
                 name: 'visit',
@@ -1979,7 +1979,7 @@ class VisitController extends Controller
         summary: 'عرض زيارات مراقب',
         description: 'استرجاع جميع زيارات مراقب معين مع إحصائيات',
         tags: ['Visits'],
-        //security: [['bearerAuth' => []]],
+        security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(
                 name: 'auditorId',
@@ -2153,7 +2153,7 @@ class VisitController extends Controller
         summary: 'عرض زيارات فرع',
         description: 'استرجاع جميع زيارات فرع معين مع إحصائيات',
         tags: ['Visits'],
-        //security: [['bearerAuth' => []]],
+        security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(
                 name: 'branchId',
@@ -2362,7 +2362,7 @@ class VisitController extends Controller
         summary: 'عرض تحليل الزيارة',
         description: 'استرجاع تفاصيل تحليل زيارة معينة',
         tags: ['Visits'],
-        //security: [['bearerAuth' => []]],
+        security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(
                 name: 'visit',

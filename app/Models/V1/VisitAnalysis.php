@@ -5,6 +5,7 @@ namespace App\Models\V1;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Staudenmeir\EloquentHasManyDeep\HasRelationships;
+use Illuminate\Database\Eloquent\Builder;
 
 class VisitAnalysis extends Model
 {
@@ -68,6 +69,36 @@ class VisitAnalysis extends Model
         'priority_recommendations'=> 'array',
         'error_categories'       => 'array',
     ];
+    
+    protected static function booted()
+    {
+        static::addGlobalScope('statistics', function (Builder $builder) {
+            if (auth()->check()){
+                
+                $user = auth()->user();
+                
+                if($user->role === 'company_admin') {
+                    $builder->whereHas('visit');
+                }
+                elseif($user->role === 'branch_manager') {
+                    $builder->whereHas('visit');
+                }
+                elseif($user->role === 'auditor') {
+                    $builder->whereHas('visit');
+                }
+                elseif($user->role === 'super_admin') {
+                    $builder->whereRaw('1 = 1');
+                }
+                else {
+                    $builder->whereRaw('1 = 0');
+                }
+            }
+            else {
+                $builder->whereRaw('1 = 0');
+            }
+        });
+
+    }
     
     public function visit()
     {

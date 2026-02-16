@@ -20,7 +20,7 @@ class CriteriaController extends Controller
         summary: 'عرض قائمة معايير التقييم',
         description: 'استرجاع قائمة معايير التقييم مع إمكانية الفلترة والترتيب',
         tags: ['Criterias'],
-        //security: [['bearerAuth' => []]],
+        security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(
                 name: 'page',
@@ -190,7 +190,7 @@ class CriteriaController extends Controller
         summary: 'عرض فئات معايير التقييم',
         description: 'استرجاع قائمة الفئات الفريدة لمعايير التقييم',
         tags: ['Criterias'],
-        //security: [['bearerAuth' => []]],
+        security: [['bearerAuth' => []]],
         responses: [
             new OA\Response(
                 response: 200,
@@ -227,7 +227,7 @@ class CriteriaController extends Controller
         summary: 'إنشاء معيار تقييم جديد',
         description: 'إنشاء معيار تقييم جديد مع نطاقات التقييم الخاصة به',
         tags: ['Criterias'],
-        //security: [['bearerAuth' => []]],
+        security: [['bearerAuth' => []]],
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\JsonContent(
@@ -361,7 +361,7 @@ class CriteriaController extends Controller
         summary: 'عرض تفاصيل معيار تقييم',
         description: 'استرجاع تفاصيل معيار تقييم مع نطاقات التقييم الخاصة به',
         tags: ['Criterias'],
-        //security: [['bearerAuth' => []]],
+        security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(
                 name: 'criteria',
@@ -450,7 +450,7 @@ class CriteriaController extends Controller
         summary: 'تحديث بيانات معيار تقييم',
         description: 'تحديث بيانات معيار تقييم موجود',
         tags: ['Criterias'],
-        //security: [['bearerAuth' => []]],
+        security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(
                 name: 'criteria',
@@ -580,7 +580,7 @@ class CriteriaController extends Controller
         summary: 'حذف معيار تقييم',
         description: 'حذف معيار تقييم مع نطاقات التقييم الخاصة به (حذف ناعم)',
         tags: ['Criterias'],
-        //security: [['bearerAuth' => []]],
+        security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(
                 name: 'criteria',
@@ -640,7 +640,7 @@ class CriteriaController extends Controller
         summary: 'استعادة معيار محذوف',
         description: 'استعادة معيار تقييم تم حذفه (حذف ناعم)',
         tags: ['Criterias'],
-        //security: [['bearerAuth' => []]],
+        security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(
                 name: 'criteria',
@@ -694,7 +694,7 @@ class CriteriaController extends Controller
         summary: 'تقييم درجة بناء على معيار',
         description: 'تحديد نطاق التقييم المناسب لدرجة معينة بناء على معيار معين',
         tags: ['Criterias'],
-        //security: [['bearerAuth' => []]],
+        security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(
                 name: 'criteria',

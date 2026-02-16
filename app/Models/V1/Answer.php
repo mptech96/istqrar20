@@ -5,6 +5,7 @@ namespace App\Models\V1;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Builder;
 
 class Answer extends Model
 {
@@ -35,7 +36,37 @@ class Answer extends Model
         'corrected_at' => 'datetime',
         'verified_at' => 'datetime',
     ];
+    
+    protected static function booted()
+    {
+        static::addGlobalScope('branch', function (Builder $builder) {
+            if (auth()->check()){
+                
+                $user = auth()->user();
+                
+                if($user->role === 'company_admin') {
+                    $builder->whereHas('visit');
+                }
+                elseif($user->role === 'branch_manager') {
+                    $builder->whereHas('visit');
+                }
+                elseif($user->role === 'auditor') {
+                    $builder->whereHas('visit');
+                }
+                elseif($user->role === 'super_admin') {
+                    $builder->whereRaw('1 = 1');
+                }
+                else {
+                    $builder->whereRaw('1 = 0');
+                }
+            }
+            else {
+                $builder->whereRaw('1 = 0');
+            }
+        });
 
+    }
+    
     public function visit()
     {
         return $this->belongsTo(Visit::class);

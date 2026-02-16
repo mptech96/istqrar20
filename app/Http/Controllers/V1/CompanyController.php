@@ -22,7 +22,7 @@ class CompanyController extends Controller
         summary: 'عرض قائمة الشركات',
         description: 'استرجاع قائمة الشركات مع إمكانية الفلترة والترتيب',
         tags: ['Companies'],
-        //security: [['bearerAuth' => []]],
+        security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(
                 name: 'page',
@@ -187,7 +187,7 @@ class CompanyController extends Controller
         summary: 'إنشاء شركة جديدة مع مديرها',
         description: 'إنشاء شركة جديدة مع بيانات المدير المرتبط بها',
         tags: ['Companies'],
-        //security: [['bearerAuth' => []]],
+        security: [['bearerAuth' => []]],
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\MediaType(
@@ -339,7 +339,7 @@ class CompanyController extends Controller
         summary: 'عرض تفاصيل شركة',
         description: 'استرجاع تفاصيل شركة معينة',
         tags: ['Companies'],
-        //security: [['bearerAuth' => []]],
+        security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(
                 name: 'company',
@@ -406,7 +406,7 @@ class CompanyController extends Controller
         summary: 'تحديث بيانات شركة',
         description: 'تحديث بيانات شركة موجودة',
         tags: ['Companies'],
-        //security: [['bearerAuth' => []]],
+        security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(
                 name: 'company',
@@ -516,7 +516,7 @@ class CompanyController extends Controller
         summary: 'حذف شركة',
         description: 'حذف شركة معينة (حذف ناعم)',
         tags: ['Companies'],
-        //security: [['bearerAuth' => []]],
+        security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(
                 name: 'company',
@@ -575,7 +575,7 @@ class CompanyController extends Controller
         summary: 'استعادة شركة محذوفة',
         description: 'استعادة شركة تم حذفها (حذف ناعم)',
         tags: ['Companies'],
-        //security: [['bearerAuth' => []]],
+        security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(
                 name: 'company',
@@ -627,7 +627,7 @@ class CompanyController extends Controller
         summary: 'عرض إحصايات الشركات',
         description: 'استرجاع تفاصيل إحصايات شركة معينة',
         tags: ['Companies'],
-        //security: [['bearerAuth' => []]],
+        security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(
                 name: 'company',

@@ -24,7 +24,7 @@ class AnswerController extends Controller
         summary: 'عرض إجابات زيارة',
         description: 'استرجاع جميع إجابات زيارة معينة مع إمكانية الفلترة',
         tags: ['Answers'],
-        //security: [['bearerAuth' => []]],
+        security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(
                 name: 'visit',
@@ -213,7 +213,7 @@ class AnswerController extends Controller
         summary: 'تسجيل إجابة جديدة',
         description: 'تسجيل إجابة لسؤال في زيارة معينة',
         tags: ['Answers'],
-        //security: [['bearerAuth' => []]],
+        security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(
                 name: 'visit',
@@ -375,7 +375,7 @@ class AnswerController extends Controller
         summary: 'عرض تفاصيل إجابة',
         description: 'استرجاع تفاصيل إجابة معينة مع علاقاتها',
         tags: ['Answers'],
-        //security: [['bearerAuth' => []]],
+        security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(
                 name: 'visit',
@@ -553,7 +553,7 @@ class AnswerController extends Controller
         summary: 'تحديث بيانات إجابة',
         description: 'تحديث بيانات إجابة موجودة',
         tags: ['Answers'],
-        //security: [['bearerAuth' => []]],
+        security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(
                 name: 'visit',
@@ -714,7 +714,7 @@ class AnswerController extends Controller
         summary: 'حذف إجابة',
         description: 'حذف إجابة (حذف ناعم)',
         tags: ['Answers'],
-        //security: [['bearerAuth' => []]],
+        security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(
                 name: 'visit',
@@ -798,7 +798,7 @@ class AnswerController extends Controller
         summary: 'استعادة إجابة محذوفة',
         description: 'استعادة إجابة تم حذفها (حذف ناعم)',
         tags: ['Answers'],
-        //security: [['bearerAuth' => []]],
+        security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(
                 name: 'visit',
@@ -884,7 +884,7 @@ class AnswerController extends Controller
         summary: 'التحقق من التصحيح',
         description: 'التحقق من إكمال التصحيح للإجابة',
         tags: ['Answers'],
-        //security: [['bearerAuth' => []]],
+        security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(
                 name: 'visit',
@@ -1000,7 +1000,7 @@ class AnswerController extends Controller
         summary: 'إعفاء من التصحيح',
         description: 'إعفاء الإجابة من التصحيح',
         tags: ['Answers'],
-        //security: [['bearerAuth' => []]],
+        security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(
                 name: 'visit',
@@ -1096,7 +1096,7 @@ class AnswerController extends Controller
         summary: 'تسجيل إجابات جماعية',
         description: 'تسجيل مجموعة من الإجابات دفعة واحدة',
         tags: ['Answers'],
-        //security: [['bearerAuth' => []]],
+        security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(
                 name: 'visit',
@@ -1313,7 +1313,7 @@ class AnswerController extends Controller
         summary: 'عرض التصحيحات المطلوبة',
         description: 'استرجاع جميع التصحيحات المطلوبة لزيارة معينة',
         tags: ['Answers'],
-        //security: [['bearerAuth' => []]],
+        security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(
                 name: 'visit',

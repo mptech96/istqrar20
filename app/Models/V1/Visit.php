@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Staudenmeir\EloquentHasManyDeep\HasRelationships;
+use Illuminate\Database\Eloquent\Builder;
 
 class Visit extends Model
 {
@@ -49,7 +50,39 @@ class Visit extends Model
         'max_possible_score' => 'integer',
         'percentage' => 'decimal:2',
     ];
+    
+    protected static function booted()
+    {
+        static::addGlobalScope('visit', function (Builder $builder) {
+            if (auth()->check()){
+                
+                $user = auth()->user();
+                
+                if($user->role === 'company_admin') {
+                    $builder->whereHas('company')
+                        ->where('status', 'completed');
+                }
+                elseif($user->role === 'branch_manager') {
+                    $builder->whereHas('branch')
+                        ->where('status', 'completed');
+                }
+                elseif($user->role === 'auditor') {
+                    $builder->where('auditor_id', $user->id);
+                }
+                elseif($user->role === 'super_admin') {
+                    $builder->whereRaw('1 = 1');
+                }
+                else {
+                    $builder->whereRaw('1 = 0');
+                }
+            }
+            else {
+                $builder->whereRaw('1 = 0');
+            }
+        });
 
+    }
+    
     public function branch()
     {
         return $this->belongsTo(Branch::class);

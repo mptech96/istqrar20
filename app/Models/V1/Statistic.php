@@ -5,6 +5,7 @@ namespace App\Models\V1;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Staudenmeir\EloquentHasManyDeep\HasRelationships;
+use Illuminate\Database\Eloquent\Builder;
 
 class Statistic extends Model
 {
@@ -54,7 +55,37 @@ class Statistic extends Model
         'period_type'       => 'string', // enum handled in validation
         'trend_direction'   => 'string',
     ];
+    
+    protected static function booted()
+    {
+        static::addGlobalScope('statistics', function (Builder $builder) {
+            if (auth()->check()){
+                
+                $user = auth()->user();
+                
+                if($user->role === 'company_admin') {
+                    $builder->whereHas('company');
+                }
+                elseif($user->role === 'branch_manager') {
+                    $builder->whereHas('branch');
+                }
+                elseif($user->role === 'auditor') {
+                    $builder->whereHas('auditor');
+                }
+                elseif($user->role === 'super_admin') {
+                    $builder->whereRaw('1 = 1');
+                }
+                else {
+                    $builder->whereRaw('1 = 0');
+                }
+            }
+            else {
+                $builder->whereRaw('1 = 0');
+            }
+        });
 
+    }
+    
     // =========================================================================
     // Relationships
     // =========================================================================

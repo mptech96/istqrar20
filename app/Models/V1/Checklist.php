@@ -5,6 +5,7 @@ namespace App\Models\V1;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Builder;
 
 class Checklist extends Model
 {
@@ -32,11 +33,46 @@ class Checklist extends Model
         'is_active' => 'boolean',
         'is_template' => 'boolean',
     ];
+    
+    protected static function booted()
+    {
+        static::addGlobalScope('branch', function (Builder $builder) {
+            if (auth()->check()){
+                
+                $user = auth()->user();
+                
+                if($user->role === 'company_admin') {
+                    $builder->whereHas('visits');
+                }
+                elseif($user->role === 'branch_manager') {
+                    $builder->whereHas('visits');
+                }
+                elseif($user->role === 'auditor') {
+                    $builder->whereHas('visits');
+                }
+                elseif($user->role === 'super_admin') {
+                    $builder->whereRaw('1 = 1');
+                }
+                else {
+                    $builder->whereRaw('1 = 0');
+                }
+            }
+            else {
+                $builder->whereRaw('1 = 0');
+            }
+        });
 
+    }
+    
     // Relationships
     public function company()
     {
         return $this->belongsTo(Company::class);
+    }
+    
+    public function visits()
+    {
+        return $this->hasMany(Visit::class);
     }
 
     public function creator()

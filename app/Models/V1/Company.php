@@ -5,6 +5,7 @@ namespace App\Models\V1;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Builder;
 
 class Company extends Model
 {
@@ -25,7 +26,37 @@ class Company extends Model
         'is_verified' => 'boolean',
         'overall_score' => 'decimal:2'
     ];
+    
+    protected static function booted()
+    {
+        static::addGlobalScope('branch', function (Builder $builder) {
+            if (auth()->check()){
+                
+                $user = auth()->user();
+                
+                if($user->role === 'company_admin') {
+                    $builder->whereHas('manager');
+                }
+                elseif($user->role === 'branch_manager') {
+                    $builder->whereHas('branches');
+                }
+                elseif($user->role === 'auditor') {
+                    $builder->whereRaw('1 = 0');
+                }
+                elseif($user->role === 'super_admin') {
+                    $builder->whereRaw('1 = 1');
+                }
+                else {
+                    $builder->whereRaw('1 = 0');
+                }
+            }
+            else {
+                $builder->whereRaw('1 = 0');
+            }
+        });
 
+    }
+    
     /**
      * علاقة الشركة بالفروع
      */

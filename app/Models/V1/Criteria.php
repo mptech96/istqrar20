@@ -5,6 +5,7 @@ namespace App\Models\V1;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Builder;
 
 class Criteria extends Model
 {
@@ -24,7 +25,37 @@ class Criteria extends Model
         'weight' => 'decimal:2',
         'is_active' => 'boolean',
     ];
+    
+    protected static function booted()
+    {
+        static::addGlobalScope('visit', function (Builder $builder) {
+            if (auth()->check()){
+                
+                $user = auth()->user();
+                
+                if($user->role === 'company_admin') {
+                    $builder->whereRaw('1 = 1');
+                }
+                elseif($user->role === 'branch_manager') {
+                    $builder->whereRaw('1 = 1');
+                }
+                elseif($user->role === 'auditor') {
+                    $builder->whereRaw('1 = 1');
+                }
+                elseif($user->role === 'super_admin') {
+                    $builder->whereRaw('1 = 1');
+                }
+                else {
+                    $builder->whereRaw('1 = 0');
+                }
+            }
+            else {
+                $builder->whereRaw('1 = 0');
+            }
+        });
 
+    }
+    
     // Relationships
     public function creator()
     {

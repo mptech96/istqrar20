@@ -22,7 +22,7 @@ class QuestionController extends Controller
         summary: 'عرض أسئلة قائمة مراجعة',
         description: 'استرجاع قائمة أسئلة قائمة مراجعة معينة',
         tags: ['Questions'],
-        //security: [['bearerAuth' => []]],
+        security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(
                 name: 'checklist',
@@ -161,7 +161,7 @@ class QuestionController extends Controller
         summary: 'عرض أنواع الأسئلة المتاحة',
         description: 'استرجاع قائمة أنواع الأسئلة المتاحة مع وصفها',
         tags: ['Questions'],
-        //security: [['bearerAuth' => []]],
+        security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(
                 name: 'checklist',
@@ -276,7 +276,7 @@ class QuestionController extends Controller
         لعرض بيانات القوائم والتقييمات ونوع السؤال
         ',
         tags: ['Questions'],
-        //security: [['bearerAuth' => []]],
+        security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(
                 name: 'checklist',
@@ -399,7 +399,7 @@ class QuestionController extends Controller
         summary: 'بيانات انشاء سؤال',
         description: 'عرض القوائم والتقييمات',
         tags: ['Questions'],
-        //security: [['bearerAuth' => []]],
+        security: [['bearerAuth' => []]],
         responses: [
             new OA\Response(
                 response: 200,
@@ -457,7 +457,7 @@ class QuestionController extends Controller
         summary: 'عرض تفاصيل سؤال',
         description: 'استرجاع تفاصيل سؤال معين',
         tags: ['Questions'],
-        //security: [['bearerAuth' => []]],
+        security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(
                 name: 'checklist',
@@ -547,7 +547,7 @@ class QuestionController extends Controller
         summary: 'تحديث بيانات سؤال',
         description: 'تحديث بيانات سؤال موجود',
         tags: ['Questions'],
-        //security: [['bearerAuth' => []]],
+        security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(
                 name: 'checklist',
@@ -686,7 +686,7 @@ class QuestionController extends Controller
         summary: 'حذف سؤال',
         description: 'حذف سؤال معين (حذف ناعم)',
         tags: ['Questions'],
-        //security: [['bearerAuth' => []]],
+        security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(
                 name: 'checklist',
@@ -754,7 +754,7 @@ class QuestionController extends Controller
         summary: 'استعادة سؤال محذوف',
         description: 'استعادة سؤال تم حذفه (حذف ناعم)',
         tags: ['Questions'],
-        //security: [['bearerAuth' => []]],
+        security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(
                 name: 'checklist',
@@ -820,7 +820,7 @@ class QuestionController extends Controller
         summary: 'إعادة ترتيب الأسئلة',
         description: 'إعادة ترتيب أسئلة قائمة مراجعة',
         tags: ['Questions'],
-        //security: [['bearerAuth' => []]],
+        security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(
                 name: 'checklist',
@@ -915,7 +915,7 @@ class QuestionController extends Controller
         summary: 'نسخ سؤال',
         description: 'إنشاء نسخة من سؤال موجود في نفس القائمة',
         tags: ['Questions'],
-        //security: [['bearerAuth' => []]],
+        security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(
                 name: 'checklist',
@@ -991,7 +991,7 @@ class QuestionController extends Controller
         summary: 'تقييم إجابة سؤال',
         description: 'تقييم إجابة سؤال وحساب النقاط بناءً على نوع السؤال',
         tags: ['Questions'],
-        //security: [['bearerAuth' => []]],
+        security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(
                 name: 'checklist',

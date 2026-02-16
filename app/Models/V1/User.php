@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Builder;
 
 class User extends Authenticatable
 {
@@ -61,7 +62,38 @@ class User extends Authenticatable
         'must_change_password' => 'boolean',
         'status' => 'integer',
     ];
+    
+    protected static function booted()
+    {
+        static::addGlobalScope('user', function (Builder $builder) {
+            if (auth()->check()){
+                
+                $user = auth()->user();
+                
+                if($user->role === 'company_admin') {
+                    $builder->where('id', $user->id)
+                        ->orWhere('company_id', $user->company->id);
+                }
+                elseif($user->role === 'branch_manager') {
+                    $builder->where('id', $user->id);
+                }
+                elseif($user->role === 'auditor') {
+                    $builder->where('id', $user->id);
+                }
+                elseif($user->role === 'super_admin') {
+                    $builder->whereRaw('1 = 1');
+                }
+                else {
+                    $builder->whereRaw('1 = 0');
+                }
+            }
+            else {
+                $builder->whereRaw('1 = 0');
+            }
+        });
 
+    }
+    
     // Relationships
     public function company()
     {

@@ -21,7 +21,7 @@ class ChecklistController extends Controller
         summary: 'عرض قوائم المراجعة',
         description: 'استرجاع قائمة قوائم المراجعة مع إمكانية الفلترة والترتيب',
         tags: ['Checklists'],
-        //security: [['bearerAuth' => []]],
+        security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(
                 name: 'page',
@@ -215,7 +215,7 @@ class ChecklistController extends Controller
         summary: 'عرض أنواع الصناعة لقوائم المراجعة',
         description: 'استرجاع قائمة أنواع الصناعة الفريدة لقوائم المراجعة',
         tags: ['Checklists'],
-        //security: [['bearerAuth' => []]],
+        security: [['bearerAuth' => []]],
         responses: [
             new OA\Response(
                 response: 200,
@@ -252,7 +252,7 @@ class ChecklistController extends Controller
         summary: 'إنشاء قائمة مراجعة جديدة',
         description: 'إنشاء قائمة مراجعة جديدة مع إعداداتها',
         tags: ['Checklists'],
-        //security: [['bearerAuth' => []]],
+        security: [['bearerAuth' => []]],
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\JsonContent(
@@ -333,7 +333,7 @@ class ChecklistController extends Controller
         summary: 'عرض تفاصيل قائمة مراجعة',
         description: 'استرجاع تفاصيل قائمة مراجعة مع أسئلتها',
         tags: ['Checklists'],
-        //security: [['bearerAuth' => []]],
+        security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(
                 name: 'checklist',
@@ -412,7 +412,7 @@ class ChecklistController extends Controller
         summary: 'تحديث بيانات قائمة مراجعة',
         description: 'تحديث بيانات قائمة مراجعة موجودة',
         tags: ['Checklists'],
-        //security: [['bearerAuth' => []]],
+        security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(
                 name: 'checklist',
@@ -500,7 +500,7 @@ class ChecklistController extends Controller
         summary: 'حذف قائمة مراجعة',
         description: 'حذف قائمة مراجعة مع أسئلتها (حذف ناعم)',
         tags: ['Checklists'],
-        //security: [['bearerAuth' => []]],
+        security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(
                 name: 'checklist',
@@ -561,7 +561,7 @@ class ChecklistController extends Controller
         summary: 'استعادة قائمة محذوفة',
         description: 'استعادة قائمة مراجعة تم حذفها (حذف ناعم)',
         tags: ['Checklists'],
-        //security: [['bearerAuth' => []]],
+        security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(
                 name: 'checklist',
@@ -616,7 +616,7 @@ class ChecklistController extends Controller
         summary: 'نسخ قائمة مراجعة',
         description: 'إنشاء نسخة من قائمة مراجعة موجودة مع أسئلتها',
         tags: ['Checklists'],
-        //security: [['bearerAuth' => []]],
+        security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(
                 name: 'checklist',
@@ -701,7 +701,7 @@ class ChecklistController extends Controller
         summary: 'عرض إحصائيات قائمة مراجعة',
         description: 'استرجاع إحصائيات قائمة مراجعة (عدد الأسئلة، النقاط، إلخ)',
         tags: ['Checklists'],
-        //security: [['bearerAuth' => []]],
+        security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(
                 name: 'checklist',

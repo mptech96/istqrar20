@@ -5,6 +5,7 @@ namespace App\Models\V1;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Builder;
 
 class Branch extends Model
 {
@@ -26,7 +27,37 @@ class Branch extends Model
         'latitude' => 'decimal:8',
         'longitude' => 'decimal:8'
     ];
+    
+    protected static function booted()
+    {
+        static::addGlobalScope('branch', function (Builder $builder) {
+            if (auth()->check()){
+                
+                $user = auth()->user();
+                
+                if($user->role === 'company_admin') {
+                    $builder->whereHas('company');
+                }
+                elseif($user->role === 'branch_manager') {
+                    $builder->whereHas('manager');
+                }
+                elseif($user->role === 'auditor') {
+                    $builder->whereHas('visits');
+                }
+                elseif($user->role === 'super_admin') {
+                    $builder->whereRaw('1 = 1');
+                }
+                else {
+                    $builder->whereRaw('1 = 0');
+                }
+            }
+            else {
+                $builder->whereRaw('1 = 0');
+            }
+        });
 
+    }
+    
     /**
      * علاقة الفرع بالشركة
      */

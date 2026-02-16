@@ -19,6 +19,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'token.cookie' => \App\Http\Middleware\VerifyTokenCookie::class,
+            'user.role' => \App\Http\Middleware\UserRole::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
