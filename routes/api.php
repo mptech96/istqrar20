@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::namespace('App\Http\Controllers\V1')->middleware(['throttle:60,1', 'api'])->group(function (){
     Route::prefix('v1')->group(function () {
-        Route::middleware('token.cookie')->group(function () {
+        Route::middleware(['token.cookie'])->group(function () {
             // Authentication
             Route::prefix('companies')->controller(CompanyController::class)->group(function () {
                 Route::get('/', 'index');

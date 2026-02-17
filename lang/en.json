@@ -2,5 +2,9 @@
     "not found": "Not Found",
     "the evaluation period has ended.": "The evaluation period has ended.",
     "questions": "questions",
-    "the user must be of the following role: super_admin": "The user must be of the following role: super_admin"
+    "the user must be of the following role: super_admin": "The user must be of the following role: super_admin",
+    "the user must be of the following role: company_admin": "The user must be of the following role: company_admin",
+    "the user must be of the following role: super_admin8": "The user must be of the following role: super_admin8",
+    "this user is not authorized": "This user is not authorized",
+    "the user must be of the following role: ": "The user must be of the following role: "
 }

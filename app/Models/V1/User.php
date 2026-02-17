@@ -65,7 +65,7 @@ class User extends Authenticatable
     
     protected static function booted()
     {
-        static::addGlobalScope('user', function (Builder $builder) {
+        static::addGlobalScope('users', function (Builder $builder) {
             if (auth()->check()){
                 
                 $user = auth()->user();

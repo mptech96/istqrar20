@@ -21,6 +21,11 @@ return Application::configure(basePath: dirname(__DIR__))
             'token.cookie' => \App\Http\Middleware\VerifyTokenCookie::class,
             'user.role' => \App\Http\Middleware\UserRole::class,
         ]);
+        
+        $middleware->api(prepend: [
+            \App\Http\Middleware\VerifyTokenCookie::class,
+        ]);
+        
     })
     ->withExceptions(function (Exceptions $exceptions) {
         $exceptions->render(function (NotFoundHttpException $e, Request $request) {
