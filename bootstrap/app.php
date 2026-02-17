@@ -22,9 +22,16 @@ return Application::configure(basePath: dirname(__DIR__))
             'user.role' => \App\Http\Middleware\UserRole::class,
         ]);
         
-        $middleware->api(prepend: [
-            \App\Http\Middleware\VerifyTokenCookie::class,
+        $middleware->priority([
+            \App\Http\Middleware\TokenCookieAuth::class,     // المصادقة أولاً
         ]);
+        
+        $middleware->group('api', [
+            'token.cookie',
+            //'throttle:api',
+            \Illuminate\Routing\Middleware\SubstituteBindings::class,
+        ]);
+
         
     })
     ->withExceptions(function (Exceptions $exceptions) {
