@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::namespace('App\Http\Controllers\V1')->middleware(['throttle:60,1', 'api'])->group(function (){
     Route::prefix('v1')->group(function () {
-        Route::middleware(['token.cookie'])->group(function () {
+        Route::middleware(['api-token-priority'])->group(function () {
             // Authentication
             Route::prefix('companies')->controller(CompanyController::class)->group(function () {
                 Route::get('/', 'index');
@@ -129,9 +129,15 @@ Route::namespace('App\Http\Controllers\V1')->middleware(['throttle:60,1', 'api']
         });
         
         Route::prefix('auth')->controller(AuthController::class)->group(function () {
-            Route::post('login', 'login');
-            Route::post('logout', 'logout')->middleware('token.cookie');
-            Route::get('me', 'me')->middleware('token.cookie');
+            Route::middleware(['api-module-priority'])->group(function () {
+                Route::post('login', 'login');
+            });
+            
+            Route::middleware(['api-token-priority'])->group(function () {
+                Route::post('logout', 'logout');
+                Route::get('me', 'me');
+            });
+            
         });
         
         Route::get('/docs', function () {

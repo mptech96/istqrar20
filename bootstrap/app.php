@@ -7,8 +7,6 @@ use Illuminate\Foundation\Configuration\Middleware;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Illuminate\Http\Request;
 
-
-
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
@@ -20,18 +18,23 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'token.cookie' => \App\Http\Middleware\VerifyTokenCookie::class,
             'user.role' => \App\Http\Middleware\UserRole::class,
+            'bindings' => \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ]);
         
-        $middleware->priority([
-            \App\Http\Middleware\TokenCookieAuth::class,     // المصادقة أولاً
-        ]);
         
-        $middleware->group('api', [
+        $middleware->group('api-token-priority', [
             'token.cookie',
-            //'throttle:api',
+            'bindings',
+        ]);
+        
+        $middleware->group('api-module-priority', [
+            'bindings',
+        ]);
+            
+        $middleware->priority([
+            \App\Http\Middleware\VerifyTokenCookie::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ]);
-
         
     })
     ->withExceptions(function (Exceptions $exceptions) {

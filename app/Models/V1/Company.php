@@ -29,7 +29,7 @@ class Company extends Model
     
     protected static function booted()
     {
-        static::addGlobalScope('branch', function (Builder $builder) {
+        static::addGlobalScope('companies', function (Builder $builder) {
             if (auth()->check()){
                 
                 $user = auth()->user();
