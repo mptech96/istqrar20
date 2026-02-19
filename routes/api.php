@@ -126,6 +126,44 @@ Route::namespace('App\Http\Controllers\V1')->middleware(['throttle:60,1', 'api']
                 
             });
             
+            Route::prefix('tickets')->controller(TicketController::class)->group(function () {
+                Route::get('/', 'index');
+                Route::get('/create', 'create');
+                Route::post('/', 'store');
+                Route::get('/statistics/overview', 'statisticsOverview');
+                Route::get('/{ticket}', 'show');
+                Route::put('/{ticket}', 'update');
+                Route::delete('/{ticket}', 'destroy');
+                Route::post('/{id}/restore', 'restore');
+                
+                // Additional actions
+                Route::post('/{ticket}/assign', 'assign');
+                Route::post('/{ticket}/resolve', 'resolve');
+                Route::post('/{ticket}/close', 'close');
+                Route::post('/{ticket}/reopen', 'reopen');
+                Route::post('/{ticket}/escalate', 'escalate');
+                
+                // Replies
+                Route::get('/{ticket}/replies', 'replies');
+                Route::post('/{ticket}/replies', 'addReply');
+                Route::put('/{ticket}/replies/{reply}', 'updateReply');
+                Route::delete('/{ticket}/replies/{reply}', 'destroyReply');
+            });
+            
+            Route::prefix('settings')->controller(SettingController::class)->group(function () {
+                Route::get('/', 'index')->middleware(['user.role:super_admin']);
+                Route::get('/public/all', 'publicSettings')->middleware(['user.role:super_admin']);
+                Route::get('/groups', 'groups')->middleware(['user.role:super_admin']);
+                Route::get('/export', 'export')->middleware(['user.role:super_admin']);
+                Route::post('/import', 'import')->middleware(['user.role:super_admin']);
+                Route::post('/bulk', 'bulkUpdate')->middleware(['user.role:super_admin']);
+                Route::post('/', 'store')->middleware(['user.role:super_admin']);
+                Route::get('/{group}', 'group');
+                Route::get('/{group}/{key}', 'show');
+                Route::put('/{setting}', 'update')->middleware(['user.role:super_admin']);
+                Route::delete('/{setting}', 'destroy')->middleware(['user.role:super_admin']);
+            });
+
         });
         
         Route::prefix('auth')->controller(AuthController::class)->group(function () {

@@ -312,3 +312,76 @@ if (! function_exists('overWriteEnvFile')) {
     }
     
 }
+
+
+if (!function_exists('setting')) {
+    /**
+     * الحصول على قيمة إعداد من قاعدة البيانات
+     * 
+     * @param string $key مفتاح الإعداد
+     * @param mixed $default القيمة الافتراضية إذا لم يوجد الإعداد
+     * @param string $group مجموعة الإعداد (اختياري)
+     * @return mixed
+     */
+    function setting($key, $default = null, $group = 'general')
+    {
+        return \App\Models\V1\Setting::get($key, $default, $group);
+    }
+}
+
+if (!function_exists('set_setting')) {
+    /**
+     * تعيين قيمة إعداد في قاعدة البيانات
+     * 
+     * @param string $key مفتاح الإعداد
+     * @param mixed $value القيمة
+     * @param string $group مجموعة الإعداد
+     * @return \\App\Models\V1\Setting
+     */
+    function set_setting($key, $value, $group = 'general')
+    {
+        return \App\Models\V1\Setting::set($key, $value, $group);
+    }
+}
+
+if (!function_exists('settings_group')) {
+    /**
+     * الحصول على جميع إعدادات مجموعة معينة
+     * 
+     * @param string $group اسم المجموعة
+     * @param bool $publicOnly العودة فقط للإعدادات العامة
+     * @return array
+     */
+    function settings_group($group, $publicOnly = false)
+    {
+        return \App\Models\V1\Setting::getGroup($group, $publicOnly);
+    }
+}
+
+if (!function_exists('has_setting')) {
+    /**
+     * التحقق من وجود إعداد
+     * 
+     * @param string $key مفتاح الإعداد
+     * @param string $group مجموعة الإعداد
+     * @return bool
+     */
+    function has_setting($key, $group = 'general')
+    {
+        return \App\Models\V1\Setting::has($key, $group);
+    }
+}
+
+if (!function_exists('remove_setting')) {
+    /**
+     * حذف إعداد
+     * 
+     * @param string $key مفتاح الإعداد
+     * @param string $group مجموعة الإعداد
+     * @return bool
+     */
+    function remove_setting($key, $group = 'general')
+    {
+        return \App\Models\V1\Setting::remove($key, $group);
+    }
+}

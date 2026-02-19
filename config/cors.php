@@ -19,7 +19,13 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['*'],
+    'allowed_origins' => [
+        'https://localhost:3000',
+        'https://istqrar.flz.sa',
+        'http://localhost:8585',
+        'http://localhost:8000',
+        'http://localhost:8158',
+    ],
 
     'allowed_origins_patterns' => [],
 

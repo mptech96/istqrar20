@@ -6722,6 +6722,2407 @@
                 ]
             }
         },
+        "/api/v1/settings": {
+            "get": {
+                "tags": [
+                    "Settings"
+                ],
+                "summary": "عرض قائمة الإعدادات",
+                "description": "استرجاع قائمة الإعدادات مع إمكانية الفلترة",
+                "operationId": "getSettings",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "رقم الصفحة",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "عدد العناصر في الصفحة",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 15
+                        }
+                    },
+                    {
+                        "name": "group",
+                        "in": "query",
+                        "description": "فلتر بمجموعة الإعدادات",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "بحث بالمفتاح أو التسمية",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "public_only",
+                        "in": "query",
+                        "description": "عرض الإعدادات العامة فقط",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "default": false
+                        }
+                    },
+                    {
+                        "name": "include_values",
+                        "in": "query",
+                        "description": "تضمين القيم",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "default": true
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "قائمة الإعدادات",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer"
+                                                    },
+                                                    "group": {
+                                                        "type": "string"
+                                                    },
+                                                    "key": {
+                                                        "type": "string"
+                                                    },
+                                                    "type": {
+                                                        "type": "string"
+                                                    },
+                                                    "label": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Settings"
+                ],
+                "summary": "إنشاء إعداد جديد",
+                "description": "إنشاء إعداد جديد في النظام",
+                "operationId": "createSetting",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "group",
+                                    "key",
+                                    "type"
+                                ],
+                                "properties": {
+                                    "group": {
+                                        "type": "string",
+                                        "example": "general"
+                                    },
+                                    "key": {
+                                        "type": "string",
+                                        "example": "site_name"
+                                    },
+                                    "value": {
+                                        "type": "string",
+                                        "example": "نظام التقييم"
+                                    },
+                                    "type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "string",
+                                            "number",
+                                            "boolean",
+                                            "json",
+                                            "array",
+                                            "text"
+                                        ],
+                                        "example": "string"
+                                    },
+                                    "label": {
+                                        "type": "string",
+                                        "example": "اسم الموقع"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "اسم الموقع الذي يظهر في الصفحة الرئيسية"
+                                    },
+                                    "is_public": {
+                                        "type": "boolean",
+                                        "example": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "تم إنشاء الإعداد بنجاح"
+                    },
+                    "422": {
+                        "description": "بيانات غير صالحة"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/settings/groups": {
+            "get": {
+                "tags": [
+                    "Settings"
+                ],
+                "summary": "عرض مجموعات الإعدادات",
+                "description": "استرجاع قائمة مجموعات الإعدادات المتاحة",
+                "operationId": "getSettingGroups",
+                "responses": {
+                    "200": {
+                        "description": "قائمة المجموعات",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/settings/{group}": {
+            "get": {
+                "tags": [
+                    "Settings"
+                ],
+                "summary": "عرض إعدادات مجموعة",
+                "description": "استرجاع إعدادات مجموعة معينة",
+                "operationId": "getSettingsByGroup",
+                "parameters": [
+                    {
+                        "name": "group",
+                        "in": "path",
+                        "description": "اسم المجموعة",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "general"
+                        }
+                    },
+                    {
+                        "name": "public_only",
+                        "in": "query",
+                        "description": "عرض الإعدادات العامة فقط",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "default": false
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "إعدادات المجموعة",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "additionalProperties": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/settings/{group}/{key}": {
+            "get": {
+                "tags": [
+                    "Settings"
+                ],
+                "summary": "عرض قيمة إعداد",
+                "description": "استرجاع قيمة إعداد معين",
+                "operationId": "getSetting",
+                "parameters": [
+                    {
+                        "name": "group",
+                        "in": "path",
+                        "description": "اسم المجموعة",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "general"
+                        }
+                    },
+                    {
+                        "name": "key",
+                        "in": "path",
+                        "description": "مفتاح الإعداد",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "site_name"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "قيمة الإعداد",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "value": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "الإعداد غير موجود"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/settings/{setting}": {
+            "put": {
+                "tags": [
+                    "Settings"
+                ],
+                "summary": "تحديث إعداد",
+                "description": "تحديث بيانات إعداد موجود",
+                "operationId": "updateSetting",
+                "parameters": [
+                    {
+                        "name": "setting",
+                        "in": "path",
+                        "description": "معرف الإعداد",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "value": {
+                                        "type": "string"
+                                    },
+                                    "label": {
+                                        "type": "string"
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "is_public": {
+                                        "type": "boolean"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "تم تحديث الإعداد بنجاح"
+                    },
+                    "404": {
+                        "description": "الإعداد غير موجود"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Settings"
+                ],
+                "summary": "حذف إعداد",
+                "description": "حذف إعداد معين",
+                "operationId": "deleteSetting",
+                "parameters": [
+                    {
+                        "name": "setting",
+                        "in": "path",
+                        "description": "معرف الإعداد",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "تم حذف الإعداد بنجاح"
+                    },
+                    "404": {
+                        "description": "الإعداد غير موجود"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/settings/bulk": {
+            "post": {
+                "tags": [
+                    "Settings"
+                ],
+                "summary": "تحديث إعدادات متعددة",
+                "description": "تحديث عدة إعدادات دفعة واحدة",
+                "operationId": "bulkUpdateSettings",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "settings"
+                                ],
+                                "properties": {
+                                    "settings": {
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "group": {
+                                                    "type": "string"
+                                                },
+                                                "key": {
+                                                    "type": "string"
+                                                },
+                                                "value": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "تم تحديث الإعدادات بنجاح"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/settings/import": {
+            "post": {
+                "tags": [
+                    "Settings"
+                ],
+                "summary": "استيراد إعدادات",
+                "description": "استيراد إعدادات من ملف JSON",
+                "operationId": "importSettings",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "file"
+                                ],
+                                "properties": {
+                                    "file": {
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "override": {
+                                        "type": "boolean",
+                                        "default": false
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "تم استيراد الإعدادات بنجاح"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/settings/export": {
+            "get": {
+                "tags": [
+                    "Settings"
+                ],
+                "summary": "تصدير الإعدادات",
+                "description": "تصدير جميع الإعدادات كملف JSON",
+                "operationId": "exportSettings",
+                "responses": {
+                    "200": {
+                        "description": "ملف الإعدادات",
+                        "content": {
+                            "application/json": {}
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/settings/public": {
+            "get": {
+                "tags": [
+                    "Settings"
+                ],
+                "summary": "عرض الإعدادات العامة",
+                "description": "استرجاع جميع الإعدادات العامة (لا تتطلب مصادقة)",
+                "operationId": "getPublicSettings",
+                "parameters": [
+                    {
+                        "name": "groups",
+                        "in": "query",
+                        "description": "المجموعات المطلوبة (مفصولة بفواصل)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "general,email"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "الإعدادات العامة",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "additionalProperties": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/tickets": {
+            "get": {
+                "tags": [
+                    "Tickets"
+                ],
+                "summary": "عرض قائمة التذاكر",
+                "description": "استرجاع قائمة التذاكر مع إمكانية الفلترة والترتيب",
+                "operationId": "getTickets",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "رقم الصفحة",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "عدد العناصر في الصفحة",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 15
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "بحث برقم التذكرة أو العنوان أو الوصف",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "فلتر بحالة التذكرة",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "open",
+                                "in_progress",
+                                "pending_customer",
+                                "resolved",
+                                "closed",
+                                "escalated"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "priority",
+                        "in": "query",
+                        "description": "فلتر بالأولوية",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "low",
+                                "medium",
+                                "high",
+                                "critical"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "ticket_type",
+                        "in": "query",
+                        "description": "فلتر بنوع التذكرة",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "dispute",
+                                "complaint",
+                                "request",
+                                "inquiry",
+                                "technical",
+                                "feedback"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "department",
+                        "in": "query",
+                        "description": "فلتر بالقسم",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "support",
+                                "technical",
+                                "quality",
+                                "billing",
+                                "admin"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "assigned_to",
+                        "in": "query",
+                        "description": "فلتر بالمستخدم المسند إليه",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "company_id",
+                        "in": "query",
+                        "description": "فلتر بمعرف الشركة",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "branch_id",
+                        "in": "query",
+                        "description": "فلتر بمعرف الفرع",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "created_by",
+                        "in": "query",
+                        "description": "فلتر بمعرف المنشئ",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "overdue_only",
+                        "in": "query",
+                        "description": "عرض التذاكر المتأخرة فقط",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "default": false
+                        }
+                    },
+                    {
+                        "name": "unassigned_only",
+                        "in": "query",
+                        "description": "عرض التذاكر غير المسندة فقط",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "default": false
+                        }
+                    },
+                    {
+                        "name": "from_date",
+                        "in": "query",
+                        "description": "من تاريخ الإنشاء",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "to_date",
+                        "in": "query",
+                        "description": "إلى تاريخ الإنشاء",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "sort_by",
+                        "in": "query",
+                        "description": "ترتيب النتائج حسب",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "created_at",
+                            "enum": [
+                                "ticket_number",
+                                "subject",
+                                "priority",
+                                "status",
+                                "created_at",
+                                "sla_due_date"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "sort_order",
+                        "in": "query",
+                        "description": "اتجاه الترتيب",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "desc",
+                            "enum": [
+                                "asc",
+                                "desc"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "include",
+                        "in": "query",
+                        "description": "العلاقات المطلوب تضمينها",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "creator,company,branch,assignedTo,replies,attachments"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "قائمة التذاكر",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "ticket_number": {
+                                                        "type": "string",
+                                                        "example": "TKT-202602-0001"
+                                                    },
+                                                    "subject": {
+                                                        "type": "string",
+                                                        "example": "مشكلة في التطبيق"
+                                                    },
+                                                    "status": {
+                                                        "type": "string",
+                                                        "example": "open"
+                                                    },
+                                                    "priority": {
+                                                        "type": "string",
+                                                        "example": "high"
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string",
+                                                        "format": "date-time"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "links": {
+                                            "properties": {
+                                                "first": {
+                                                    "type": "string"
+                                                },
+                                                "last": {
+                                                    "type": "string"
+                                                },
+                                                "prev": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                },
+                                                "next": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "meta": {
+                                            "properties": {
+                                                "current_page": {
+                                                    "type": "integer"
+                                                },
+                                                "from": {
+                                                    "type": "integer",
+                                                    "nullable": true
+                                                },
+                                                "last_page": {
+                                                    "type": "integer"
+                                                },
+                                                "path": {
+                                                    "type": "string"
+                                                },
+                                                "per_page": {
+                                                    "type": "integer"
+                                                },
+                                                "to": {
+                                                    "type": "integer",
+                                                    "nullable": true
+                                                },
+                                                "total": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "غير مصرح به"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Tickets"
+                ],
+                "summary": "إنشاء تذكرة جديدة",
+                "description": "إنشاء تذكرة جديدة مع إمكانية رفع مرفقات",
+                "operationId": "createTicket",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "user_type",
+                                    "subject",
+                                    "description",
+                                    "ticket_type"
+                                ],
+                                "properties": {
+                                    "user_type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "company",
+                                            "branch",
+                                            "auditor",
+                                            "admin",
+                                            "quality"
+                                        ]
+                                    },
+                                    "company_id": {
+                                        "type": "integer",
+                                        "example": 1,
+                                        "nullable": true
+                                    },
+                                    "branch_id": {
+                                        "type": "integer",
+                                        "example": 1,
+                                        "nullable": true
+                                    },
+                                    "visit_id": {
+                                        "type": "integer",
+                                        "example": 1,
+                                        "nullable": true
+                                    },
+                                    "subject": {
+                                        "type": "string",
+                                        "example": "مشكلة في التطبيق"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "شرح المشكلة بالتفصيل"
+                                    },
+                                    "ticket_type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "dispute",
+                                            "complaint",
+                                            "request",
+                                            "inquiry",
+                                            "technical",
+                                            "feedback"
+                                        ]
+                                    },
+                                    "priority": {
+                                        "type": "string",
+                                        "default": "medium",
+                                        "enum": [
+                                            "low",
+                                            "medium",
+                                            "high",
+                                            "critical"
+                                        ]
+                                    },
+                                    "department": {
+                                        "type": "string",
+                                        "default": "support",
+                                        "enum": [
+                                            "support",
+                                            "technical",
+                                            "quality",
+                                            "billing",
+                                            "admin"
+                                        ]
+                                    },
+                                    "attachments": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "binary"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "تم إنشاء التذكرة بنجاح",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "ticket_number": {
+                                                    "type": "string",
+                                                    "example": "TKT-202602-0001"
+                                                },
+                                                "subject": {
+                                                    "type": "string",
+                                                    "example": "مشكلة في التطبيق"
+                                                },
+                                                "status": {
+                                                    "type": "string",
+                                                    "example": "open"
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "تم إنشاء التذكرة بنجاح"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "بيانات غير صالحة"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/tickets/create": {
+            "get": {
+                "tags": [
+                    "Tickets"
+                ],
+                "summary": "بيانات إنشاء تذكرة",
+                "description": "عرض الشركات والفروع والزيارات والمستخدمين",
+                "operationId": "getTicketCreateData",
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "companies": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "name": {
+                                                        "type": "string",
+                                                        "example": "شركة 1"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "branches": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "name": {
+                                                        "type": "string",
+                                                        "example": "فرع 1"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "visits": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "visit_date": {
+                                                        "type": "string",
+                                                        "format": "date"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "users": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "name": {
+                                                        "type": "string",
+                                                        "example": "محمد"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "ticket_types": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "priorities": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "departments": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/tickets/{ticket}": {
+            "get": {
+                "tags": [
+                    "Tickets"
+                ],
+                "summary": "عرض تفاصيل تذكرة",
+                "description": "استرجاع تفاصيل تذكرة معينة مع ردودها",
+                "operationId": "getTicket",
+                "parameters": [
+                    {
+                        "name": "ticket",
+                        "in": "path",
+                        "description": "معرف التذكرة أو رقم التذكرة",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    },
+                    {
+                        "name": "include",
+                        "in": "query",
+                        "description": "العلاقات المطلوب تضمينها",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "creator,company,branch,assignedTo,replies,attachments"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "تفاصيل التذكرة",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "ticket_number": {
+                                                    "type": "string",
+                                                    "example": "TKT-202602-0001"
+                                                },
+                                                "subject": {
+                                                    "type": "string",
+                                                    "example": "مشكلة في التطبيق"
+                                                },
+                                                "description": {
+                                                    "type": "string",
+                                                    "example": "شرح المشكلة"
+                                                },
+                                                "status": {
+                                                    "type": "string",
+                                                    "example": "open"
+                                                },
+                                                "priority": {
+                                                    "type": "string",
+                                                    "example": "high"
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "التذكرة غير موجودة"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Tickets"
+                ],
+                "summary": "تحديث بيانات تذكرة",
+                "description": "تحديث بيانات تذكرة موجودة",
+                "operationId": "updateTicket",
+                "parameters": [
+                    {
+                        "name": "ticket",
+                        "in": "path",
+                        "description": "معرف التذكرة",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "subject": {
+                                        "type": "string",
+                                        "example": "عنوان محدث"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "وصف محدث"
+                                    },
+                                    "priority": {
+                                        "type": "string",
+                                        "enum": [
+                                            "low",
+                                            "medium",
+                                            "high",
+                                            "critical"
+                                        ]
+                                    },
+                                    "department": {
+                                        "type": "string",
+                                        "enum": [
+                                            "support",
+                                            "technical",
+                                            "quality",
+                                            "billing",
+                                            "admin"
+                                        ]
+                                    },
+                                    "assigned_to": {
+                                        "type": "integer",
+                                        "example": 2,
+                                        "nullable": true
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "enum": [
+                                            "open",
+                                            "in_progress",
+                                            "pending_customer",
+                                            "resolved",
+                                            "closed",
+                                            "escalated"
+                                        ]
+                                    },
+                                    "resolution": {
+                                        "type": "string",
+                                        "example": "تم حل المشكلة"
+                                    },
+                                    "customer_satisfaction": {
+                                        "type": "integer",
+                                        "maximum": 5,
+                                        "minimum": 1,
+                                        "example": 5
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "تم تحديث التذكرة بنجاح",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "تم تحديث التذكرة بنجاح"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "subject": {
+                                                    "type": "string",
+                                                    "example": "عنوان محدث"
+                                                },
+                                                "status": {
+                                                    "type": "string",
+                                                    "example": "in_progress"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "التذكرة غير موجودة"
+                    },
+                    "422": {
+                        "description": "بيانات غير صالحة"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Tickets"
+                ],
+                "summary": "حذف تذكرة",
+                "description": "حذف تذكرة (حذف ناعم)",
+                "operationId": "deleteTicket",
+                "parameters": [
+                    {
+                        "name": "ticket",
+                        "in": "path",
+                        "description": "معرف التذكرة",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "تم حذف التذكرة بنجاح",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "تم حذف التذكرة بنجاح"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "ticket_number": {
+                                                    "type": "string",
+                                                    "example": "TKT-202602-0001"
+                                                },
+                                                "deleted_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "التذكرة غير موجودة"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/tickets/{ticket}/restore": {
+            "post": {
+                "tags": [
+                    "Tickets"
+                ],
+                "summary": "استعادة تذكرة محذوفة",
+                "description": "استعادة تذكرة تم حذفها (حذف ناعم)",
+                "operationId": "restoreTicket",
+                "parameters": [
+                    {
+                        "name": "ticket",
+                        "in": "path",
+                        "description": "معرف التذكرة",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "تم استعادة التذكرة بنجاح",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "تم استعادة التذكرة بنجاح"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "ticket_number": {
+                                                    "type": "string",
+                                                    "example": "TKT-202602-0001"
+                                                },
+                                                "deleted_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": null,
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "التذكرة غير موجودة"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/tickets/{ticket}/replies": {
+            "get": {
+                "tags": [
+                    "Ticket Replies"
+                ],
+                "summary": "عرض ردود التذكرة",
+                "description": "استرجاع قائمة ردود تذكرة معينة",
+                "operationId": "getTicketReplies",
+                "parameters": [
+                    {
+                        "name": "ticket",
+                        "in": "path",
+                        "description": "معرف التذكرة",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "include_internal",
+                        "in": "query",
+                        "description": "تضمين الردود الداخلية",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "default": false
+                        }
+                    },
+                    {
+                        "name": "include",
+                        "in": "query",
+                        "description": "العلاقات المطلوب تضمينها",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "replier,attachments"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "قائمة ردود التذكرة",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "message": {
+                                                        "type": "string",
+                                                        "example": "نحن نعمل على حل المشكلة"
+                                                    },
+                                                    "is_internal": {
+                                                        "type": "boolean",
+                                                        "example": false
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string",
+                                                        "format": "date-time"
+                                                    },
+                                                    "replier": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 2
+                                                            },
+                                                            "name": {
+                                                                "type": "string",
+                                                                "example": "أحمد محمد"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "التذكرة غير موجودة"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Ticket Replies"
+                ],
+                "summary": "إضافة رد على تذكرة",
+                "description": "إضافة رد جديد على تذكرة معينة",
+                "operationId": "createTicketReply",
+                "parameters": [
+                    {
+                        "name": "ticket",
+                        "in": "path",
+                        "description": "معرف التذكرة",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "message"
+                                ],
+                                "properties": {
+                                    "message": {
+                                        "type": "string",
+                                        "example": "نحن نعمل على حل المشكلة"
+                                    },
+                                    "is_internal": {
+                                        "type": "boolean",
+                                        "default": false,
+                                        "example": false
+                                    },
+                                    "attachments": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "binary"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "تم إضافة الرد بنجاح",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "نحن نعمل على حل المشكلة"
+                                                },
+                                                "is_internal": {
+                                                    "type": "boolean",
+                                                    "example": false
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "تم إضافة الرد بنجاح"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "التذكرة غير موجودة"
+                    },
+                    "422": {
+                        "description": "بيانات غير صالحة"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/tickets/{ticket}/replies/{reply}": {
+            "put": {
+                "tags": [
+                    "Ticket Replies"
+                ],
+                "summary": "تحديث رد على تذكرة",
+                "description": "تحديث رد موجود",
+                "operationId": "updateTicketReply",
+                "parameters": [
+                    {
+                        "name": "ticket",
+                        "in": "path",
+                        "description": "معرف التذكرة",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "reply",
+                        "in": "path",
+                        "description": "معرف الرد",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "message": {
+                                        "type": "string",
+                                        "example": "نحن نعمل على حل المشكلة - محدث"
+                                    },
+                                    "is_internal": {
+                                        "type": "boolean",
+                                        "example": false
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "تم تحديث الرد بنجاح",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "تم تحديث الرد بنجاح"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "نحن نعمل على حل المشكلة - محدث"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "الرد غير موجود"
+                    },
+                    "422": {
+                        "description": "بيانات غير صالحة"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Ticket Replies"
+                ],
+                "summary": "حذف رد على تذكرة",
+                "description": "حذف رد معين (حذف ناعم)",
+                "operationId": "deleteTicketReply",
+                "parameters": [
+                    {
+                        "name": "ticket",
+                        "in": "path",
+                        "description": "معرف التذكرة",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "reply",
+                        "in": "path",
+                        "description": "معرف الرد",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "تم حذف الرد بنجاح",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "تم حذف الرد بنجاح"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "deleted_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "الرد غير موجود"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/tickets/{ticket}/assign": {
+            "post": {
+                "tags": [
+                    "Tickets"
+                ],
+                "summary": "إسناد تذكرة إلى مستخدم",
+                "description": "إسناد تذكرة إلى مستخدم معين",
+                "operationId": "assignTicket",
+                "parameters": [
+                    {
+                        "name": "ticket",
+                        "in": "path",
+                        "description": "معرف التذكرة",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "assigned_to"
+                                ],
+                                "properties": {
+                                    "assigned_to": {
+                                        "type": "integer",
+                                        "example": 2
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "تم إسناد التذكرة بنجاح",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "تم إسناد التذكرة بنجاح"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "assigned_to": {
+                                                    "type": "integer",
+                                                    "example": 2
+                                                },
+                                                "assigned_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "التذكرة غير موجودة"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/tickets/{ticket}/resolve": {
+            "post": {
+                "tags": [
+                    "Tickets"
+                ],
+                "summary": "حل تذكرة",
+                "description": "تحديد حل للتذكرة وتغيير حالتها إلى محلولة",
+                "operationId": "resolveTicket",
+                "parameters": [
+                    {
+                        "name": "ticket",
+                        "in": "path",
+                        "description": "معرف التذكرة",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "resolution"
+                                ],
+                                "properties": {
+                                    "resolution": {
+                                        "type": "string",
+                                        "example": "تم حل المشكلة"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "تم حل التذكرة بنجاح",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "تم حل التذكرة بنجاح"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "status": {
+                                                    "type": "string",
+                                                    "example": "resolved"
+                                                },
+                                                "resolution": {
+                                                    "type": "string",
+                                                    "example": "تم حل المشكلة"
+                                                },
+                                                "resolved_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "التذكرة غير موجودة"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/tickets/{ticket}/close": {
+            "post": {
+                "tags": [
+                    "Tickets"
+                ],
+                "summary": "إغلاق تذكرة",
+                "description": "إغلاق تذكرة محلولة",
+                "operationId": "closeTicket",
+                "parameters": [
+                    {
+                        "name": "ticket",
+                        "in": "path",
+                        "description": "معرف التذكرة",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "تم إغلاق التذكرة بنجاح",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "تم إغلاق التذكرة بنجاح"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "status": {
+                                                    "type": "string",
+                                                    "example": "closed"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "لا يمكن إغلاق التذكرة",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "لا يمكن إغلاق التذكرة إلا إذا كانت محلولة"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "التذكرة غير موجودة"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/tickets/{ticket}/reopen": {
+            "post": {
+                "tags": [
+                    "Tickets"
+                ],
+                "summary": "إعادة فتح تذكرة",
+                "description": "إعادة فتح تذكرة مغلقة",
+                "operationId": "reopenTicket",
+                "parameters": [
+                    {
+                        "name": "ticket",
+                        "in": "path",
+                        "description": "معرف التذكرة",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "تم إعادة فتح التذكرة بنجاح",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "تم إعادة فتح التذكرة بنجاح"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "status": {
+                                                    "type": "string",
+                                                    "example": "open"
+                                                },
+                                                "resolution": {
+                                                    "type": "string",
+                                                    "example": null
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "لا يمكن إعادة فتح التذكرة",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "لا يمكن إعادة فتح التذكرة إلا إذا كانت مغلقة"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "التذكرة غير موجودة"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/tickets/{ticket}/escalate": {
+            "post": {
+                "tags": [
+                    "Tickets"
+                ],
+                "summary": "رفع مستوى التذكرة",
+                "description": "رفع مستوى التذكرة إلى مستوى أعلى",
+                "operationId": "escalateTicket",
+                "parameters": [
+                    {
+                        "name": "ticket",
+                        "in": "path",
+                        "description": "معرف التذكرة",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "تم رفع مستوى التذكرة بنجاح",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "تم رفع مستوى التذكرة بنجاح"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "status": {
+                                                    "type": "string",
+                                                    "example": "escalated"
+                                                },
+                                                "priority": {
+                                                    "type": "string",
+                                                    "example": "critical"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "التذكرة غير موجودة"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/tickets/statistics/overview": {
+            "get": {
+                "tags": [
+                    "Tickets"
+                ],
+                "summary": "إحصائيات عامة للتذاكر",
+                "description": "استرجاع إحصائيات عامة عن التذاكر",
+                "operationId": "getTicketsStatisticsOverview",
+                "responses": {
+                    "200": {
+                        "description": "إحصائيات التذاكر",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "total_tickets": {
+                                            "type": "integer",
+                                            "example": 150
+                                        },
+                                        "open_tickets": {
+                                            "type": "integer",
+                                            "example": 25
+                                        },
+                                        "in_progress_tickets": {
+                                            "type": "integer",
+                                            "example": 30
+                                        },
+                                        "resolved_tickets": {
+                                            "type": "integer",
+                                            "example": 60
+                                        },
+                                        "closed_tickets": {
+                                            "type": "integer",
+                                            "example": 35
+                                        },
+                                        "overdue_tickets": {
+                                            "type": "integer",
+                                            "example": 5
+                                        },
+                                        "unassigned_tickets": {
+                                            "type": "integer",
+                                            "example": 8
+                                        },
+                                        "avg_response_time": {
+                                            "type": "number",
+                                            "format": "float",
+                                            "example": 3.5
+                                        },
+                                        "avg_resolution_time": {
+                                            "type": "number",
+                                            "format": "float",
+                                            "example": 24.2
+                                        },
+                                        "avg_satisfaction": {
+                                            "type": "number",
+                                            "format": "float",
+                                            "example": 4.2
+                                        },
+                                        "by_priority": {
+                                            "properties": {
+                                                "critical": {
+                                                    "type": "integer",
+                                                    "example": 5
+                                                },
+                                                "high": {
+                                                    "type": "integer",
+                                                    "example": 15
+                                                },
+                                                "medium": {
+                                                    "type": "integer",
+                                                    "example": 80
+                                                },
+                                                "low": {
+                                                    "type": "integer",
+                                                    "example": 50
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "by_type": {
+                                            "type": "object",
+                                            "additionalProperties": {
+                                                "type": "integer"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/v1/users": {
             "get": {
                 "tags": [
@@ -10506,6 +12907,18 @@
         {
             "name": "Answers",
             "description": "إدارة اجابات اسئلة الزيارة"
+        },
+        {
+            "name": "Tickets",
+            "description": "التذاكر"
+        },
+        {
+            "name": "Ticket Replies",
+            "description": "الرد على التذاكر"
+        },
+        {
+            "name": "Settings",
+            "description": "إدارة الإعدادات"
         }
     ]
 }

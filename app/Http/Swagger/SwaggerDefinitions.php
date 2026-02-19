@@ -72,4 +72,19 @@ use OpenApi\Attributes as OA;
     description: "إدارة اجابات اسئلة الزيارة"
 )]
 
+#[OA\Tag(
+    name: "Tickets",
+    description: "التذاكر"
+)]
+
+#[OA\Tag(
+    name: "Ticket Replies",
+    description: "الرد على التذاكر"
+)]
+
+#[OA\Tag(
+    name: "Settings",
+    description: "إدارة الإعدادات"
+)]
+
 class SwaggerDefinitions{}
