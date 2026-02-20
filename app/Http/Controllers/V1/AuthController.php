@@ -106,7 +106,7 @@ class AuthController extends Controller
                 true,    // secure (HTTPS only)
                 true,    // httpOnly
                 false,   // raw
-                'strict' // sameSite
+                'none' // sameSite
             ));
     }
 

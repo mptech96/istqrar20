@@ -158,6 +158,7 @@ if (!function_exists('____sql')) {
     {
         try{
             DB::unprepared(file_get_contents( base_path('sql/v1/database.sql')));
+            DB::unprepared(file_get_contents( base_path('sql/v1/settings_seeder.sql')));
         }catch (\Exception $e) {
             $e->getMessage();
         }

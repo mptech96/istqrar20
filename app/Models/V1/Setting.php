@@ -64,7 +64,11 @@ class Setting extends Model
     {
         // Handle encryption if needed
         if ($this->is_encrypted && $value) {
-            $value = decrypt($value);
+            try {
+                $value = decrypt($value);
+            } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
+                return $value;
+            }
         }
 
         // Cast based on type
