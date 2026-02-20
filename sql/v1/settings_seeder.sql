@@ -99,3 +99,21 @@ UPDATE `settings`
 SET `validation_rules` = 'email',
     `updated_at` = NOW()
 WHERE `group` = 'general' AND `key` = 'contact_email';
+
+INSERT INTO `settings` (`group`, `key`, `value`, `type`, `label`, `description`, `options`, `created_at`, `updated_at`) VALUES
+('ai', 'max_daily_deep_analysis', '5', 'number', 'الحد الأقصى للتحليلات العميقة يومياً', 'عدد مرات التحليل العميق المسموح بها لكل مستخدم يومياً', NULL, NOW(), NOW()),
+('ai', 'analysis_cooldown_hours', '24', 'number', 'فترة التهدئة بين التحليلات', 'عدد الساعات بين كل تحليل عميق لنفس الفرع', NULL, NOW(), NOW()),
+('ai', 'deep_analysis_model', 'gpt-4', 'string', 'نموذج التحليل العميق', NULL, '{"gpt-4": "GPT-4 (أدق - أغلى)", "gpt-3.5-turbo": "GPT-3.5 (أسرع - أرخص)"}', NOW(), NOW()),
+('ai', 'deep_analysis_temperature', '0.2', 'number', 'درجة حرارة التحليل العميق', 'قيمة منخفضة = تحليل دقيق، قيمة مرتفعة = تحليل إبداعي', NULL, NOW(), NOW()),
+('ai', 'deep_analysis_max_tokens', '2000', 'number', 'الحد الأقصى للـ tokens', NULL, NULL, NOW(), NOW()),
+('ai', 'enable_background_analysis', 'true', 'boolean', 'تفعيل التحليل في الخلفية', NULL, NULL, NOW(), NOW()),
+('ai', 'openai_api_key', '', 'string', 'مفتاح API', 'مفتاح API الخاص بحسابك في OpenAI - يبدأ عادةً بـ (sk-)', NULL, NOW(), NOW()),
+('ai', 'openai_organization', '', 'string', 'معرف المؤسسة', 'معرف المؤسسة في OpenAI (اختياري) - للحسابات التابعة لمؤسسات، يبدأ بـ (org-)', NULL, NOW(), NOW()),
+('ai', 'openai_request_timeout', '30', 'number', 'مهلة الطلب', 'الحد الأقصى لانتظار استجابة من OpenAI (بالثواني)', null, NOW(), NOW())
+ON DUPLICATE KEY UPDATE
+    `value` = VALUES(`value`),
+    `type` = VALUES(`type`),
+    `label` = VALUES(`label`),
+    `description` = VALUES(`description`),
+    `options` = VALUES(`options`),
+    `updated_at` = NOW();

@@ -5648,6 +5648,124 @@
                 ]
             }
         },
+        "/api/v1/visits/{visit}/deep-analysis": {
+            "post": {
+                "tags": [
+                    "AI Analysis"
+                ],
+                "summary": "تشغيل تحليل عميق للزيارة",
+                "description": "يقوم بتحليل شامل باستخدام الذكاء الاصطناعي عند طلب المستخدم",
+                "operationId": "runDeepAnalysis",
+                "parameters": [
+                    {
+                        "name": "visit",
+                        "in": "path",
+                        "description": "معرف الزيارة",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "تم التحليل بنجاح",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer"
+                                        },
+                                        "summary": {
+                                            "type": "string"
+                                        },
+                                        "analyses": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "202": {
+                        "description": "التحليل قيد المعالجة (سيتم إعلامك عند الانتهاء)"
+                    },
+                    "429": {
+                        "description": "تم تجاوز حد الطلبات المسموح به"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/visits/{visit}/deep-analysis/latest": {
+            "get": {
+                "tags": [
+                    "AI Analysis"
+                ],
+                "summary": "الحصول على آخر تحليل عميق",
+                "operationId": "getLatestDeepAnalysis",
+                "parameters": [
+                    {
+                        "name": "visit",
+                        "in": "path",
+                        "description": "معرف الزيارة",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "اخر تحليل"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/visits/{visit}/deep-analysis/status": {
+            "get": {
+                "tags": [
+                    "AI Analysis"
+                ],
+                "summary": "التحقق من حالة التحليل",
+                "operationId": "getDeepAnalysisStatus",
+                "parameters": [
+                    {
+                        "name": "visit",
+                        "in": "path",
+                        "description": "معرف الزيارة",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "حالة التحليل"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/v1/checklists/{checklist}/questions": {
             "get": {
                 "tags": [
@@ -12915,6 +13033,10 @@
         {
             "name": "Ticket Replies",
             "description": "الرد على التذاكر"
+        },
+        {
+            "name": "AI Analysis",
+            "description": "قيد التطوير"
         },
         {
             "name": "Settings",

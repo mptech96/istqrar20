@@ -83,6 +83,11 @@ use OpenApi\Attributes as OA;
 )]
 
 #[OA\Tag(
+    name: "AI Analysis",
+    description: "قيد التطوير"
+)]
+
+#[OA\Tag(
     name: "Settings",
     description: "إدارة الإعدادات"
 )]

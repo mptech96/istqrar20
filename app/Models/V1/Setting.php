@@ -149,7 +149,7 @@ class Setting extends Model
     {
         $cacheKey = "setting_{$group}_{$key}";
         
-        return Cache::remember($cacheKey, now()->addDay(), function () use ($group, $key, $default) {
+        return Cache::remember($cacheKey, now()->addMinutes(5), function () use ($group, $key, $default) {
             $setting = self::where('group', $group)
                           ->where('key', $key)
                           ->first();
@@ -162,7 +162,7 @@ class Setting extends Model
     {
         $cacheKey = "settings_group_{$group}_" . ($publicOnly ? 'public' : 'all');
         
-        return Cache::remember($cacheKey, now()->addDay(), function () use ($group, $publicOnly) {
+        return Cache::remember($cacheKey, now()->addMinutes(5), function () use ($group, $publicOnly) {
             $query = self::where('group', $group);
             
             if ($publicOnly) {
