@@ -92,4 +92,9 @@ use OpenApi\Attributes as OA;
     description: "إدارة الإعدادات"
 )]
 
+#[OA\Tag(
+    name: "Dashboard",
+    description: "لوحة التحكم"
+)]
+
 class SwaggerDefinitions{}

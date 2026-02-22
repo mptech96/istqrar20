@@ -18,21 +18,24 @@ class VerifyTokenCookie
      */
     public function handle(Request $request, Closure $next): Response
     {
-
-        $token = $request->cookie('auth_token') ?? $request->bearerToken();
-        
-        if ($token) {
+        try{
             
-            $accessToken = PersonalAccessToken::findToken(decrypt($token));
+            $token = $request->cookie('auth_token') ?? $request->bearerToken();
             
-            if ($accessToken) {
+            if ($token) {
                 
-                $user = $accessToken->tokenable;
-                Auth::setUser($user);
-                return $next($request);
+                $accessToken = PersonalAccessToken::findToken(decrypt($token));
                 
+                if ($accessToken) {
+                    
+                    $user = $accessToken->tokenable;
+                    Auth::setUser($user);
+                    return $next($request);
+                    
+                }
             }
         }
+        catch (\Exception $e) {}
         
         return response()->json(['error' => 'Authentication required'], 401);
     }

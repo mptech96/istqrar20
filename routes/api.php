@@ -163,7 +163,14 @@ Route::namespace('App\Http\Controllers\V1')->middleware(['throttle:60,1', 'api']
                 Route::put('/{setting}', 'update')->middleware(['user.role:super_admin']);
                 Route::delete('/{setting}', 'destroy')->middleware(['user.role:super_admin']);
             });
-
+            
+            Route::prefix('dashboard')->controller(DashboardController::class)->group(function () {
+                //Route::get('/', 'index');
+                Route::get('/super-admin', 'superAdminDashboard');
+                Route::get('/company-admin', 'companyAdminDashboard');
+                Route::get('/branch-manager', 'branchManagerDashboard');
+                Route::get('/auditor', 'auditorDashboard');
+            });
         });
         
         Route::prefix('auth')->controller(AuthController::class)->group(function () {

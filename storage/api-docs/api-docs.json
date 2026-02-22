@@ -5648,6 +5648,476 @@
                 ]
             }
         },
+        "/api/v1/dashboard/super-admin": {
+            "get": {
+                "tags": [
+                    "Dashboard"
+                ],
+                "summary": "لوحة تحكم مدير النظام",
+                "description": "إحصائيات عامة عن النظام، أحدث الشركات والزيارات، توزيع الزيارات، أفضل الشركات",
+                "operationId": "superAdminDashboard",
+                "responses": {
+                    "200": {
+                        "description": "بيانات لوحة التحكم",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "statistics": {
+                                            "properties": {
+                                                "total_companies": {
+                                                    "type": "integer",
+                                                    "example": 25
+                                                },
+                                                "total_branches": {
+                                                    "type": "integer",
+                                                    "example": 120
+                                                },
+                                                "total_users": {
+                                                    "type": "integer",
+                                                    "example": 300
+                                                },
+                                                "total_auditors": {
+                                                    "type": "integer",
+                                                    "example": 45
+                                                },
+                                                "total_visits": {
+                                                    "type": "integer",
+                                                    "example": 850
+                                                },
+                                                "completed_visits": {
+                                                    "type": "integer",
+                                                    "example": 600
+                                                },
+                                                "scheduled_visits": {
+                                                    "type": "integer",
+                                                    "example": 150
+                                                },
+                                                "in_progress_visits": {
+                                                    "type": "integer",
+                                                    "example": 50
+                                                },
+                                                "avg_percentage": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 78.5
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "tickets": {
+                                            "properties": {
+                                                "total": {
+                                                    "type": "integer",
+                                                    "example": 120
+                                                },
+                                                "open": {
+                                                    "type": "integer",
+                                                    "example": 35
+                                                },
+                                                "overdue": {
+                                                    "type": "integer",
+                                                    "example": 8
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "category_distribution": {
+                                            "type": "object",
+                                            "additionalProperties": {
+                                                "type": "integer",
+                                                "example": 15
+                                            }
+                                        },
+                                        "top_companies": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "name": {
+                                                        "type": "string",
+                                                        "example": "شركة التقنية"
+                                                    },
+                                                    "avg_percentage": {
+                                                        "type": "number",
+                                                        "format": "float",
+                                                        "example": 92.5
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "غير مصرح به"
+                    },
+                    "403": {
+                        "description": "ممنوع الوصول - المستخدم ليس مدير نظام"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/dashboard/company-admin": {
+            "get": {
+                "tags": [
+                    "Dashboard"
+                ],
+                "summary": "لوحة تحكم مدير الشركة",
+                "description": "إحصائيات خاصة بشركة المستخدم الحالي، أداء الفروع، التصحيحات المعلقة، التذاكر المفتوحة",
+                "operationId": "companyAdminDashboard",
+                "responses": {
+                    "200": {
+                        "description": "بيانات لوحة التحكم",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "statistics": {
+                                            "properties": {
+                                                "branches_count": {
+                                                    "type": "integer",
+                                                    "example": 5
+                                                },
+                                                "auditors_count": {
+                                                    "type": "integer",
+                                                    "example": 8
+                                                },
+                                                "branch_managers_count": {
+                                                    "type": "integer",
+                                                    "example": 5
+                                                },
+                                                "total_visits": {
+                                                    "type": "integer",
+                                                    "example": 42
+                                                },
+                                                "completed_visits": {
+                                                    "type": "integer",
+                                                    "example": 30
+                                                },
+                                                "avg_company_score": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 81.3
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "branches_category": {
+                                            "type": "object",
+                                            "additionalProperties": {
+                                                "type": "integer",
+                                                "example": 2
+                                            }
+                                        },
+                                        "branches_performance": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "name": {
+                                                        "type": "string",
+                                                        "example": "الفرع الرئيسي"
+                                                    },
+                                                    "last_visit_percentage": {
+                                                        "type": "number",
+                                                        "format": "float",
+                                                        "example": 85
+                                                    },
+                                                    "category": {
+                                                        "type": "string",
+                                                        "example": "B"
+                                                    },
+                                                    "total_visits": {
+                                                        "type": "integer",
+                                                        "example": 10
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "pending_corrections": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "branch": {
+                                                        "type": "string",
+                                                        "example": "الفرع الرئيسي"
+                                                    },
+                                                    "question": {
+                                                        "type": "string",
+                                                        "example": "هل تم تنظيف الممرات؟"
+                                                    },
+                                                    "deadline": {
+                                                        "type": "string",
+                                                        "format": "date",
+                                                        "example": "2026-02-28"
+                                                    },
+                                                    "is_overdue": {
+                                                        "type": "boolean",
+                                                        "example": false
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "غير مصرح به"
+                    },
+                    "403": {
+                        "description": "ممنوع الوصول - المستخدم ليس مدير شركة أو ليس له شركة"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/dashboard/branch-manager": {
+            "get": {
+                "tags": [
+                    "Dashboard"
+                ],
+                "summary": "لوحة تحكم مدير الفرع",
+                "description": "إحصائيات خاصة بالفرع، التصحيحات المطلوبة، التذاكر المفتوحة، آخر الزيارات",
+                "operationId": "branchManagerDashboard",
+                "responses": {
+                    "200": {
+                        "description": "بيانات لوحة التحكم",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "branch": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "الفرع الرئيسي"
+                                                },
+                                                "company": {
+                                                    "type": "string",
+                                                    "example": "شركة التقنية"
+                                                },
+                                                "compliance_score": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 82.5
+                                                },
+                                                "category": {
+                                                    "type": "string",
+                                                    "example": "B"
+                                                },
+                                                "last_visit_date": {
+                                                    "type": "string",
+                                                    "format": "date",
+                                                    "example": "2026-02-10"
+                                                },
+                                                "next_scheduled_visit": {
+                                                    "type": "string",
+                                                    "format": "date",
+                                                    "example": "2026-03-01"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "statistics": {
+                                            "properties": {
+                                                "total_visits": {
+                                                    "type": "integer",
+                                                    "example": 15
+                                                },
+                                                "last_visit_score": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 85
+                                                },
+                                                "next_visit_date": {
+                                                    "type": "string",
+                                                    "format": "date",
+                                                    "example": "2026-03-01"
+                                                },
+                                                "avg_score": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 78.3
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "pending_corrections": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "question": {
+                                                        "type": "string",
+                                                        "example": "هل تم تنظيف الممرات؟"
+                                                    },
+                                                    "corrective_action": {
+                                                        "type": "string",
+                                                        "example": "تنظيف الممرات"
+                                                    },
+                                                    "deadline": {
+                                                        "type": "string",
+                                                        "format": "date",
+                                                        "example": "2026-02-28"
+                                                    },
+                                                    "status": {
+                                                        "type": "string",
+                                                        "example": "pending"
+                                                    },
+                                                    "status_text": {
+                                                        "type": "string",
+                                                        "example": "قيد الانتظار"
+                                                    },
+                                                    "is_overdue": {
+                                                        "type": "boolean",
+                                                        "example": false
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "غير مصرح به"
+                    },
+                    "403": {
+                        "description": "ممنوع الوصول - المستخدم ليس مدير فرع أو ليس له فرع"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/dashboard/auditor": {
+            "get": {
+                "tags": [
+                    "Dashboard"
+                ],
+                "summary": "لوحة تحكم المراقب",
+                "description": "إحصائيات الزيارات الخاصة بالمراقب، زيارات اليوم والزيارات القادمة، آخر التصحيحات التي تم التحقق منها",
+                "operationId": "auditorDashboard",
+                "responses": {
+                    "200": {
+                        "description": "بيانات لوحة التحكم",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "statistics": {
+                                            "properties": {
+                                                "total_visits": {
+                                                    "type": "integer",
+                                                    "example": 35
+                                                },
+                                                "completed_visits": {
+                                                    "type": "integer",
+                                                    "example": 20
+                                                },
+                                                "scheduled_visits": {
+                                                    "type": "integer",
+                                                    "example": 8
+                                                },
+                                                "in_progress_visits": {
+                                                    "type": "integer",
+                                                    "example": 2
+                                                },
+                                                "avg_score": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 79.4
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "recent_verified_corrections": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "branch": {
+                                                        "type": "string",
+                                                        "example": "الفرع الرئيسي"
+                                                    },
+                                                    "question": {
+                                                        "type": "string",
+                                                        "example": "هل تم تنظيف الممرات؟"
+                                                    },
+                                                    "verified_at": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": "2026-02-10 14:30"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "غير مصرح به"
+                    },
+                    "403": {
+                        "description": "ممنوع الوصول - المستخدم ليس مراقب"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/v1/visits/{visit}/deep-analysis": {
             "post": {
                 "tags": [
@@ -13041,6 +13511,10 @@
         {
             "name": "Settings",
             "description": "إدارة الإعدادات"
+        },
+        {
+            "name": "Dashboard",
+            "description": "لوحة التحكم"
         }
     ]
 }

@@ -60,54 +60,61 @@ class AuthController extends Controller
     )]
     public function login(Request $request)
     {
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
-        ]);
-
-        $user = User::where('email', $request->email)->first();
-        
-        //$user->update(['password' => Hash::make($request->password)]);
-        
-        if (!$user || !Hash::check($request->password, $user->password)) {
-            throw ValidationException::withMessages([
-                'email' => ['بيانات الدخول غير صحيحة.']
+        try {
+            
+            $request->validate([
+                'email' => 'required|email',
+                'password' => 'required',
             ]);
-        }
-
-        if (!$user->status) {
-            throw ValidationException::withMessages([
-                'email' => ['الحساب غير نشط.']
+    
+            $user = User::where('email', $request->email)->first();
+            
+            //$user->update(['password' => Hash::make($request->password)]);
+            
+            if (!$user || !Hash::check($request->password, $user->password)) {
+                throw ValidationException::withMessages([
+                    'email' => ['بيانات الدخول غير صحيحة.']
+                ]);
+            }
+    
+            if (!$user->status) {
+                throw ValidationException::withMessages([
+                    'email' => ['الحساب غير نشط.']
+                ]);
+            }
+            
+            $user->tokens()->delete();
+            
+            $user->update([
+                'last_login_at' => now(),
+                'last_login_ip' => $request->ip()
             ]);
+    
+            $token = encrypt($user->createToken("auth_token")->plainTextToken);
+    
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'user' => $user,
+                    'token' => $token
+                ],
+                'message' => 'تم تسجيل الدخول بنجاح'
+            ])->withCookie(Cookie::make(
+                    'auth_token',
+                    $token,
+                    60 * 24, // يوم واحد
+                    null,    // path
+                    null,    // domain
+                    true,    // secure (HTTPS only)
+                    true,    // httpOnly
+                    false,   // raw
+                    'none' // sameSite
+                ));
         }
-        
-        $user->tokens()->delete();
-        
-        $user->update([
-            'last_login_at' => now(),
-            'last_login_ip' => $request->ip()
-        ]);
-
-        $token = encrypt($user->createToken("auth_token")->plainTextToken);
-
-        return response()->json([
-            'success' => true,
-            'data' => [
-                'user' => $user,
-                'token' => $token
-            ],
-            'message' => 'تم تسجيل الدخول بنجاح'
-        ])->withCookie(Cookie::make(
-                'auth_token',
-                $token,
-                60 * 24, // يوم واحد
-                null,    // path
-                null,    // domain
-                true,    // secure (HTTPS only)
-                true,    // httpOnly
-                false,   // raw
-                'none' // sameSite
-            ));
+        catch (\Exception $e) {}
+        throw ValidationException::withMessages([
+            'email' => ['بيانات الدخول غير صحيحة.']
+         ]);
     }
 
     // ------------------------ LOGOUT ------------------------
