@@ -96,5 +96,9 @@ use OpenApi\Attributes as OA;
     name: "Dashboard",
     description: "لوحة التحكم"
 )]
+#[OA\Tag(
+    name: "Reports",
+    description: "التقارير"
+)]
 
 class SwaggerDefinitions{}

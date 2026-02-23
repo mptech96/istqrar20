@@ -171,6 +171,15 @@ Route::namespace('App\Http\Controllers\V1')->middleware(['throttle:60,1', 'api']
                 Route::get('/branch-manager', 'branchManagerDashboard');
                 Route::get('/auditor', 'auditorDashboard');
             });
+            
+            Route::prefix('reports')->controller(ReportController::class)->group(function () {
+                //Route::get('/', 'index');
+                Route::get('/super-admin', 'superAdminReport');
+                Route::get('/company-admin', 'companyAdminReport');
+                Route::get('/branch-manager', 'branchManagerReport');
+                Route::get('/auditor', 'auditorReport');
+            });
+            
         });
         
         Route::prefix('auth')->controller(AuthController::class)->group(function () {
