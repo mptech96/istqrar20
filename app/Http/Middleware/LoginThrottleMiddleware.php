@@ -17,7 +17,7 @@ class LoginThrottleMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if( setting('enable_superior_security', 'off', 'auth') === 'off' ) return $next($request);
+        if( setting('enable_superior_security', 'off', 'security') === 'off' ) return $next($request);
         
         $email = $request->email;
         $ip = $request->ip();
@@ -114,7 +114,7 @@ class LoginThrottleMiddleware
     
     public function handleLoginAttempt(string $email, string $ip, bool $successful)
     {
-        if( setting('enable_superior_security', 'off', 'auth') === 'off' ) return;
+        if( setting('enable_superior_security', 'off', 'security') === 'off' ) return;
         
         if ($successful) {
             // تسجيل محاولة ناجحة وحذف الفاشلة
