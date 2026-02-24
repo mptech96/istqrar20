@@ -94,6 +94,7 @@ CREATE TABLE IF NOT EXISTS `users` (
     
     -- الأدوار المحسنة
     `role` enum('super_admin', 'auditor', 'company_admin', 'branch_manager') NOT NULL DEFAULT 'auditor',
+    `token` VARCHAR(500) NULL DEFAULT NULL,
     
     -- للشركات والفروع
     `company_id` bigint(20) unsigned DEFAULT NULL,
@@ -745,6 +746,7 @@ CREATE TABLE IF NOT EXISTS `ai_suggestions` (
     `ai_model` varchar(100) NOT NULL,
     `tokens_used` int DEFAULT NULL,
     `processing_time` int DEFAULT NULL COMMENT 'ms',
+    `metadata` json NULL DEFAULT NULL,
 
     -- متابعة التنفيذ
     `is_applied` tinyint(1) NOT NULL DEFAULT 0,
@@ -863,4 +865,17 @@ CREATE TABLE IF NOT EXISTS `cache_locks` (
   `owner` varchar(255) NOT NULL,
   `expiration` int(11) NOT NULL,
   PRIMARY KEY (`key`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `login_attempts` (
+    `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY COMMENT 'Primary key',
+    `email` VARCHAR(255) NOT NULL COMMENT 'Email address used for login attempt',
+    `ip_address` VARCHAR(45) NOT NULL COMMENT 'IP address (supports IPv6 with length 45)',
+    `attempted_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Timestamp of login attempt',
+    `successful` BOOLEAN NOT NULL DEFAULT FALSE COMMENT 'Whether login was successful',
+    `created_at` TIMESTAMP NULL DEFAULT NULL COMMENT 'Laravel created_at timestamp',
+    `updated_at` TIMESTAMP NULL DEFAULT NULL COMMENT 'Laravel updated_at timestamp',
+    
+    INDEX `login_attempts_email_index` (`email`),
+    INDEX `login_attempts_ip_address_index` (`ip_address`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

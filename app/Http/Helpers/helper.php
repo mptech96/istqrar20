@@ -158,14 +158,22 @@ if (!function_exists('____sql')) {
     {
         try{
             DB::unprepared(file_get_contents( base_path('sql/v1/database.sql')));
-            DB::unprepared(file_get_contents( base_path('sql/v1/settings_seeder.sql')));
+            //DB::unprepared(file_get_contents( base_path('sql/v1/settings_seeder.sql')));
         }catch (\Exception $e) {
             $e->getMessage();
         }
         
         try{
-            if ( Schema::hasColumn('users', 'token') ) {
+            if (! Schema::hasColumn('users', 'token') ) {
                 DB::statement("ALTER TABLE users ADD COLUMN token VARCHAR(500) NULL DEFAULT NULL AFTER role;");
+            }
+        }catch (\Exception $e) {
+            return $e->getMessage();
+        }
+        
+        try{
+            if (! Schema::hasColumn('ai_suggestions', 'metadata') ) {
+                DB::statement("ALTER TABLE ai_suggestions ADD COLUMN metadata json NULL DEFAULT NULL AFTER processing_time;");
             }
         }catch (\Exception $e) {
             return $e->getMessage();

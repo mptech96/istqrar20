@@ -61,7 +61,6 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         try {
-            
             $request->validate([
                 'email' => 'required|email',
                 'password' => 'required',
@@ -72,6 +71,9 @@ class AuthController extends Controller
             //$user->update(['password' => Hash::make($request->password)]);
             
             if (!$user || !Hash::check($request->password, $user->password)) {
+                
+                app(\App\Http\Middleware\LoginThrottleMiddleware::class)->handleLoginAttempt($request->email, $request->ip(), false);
+                
                 throw ValidationException::withMessages([
                     'email' => ['بيانات الدخول غير صحيحة.']
                 ]);
@@ -91,7 +93,9 @@ class AuthController extends Controller
             ]);
     
             $token = encrypt($user->createToken("auth_token")->plainTextToken);
-    
+            
+            app(\App\Http\Middleware\LoginThrottleMiddleware::class)->handleLoginAttempt($request->email, $request->ip(), true);
+            
             return response()->json([
                 'success' => true,
                 'data' => [

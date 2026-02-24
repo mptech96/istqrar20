@@ -18,6 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'token.cookie' => \App\Http\Middleware\VerifyTokenCookie::class,
             'user.role' => \App\Http\Middleware\UserRole::class,
+            'throttle.login' => \App\Http\Middleware\LoginThrottleMiddleware::class,
             'bindings' => \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ]);
         

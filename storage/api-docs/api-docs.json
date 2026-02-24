@@ -10723,6 +10723,38 @@
                 ]
             }
         },
+        "/api/v1/users/un-block/{email}": {
+            "post": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "رفع الحظر عن مستخدم",
+                "description": "رفع حظر مستخدم حاول تسجيل الدخول بمحاولات",
+                "operationId": "unBlockUser",
+                "parameters": [
+                    {
+                        "name": "email",
+                        "in": "path",
+                        "description": "ايميل المستخدم",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "user@user.com"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "تم رفع حظر المستخدم"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/v1/users/{user}": {
             "get": {
                 "tags": [

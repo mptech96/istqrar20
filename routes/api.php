@@ -39,6 +39,7 @@ Route::namespace('App\Http\Controllers\V1')->middleware(['throttle:60,1', 'api']
             Route::prefix('users')->controller(UserController::class)->group(function () {
                 Route::get('/', 'index');
                 Route::get('/create', 'create');
+                Route::post('/un-block/{email}', 'unBlockUser');
                 Route::post('/', 'store')->middleware(['user.role:super_admin']);
                 Route::get('/{user}/documents-expiry', 'documentsExpiry');
                 Route::put('/{user}', 'update')->middleware(['user.role:super_admin']);
@@ -123,6 +124,12 @@ Route::namespace('App\Http\Controllers\V1')->middleware(['throttle:60,1', 'api']
                     Route::post('bulk', 'bulkStore')->middleware(['user.role:super_admin']);
                 });
                 
+                Route::prefix('{visit}/deep-analysis')->controller(DeepAnalysisController::class)->group(function () {
+                    Route::Post('', 'analyze');
+                    Route::get('latest', 'latest');
+                    Route::get('status', 'status');
+                });
+                
                 
             });
             
@@ -183,7 +190,7 @@ Route::namespace('App\Http\Controllers\V1')->middleware(['throttle:60,1', 'api']
         });
         
         Route::prefix('auth')->controller(AuthController::class)->group(function () {
-            Route::middleware(['api-module-priority'])->group(function () {
+            Route::middleware(['api-module-priority', 'throttle.login'])->group(function () {
                 Route::post('login', 'login');
             });
             

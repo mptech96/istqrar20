@@ -5,6 +5,7 @@ namespace App\Http\Controllers\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\V1\AiSuggestionResource;
 use App\Models\V1\Visit;
+use App\Models\V1\AiSuggestion;
 use App\Services\V1\AI\DeepAnalysisService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -99,8 +100,7 @@ class DeepAnalysisController extends Controller
         // تنفيذ التحليل
         try {
             // تحديث عداد الطلبات
-            Cache::increment($requestKey);
-            Cache::expire($requestKey, now()->endOfDay());
+            Cache::put($requestKey, $requestsToday + 1, now()->endOfDay());
 
             // للتحليلات الطويلة، نستخدم Job
             /*if ($request->boolean('background')) {

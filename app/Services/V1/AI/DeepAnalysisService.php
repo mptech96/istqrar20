@@ -4,6 +4,7 @@ namespace App\Services\V1\AI;
 
 use App\Models\V1\Visit;
 use App\Models\V1\AiSuggestion;
+use App\Models\V1\Branch;
 use App\Models\V1\Statistic;
 use App\Services\V1\OpenAiService;
 use Illuminate\Support\Facades\DB;

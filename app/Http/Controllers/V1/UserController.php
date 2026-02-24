@@ -372,6 +372,41 @@ class UserController extends Controller
         });
     }
     
+    #[OA\Post(
+        path: '/api/v1/users/un-block/{email}',
+        operationId: 'unBlockUser',
+        summary: 'رفع الحظر عن مستخدم',
+        description: 'رفع حظر مستخدم حاول تسجيل الدخول بمحاولات',
+        tags: ['Users'],
+        security: [['bearerAuth' => []]],
+        parameters: [
+            new OA\Parameter(
+                name: 'email',
+                description: 'ايميل المستخدم',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(type: 'string', example: "user@user.com")
+            ),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'تم رفع حظر المستخدم'
+            ),
+        ]
+    )]
+    
+    public function unBlockUser(string $email)
+    {
+        \App\Models\V1\LoginAttempt::where('email', $email)
+            ->where('successful', false)
+            ->delete();
+            
+        return response()->json([
+            'message' => 'تم رفع حظر المستخدم'
+        ], 200);
+    }
+    
     #[OA\Get(
         path: '/api/v1/users/{user}',
         operationId: 'getUser',
