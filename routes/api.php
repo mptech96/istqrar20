@@ -116,12 +116,12 @@ Route::namespace('App\Http\Controllers\V1')->middleware(['throttle:60,1', 'api']
                 
                 Route::prefix('{visit}/answers')->controller(AnswerController::class)->group(function () {
                     Route::get('', 'index');
-                    Route::post('', 'store')->middleware(['user.role:super_admin']);
+                    Route::post('', 'store')->middleware(['user.role:auditor']);
                     Route::get('/{answer}', 'show');
-                    Route::put('/{answer}', 'update')->middleware(['user.role:super_admin']);
+                    Route::put('/{answer}', 'update')->middleware(['user.role:auditor']);
                     Route::delete('/{answer}', 'destroy')->middleware(['user.role:super_admin']);
                     Route::post('/{id}/restore', 'restore')->middleware(['user.role:super_admin']);
-                    Route::post('bulk', 'bulkStore')->middleware(['user.role:super_admin']);
+                    Route::post('bulk', 'bulkStore')->middleware(['user.role:auditor']);
                 });
                 
                 Route::prefix('{visit}/deep-analysis')->controller(DeepAnalysisController::class)->group(function () {
