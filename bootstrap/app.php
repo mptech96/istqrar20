@@ -18,12 +18,14 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'token.cookie' => \App\Http\Middleware\VerifyTokenCookie::class,
             'user.role' => \App\Http\Middleware\UserRole::class,
+            'put.requests' => \App\Http\Middleware\HandlePutRequests::class,
             'throttle.login' => \App\Http\Middleware\LoginThrottleMiddleware::class,
             'bindings' => \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ]);
         
         
         $middleware->group('api-token-priority', [
+            'put.requests',
             'token.cookie',
             'bindings',
         ]);
@@ -33,6 +35,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
             
         $middleware->priority([
+            \App\Http\Middleware\HandlePutRequests::class,
             \App\Http\Middleware\VerifyTokenCookie::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ]);
