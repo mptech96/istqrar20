@@ -22,11 +22,10 @@ return [
     'allowed_origins' => [
         'https://localhost:3000',
         'https://istqrar.flz.sa',
+        'https://istqrar.al-balad.sa',
         'http://localhost:8585',
         'http://localhost:8000',
         'http://localhost:8158',
-        'https://istqrar.al-balad.sa',
-        'https://al-balad.sa',
     ],
 
     'allowed_origins_patterns' => [],
