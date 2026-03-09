@@ -3,6 +3,7 @@
 namespace App\Http\Requests\V1;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rules\Password;
 
 class UpdateUserRequest extends FormRequest
 {
@@ -20,6 +21,7 @@ class UpdateUserRequest extends FormRequest
             'name' => ['sometimes', 'string', 'max:255'],
             'email' => ['sometimes', 'email', 'unique:users,email,' . $userId],
             'phone' => ['sometimes', 'string', 'max:20'],
+            'password' => ['sometimes', 'confirmed', Password::min(8)],
             
             // Role and assignment
             'role' => ['sometimes', 'string', 'in:super_admin,auditor,company_admin,branch_manager'],

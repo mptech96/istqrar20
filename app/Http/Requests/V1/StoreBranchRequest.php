@@ -4,6 +4,7 @@ namespace App\Http\Requests\V1;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rules\Password;
+use Illuminate\Validation\Rule;
 
 class StoreBranchRequest extends FormRequest
 {
@@ -32,13 +33,46 @@ class StoreBranchRequest extends FormRequest
             'compliance_score' => ['nullable', 'numeric', 'between:0,100'],
             
             // Branch Manager User data
-            'user_name' => ['required', 'string', 'max:255'],
-            'user_email' => ['required', 'email', 'unique:users,email'],
-            'user_password' => ['required', 'confirmed', Password::min(8)],
-            'user_phone' => ['required', 'string', 'max:20'],
+            'user_id' => ['nullable', 'integer', 'exists:users,id'],
+
+
+            'user_name' => [
+                Rule::when($this->filled('user_id'),
+                    ['sometimes', 'nullable', 'string', 'max:255'],  // إذا كان user_id موجوداً: اختياري
+                    ['required', 'string', 'max:255']                // إذا كان user_id غير موجود: إجباري
+                )
+            ],
+            
+            'user_email' => [
+                Rule::when($this->filled('user_id'),
+                    [
+                        'sometimes', 
+                        'nullable', 
+                        'email', 
+                        Rule::unique('users', 'email')->ignore($this->user_id)
+                    ],
+                    ['required', 'email', 'unique:users,email']
+                )
+            ],
+            
+            'user_password' => [
+                Rule::when($this->filled('user_id'),
+                    ['sometimes', 'nullable', 'confirmed', Password::min(8)],  // اختياري عند التعديل
+                    ['required', 'confirmed', Password::min(8)]                 // إجباري عند الإنشاء
+                )
+            ],
+            
+            'user_phone' => [
+                Rule::when($this->filled('user_id'),
+                    ['sometimes', 'nullable', 'string', 'max:20'],
+                    ['required', 'string', 'max:20']
+                )
+            ],
+            
             'user_personal_photo' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
             'user_birth_date' => ['nullable', 'date', 'before:-18 years'],
             'user_gender' => ['nullable', 'integer', 'in:1,2,3'],
+
         ];
     }
 

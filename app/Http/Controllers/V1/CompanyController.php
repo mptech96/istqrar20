@@ -180,7 +180,49 @@ class CompanyController extends Controller
         
         return CompanyResource::collection($companies);
     }
+
+     #[OA\Get(
+        path: '/api/v1/companies/create',
+        operationId: 'addCompany',
+        summary: 'عرض تفاصيل المستخدمين',
+        description: 'استرجا المستخدمين',
+        tags: ['Companies'],
+        security: [['bearerAuth' => []]],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'تفاصيل المستخدم',
+                content: new OA\JsonContent(
+                    type: 'object',
+                    properties: [
+                        new OA\Property(
+                            property: 'data',
+                            type: 'object',
+                            properties: [
+                                new OA\Property(property: 'id', type: 'integer', example: 1),
+                                new OA\Property(property: 'name', type: 'string', example: 'محمد'),
+                               
+                            ]
+                        )
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 404,
+                description: 'المستخدم غير موجود'
+            ),
+        ]
+    )]
     
+    public function create()
+    {
+        return response()->json([
+            'users' => User::select(['id', 'name'])->latest()->get()
+        ]);        
+    }
+
+
+
     #[OA\Post(
         path: '/api/v1/companies',
         operationId: 'createCompany',
@@ -198,7 +240,7 @@ class CompanyController extends Controller
                         'name', 'email', 'phone', 'commercial_registration', 'city', 'address',
                         'contact_person', 'subscription_start', 'subscription_end',
                         'subscription_status', 'category', 
-                        'user_name', 'user_email', 'user_password', 'user_password_confirmation'
+                        //'user_name', 'user_email', 'user_password', 'user_password_confirmation'
                     ],
                     properties: [
                         new OA\Property(property: 'name', type: 'string', example: 'شركة التقنية المحدودة'),
@@ -221,6 +263,7 @@ class CompanyController extends Controller
                         new OA\Property(property: 'status', type: 'boolean', example: true),
                         new OA\Property(property: 'is_verified', type: 'boolean', example: false),
                         
+                        new OA\Property(property: 'user_id', type: 'integer', example: 2, description: 'في حال اضفت معرف المدير  يمكن تخطي باقي بيانات المدير'),
                         new OA\Property(property: 'user_name', type: 'string', example: 'مدير الشركة'),
                         new OA\Property(property: 'user_email', type: 'string', format: 'email', example: 'manager@company.com'),
                         new OA\Property(property: 'user_password', type: 'string', format: 'password'),
@@ -313,21 +356,32 @@ class CompanyController extends Controller
             if ($request->hasFile('user_personal_photo')) {
                 $personal_photoPath = __saveFile($request->file('user_personal_photo'), base_path('public/uploads/users/personal_photos/'));
             }
-            
-            // Create company manager user
-            $manager = $company->manager()->create([
-                'name' => $request->input('user_name'),
-                'email' => $request->input('user_email'),
-                'password' => Hash::make($request->input('user_password')),
-                'phone' => $request->input('user_phone'),
-                'personal_photo' => $personal_photoPath,
-                'birth_date' => $request->input('user_birth_date'),
-                'gender' => $request->input('user_gender'),
-                //'status' => $request->input('user_status', true),
-                //'company_id' => $company->id,
-                //'created_by' => ,
-                'role' => 'company_admin',
-            ]);
+
+            if($request->filled('user_id')){
+                $manager = User::find($request->user_id);
+                $manager->update([
+                    'company_id' => $company->id,
+                    'role' => 'company_admin',
+
+                ]);
+            }
+            else{
+                 // Create company manager user
+                $manager = $company->manager()->create([
+                    'name' => $request->input('user_name'),
+                    'email' => $request->input('user_email'),
+                    'password' => Hash::make($request->input('user_password')),
+                    'phone' => $request->input('user_phone'),
+                    'personal_photo' => $personal_photoPath,
+                    'birth_date' => $request->input('user_birth_date'),
+                    'gender' => $request->input('user_gender'),
+                    //'status' => $request->input('user_status', true),
+                    //'company_id' => $company->id,
+                    //'created_by' => ,
+                    'role' => 'company_admin',
+                ]);
+            }
+         
             
             return new CompanyResource($company->load(['manager']));
         });
@@ -430,6 +484,8 @@ class CompanyController extends Controller
                         new OA\Property(property: 'address', type: 'string', example: 'حي الصفا، شارع الأمير سلطان'),
                         new OA\Property(property: 'contact_person', type: 'string', example: 'محمد أحمد'),
                         new OA\Property(property: 'logo', type: 'string', format: 'binary', description: 'شعار الشركة'),
+                        new OA\Property(property: 'user_id', type: 'integer', example: 2),
+
                         new OA\Property(
                             property: 'subscription_status',
                             type: 'string',
@@ -489,6 +545,8 @@ class CompanyController extends Controller
             'logo' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
             'status' => ['nullable'],
             'subscription_status' => ['nullable', 'string', 'in:active,inactive,suspended'],
+            'user_id' => ['nullable', 'integer', 'exists:users,id'],
+
         ]);
     
         $request->merge([
@@ -506,6 +564,15 @@ class CompanyController extends Controller
         $company->update($request->only([
             'name', 'email', 'phone', 'subscription_status', 'status'
         ]));
+
+        if($request->filled('user_id')){
+            $manager = User::find($request->user_id);
+            $manager->update([
+                'company_id' => $company->id,
+                'role' => 'company_admin',
+
+            ]);
+        }
         
         return new CompanyResource($company->load(['manager']));
     }

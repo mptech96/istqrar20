@@ -208,11 +208,48 @@ class BranchController extends Controller
         
         return BranchResource::collection($branches);
     }
+
+     #[OA\Get(
+        path: '/api/v1/branches/create',
+        operationId: 'addBranches',
+        summary: 'عرض تفاصيل المستخدمين',
+        description: 'استرجا المستخدمين',
+        tags: ['Branches'],
+        security: [['bearerAuth' => []]],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'تفاصيل المستخدم',
+                content: new OA\JsonContent(
+                    type: 'object',
+                    properties: [
+                        new OA\Property(
+                            property: 'data',
+                            type: 'object',
+                            properties: [
+                                new OA\Property(property: 'id', type: 'integer', example: 1),
+                                new OA\Property(property: 'name', type: 'string', example: 'محمد'),
+                               
+                            ]
+                        )
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 404,
+                description: 'المستخدم غير موجود'
+            ),
+        ]
+    )]
     
     public function create()
     {
-        return Company::pluck('id', 'name');
+        return response()->json([
+            'users' => User::select(['id', 'name'])->latest()->get(),
+            'companies' => Company::select(['id', 'name'])->latest()->get(),
+        ]);        
     }
+
     
     #[OA\Post(
         path: '/api/v1/branches',
@@ -229,7 +266,7 @@ class BranchController extends Controller
                     type: 'object',
                     required: [
                         'company_id', 'name', 'email', 'phone', 'city', 'address', 'category',
-                        'user_name', 'user_email', 'user_password', 'user_password_confirmation', 'user_phone'
+                        //'user_name', 'user_email', 'user_password', 'user_password_confirmation', 'user_phone'
                     ],
                     properties: [
                         new OA\Property(property: 'company_id', type: 'integer', example: 1),
@@ -245,6 +282,7 @@ class BranchController extends Controller
                         new OA\Property(property: 'status', type: 'boolean', example: true),
                         
                         // Branch Manager User data
+                        new OA\Property(property: 'user_id', type: 'integer', example: 2, description: 'في حال اضفت معرف المدير  يمكن تخطي باقي بيانات المدير'),
                         new OA\Property(property: 'user_name', type: 'string', example: 'مدير الفرع'),
                         new OA\Property(property: 'user_email', type: 'string', format: 'email', example: 'branch.manager@company.com'),
                         new OA\Property(property: 'user_password', type: 'string', format: 'password'),
@@ -316,17 +354,29 @@ class BranchController extends Controller
             }
             
             // Create branch manager user
-            $manager = User::create([
-                'name' => $request->input('user_name'),
-                'email' => $request->input('user_email'),
-                'password' => Hash::make($request->input('user_password')),
-                'phone' => $request->input('user_phone'),
-                'personal_photo' => $personal_photoPath,
-                'birth_date' => $request->input('user_birth_date'),
-                'gender' => $request->input('user_gender'),
-                'company_id' => $company->id,
-                'role' => 'branch_manager',
-            ]);
+            $manager = null;
+            if($request->filled('user_id')){
+                $manager = User::find($request->user_id);
+                $manager->update([
+                    'company_id' => $company->id,
+                    'role' => 'branch_manager',
+
+                ]);
+            }
+            else{
+                $manager = User::create([
+                    'name' => $request->input('user_name'),
+                    'email' => $request->input('user_email'),
+                    'password' => Hash::make($request->input('user_password')),
+                    'phone' => $request->input('user_phone'),
+                    'personal_photo' => $personal_photoPath,
+                    'birth_date' => $request->input('user_birth_date'),
+                    'gender' => $request->input('user_gender'),
+                    'company_id' => $company->id,
+                    'role' => 'branch_manager',
+                ]);
+            }
+            
             
             // Create branch
             $branch = Branch::create([
@@ -463,6 +513,8 @@ class BranchController extends Controller
                     new OA\Property(property: 'last_visit_date', type: 'string', format: 'date', example: '2024-01-15'),
                     new OA\Property(property: 'next_scheduled_visit', type: 'string', format: 'date', example: '2024-02-15'),
                     new OA\Property(property: 'status', type: 'boolean', example: true),
+
+                    new OA\Property(property: 'manager_user_id', type: 'integer', example: 2),
                     new OA\Property(property: 'manager_name', type: 'string', example: 'مدير الفرع (محدث)'),
                     new OA\Property(property: 'manager_email', type: 'string', format: 'email', example: 'updated.manager@company.com'),
                     new OA\Property(property: 'manager_phone', type: 'string', example: '+966511111113'),
@@ -512,12 +564,14 @@ class BranchController extends Controller
     public function update(UpdateBranchRequest $request, Branch $branch)
     {
         // Update branch data
-        $branch->update($request->only([
-            'name', 'email', 'phone', 'city', 'address',
-            'latitude', 'longitude', 'category', 'compliance_score',
-            'total_visits', 'last_visit_date', 'next_scheduled_visit',
-            'manager_name', 'manager_email', 'manager_phone'
-        ]));
+        $branch->update(
+            collect($request->only([
+                'name', 'email', 'phone', 'city', 'address',
+                'latitude', 'longitude', 'category', 'compliance_score',
+                'total_visits', 'last_visit_date', 'next_scheduled_visit',
+                'manager_name', 'manager_email', 'manager_phone', 'manager_user_id'
+            ]))->filter(fn($value) => filled($value))->toArray()
+        );
         
         // Handle status update
         if ($request->has('status')) {
@@ -527,7 +581,7 @@ class BranchController extends Controller
         
         // Update manager user if manager info changed
         if ($branch->manager_user_id && 
-            ($request->has('manager_email') || $request->has('manager_name') || $request->has('manager_phone'))) {
+            ($request->has('manager_user_id') || $request->has('manager_email') || $request->has('manager_name') || $request->has('manager_phone'))) {
             
             $manager = User::find($branch->manager_user_id);
             if ($manager) {
@@ -535,6 +589,7 @@ class BranchController extends Controller
                     'name' => $request->input('manager_name', $manager->name),
                     'email' => $request->input('manager_email', $manager->email),
                     'phone' => $request->input('manager_phone', $manager->phone),
+                    'branch_id' =>  $branch->id,
                 ]);
             }
         }

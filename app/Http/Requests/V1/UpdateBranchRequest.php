@@ -38,6 +38,7 @@ class UpdateBranchRequest extends FormRequest
             'status' => ['nullable', 'boolean'],
             
             // Manager update
+            'manager_user_id' => ['nullable', 'integer', 'exists:users,id'],
             'manager_name' => ['nullable', 'string', 'max:255'],
             'manager_email' => ['nullable', 'email'],
             'manager_phone' => ['nullable', 'string', 'max:20'],

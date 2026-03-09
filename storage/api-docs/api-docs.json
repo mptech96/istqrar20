@@ -2031,12 +2031,7 @@
                                     "phone",
                                     "city",
                                     "address",
-                                    "category",
-                                    "user_name",
-                                    "user_email",
-                                    "user_password",
-                                    "user_password_confirmation",
-                                    "user_phone"
+                                    "category"
                                 ],
                                 "properties": {
                                     "company_id": {
@@ -2086,6 +2081,11 @@
                                     "status": {
                                         "type": "boolean",
                                         "example": true
+                                    },
+                                    "user_id": {
+                                        "description": "في حال اضفت معرف المدير  يمكن تخطي باقي بيانات المدير",
+                                        "type": "integer",
+                                        "example": 2
                                     },
                                     "user_name": {
                                         "type": "string",
@@ -2206,6 +2206,51 @@
                                 }
                             }
                         }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/branches/create": {
+            "get": {
+                "tags": [
+                    "Branches"
+                ],
+                "summary": "عرض تفاصيل المستخدمين",
+                "description": "استرجا المستخدمين",
+                "operationId": "addBranches",
+                "responses": {
+                    "200": {
+                        "description": "تفاصيل المستخدم",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "محمد"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "المستخدم غير موجود"
                     }
                 },
                 "security": [
@@ -2422,6 +2467,10 @@
                                     "status": {
                                         "type": "boolean",
                                         "example": true
+                                    },
+                                    "manager_user_id": {
+                                        "type": "integer",
+                                        "example": 2
                                     },
                                     "manager_name": {
                                         "type": "string",
@@ -3965,11 +4014,7 @@
                                     "subscription_start",
                                     "subscription_end",
                                     "subscription_status",
-                                    "category",
-                                    "user_name",
-                                    "user_email",
-                                    "user_password",
-                                    "user_password_confirmation"
+                                    "category"
                                 ],
                                 "properties": {
                                     "name": {
@@ -4035,6 +4080,11 @@
                                     "is_verified": {
                                         "type": "boolean",
                                         "example": false
+                                    },
+                                    "user_id": {
+                                        "description": "في حال اضفت معرف المدير  يمكن تخطي باقي بيانات المدير",
+                                        "type": "integer",
+                                        "example": 2
                                     },
                                     "user_name": {
                                         "type": "string",
@@ -4157,6 +4207,51 @@
                                 }
                             }
                         }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/companies/create": {
+            "get": {
+                "tags": [
+                    "Companies"
+                ],
+                "summary": "عرض تفاصيل المستخدمين",
+                "description": "استرجا المستخدمين",
+                "operationId": "addCompany",
+                "responses": {
+                    "200": {
+                        "description": "تفاصيل المستخدم",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "محمد"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "المستخدم غير موجود"
                     }
                 },
                 "security": [
@@ -4340,6 +4435,10 @@
                                         "description": "شعار الشركة",
                                         "type": "string",
                                         "format": "binary"
+                                    },
+                                    "user_id": {
+                                        "type": "integer",
+                                        "example": 2
                                     },
                                     "subscription_status": {
                                         "type": "string",
@@ -10574,6 +10673,16 @@
                                         ],
                                         "example": "auditor"
                                     },
+                                    "company_id": {
+                                        "type": "integer",
+                                        "example": 1,
+                                        "nullable": true
+                                    },
+                                    "branch_id": {
+                                        "type": "integer",
+                                        "example": 1,
+                                        "nullable": true
+                                    },
                                     "department": {
                                         "type": "string",
                                         "example": "الجودة"
@@ -10879,6 +10988,14 @@
                                         "format": "email",
                                         "example": "updated.user@example.com"
                                     },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password"
+                                    },
+                                    "password_confirmation": {
+                                        "type": "string",
+                                        "format": "password"
+                                    },
                                     "phone": {
                                         "type": "string",
                                         "example": "+966511111112"
@@ -10904,6 +11021,16 @@
                                             "branch_manager"
                                         ],
                                         "example": "auditor"
+                                    },
+                                    "company_id": {
+                                        "type": "integer",
+                                        "example": 1,
+                                        "nullable": true
+                                    },
+                                    "branch_id": {
+                                        "type": "integer",
+                                        "example": 1,
+                                        "nullable": true
                                     },
                                     "department": {
                                         "type": "string",

@@ -223,8 +223,8 @@ class UserController extends Controller
                             enum: ['super_admin', 'auditor', 'company_admin', 'branch_manager'],
                             example: 'auditor'
                         ),
-                        //new OA\Property(property: 'company_id', type: 'integer', example: 1, nullable: true),
-                        //new OA\Property(property: 'branch_id', type: 'integer', example: 1, nullable: true),
+                        new OA\Property(property: 'company_id', type: 'integer', example: 1, nullable: true),
+                        new OA\Property(property: 'branch_id', type: 'integer', example: 1, nullable: true),
                         new OA\Property(property: 'department', type: 'string', example: 'الجودة'),
                         new OA\Property(property: 'position', type: 'string', example: 'مراجع'),
                         new OA\Property(property: 'national_number', type: 'string', example: '1234567890'),
@@ -493,13 +493,15 @@ class UserController extends Controller
                     properties: [
                         new OA\Property(property: 'name', type: 'string', example: 'محمد أحمد (محدث)'),
                         new OA\Property(property: 'email', type: 'string', format: 'email', example: 'updated.user@example.com'),
+                        new OA\Property(property: 'password', type: 'string', format: 'password'),
+                        new OA\Property(property: 'password_confirmation', type: 'string', format: 'password'),
                         new OA\Property(property: 'phone', type: 'string', example: '+966511111112'),
                         new OA\Property(property: 'municipality_certificate', type: 'file', format: 'binary'),
                         new OA\Property(property: 'driving_license', type: 'file', format: 'binary'),
                         new OA\Property(property: 'personal_photo', type: 'file', format: 'binary'),
                         new OA\Property(property: 'role', type: 'string', enum: ['super_admin', 'auditor', 'company_admin', 'branch_manager'], example: 'auditor'),
-                        //new OA\Property(property: 'company_id', type: 'integer', example: 1, nullable: true),
-                        //new OA\Property(property: 'branch_id', type: 'integer', example: 1, nullable: true),
+                        new OA\Property(property: 'company_id', type: 'integer', example: 1, nullable: true),
+                        new OA\Property(property: 'branch_id', type: 'integer', example: 1, nullable: true),
                         new OA\Property(property: 'department', type: 'string', example: 'الجودة'),
                         new OA\Property(property: 'position', type: 'string', example: 'مراجع'),
                         new OA\Property(property: 'national_number', type: 'string', example: '1234567890'),
@@ -590,12 +592,18 @@ class UserController extends Controller
             }
             
             // Update user data
-            $user->update($request->only([
-                'name', 'email', 'phone', 'role', 'company_id', 'branch_id',
-                'department', 'position', 'national_number', 'certificate_expiry',
-                'license_expiry', 'id_expiry', 'birth_date', 'gender', 
-                'is_certificate_valid', 'is_license_valid', 'is_id_valid'
-            ]));
+            $user->update(
+                collect($request->only([
+                    'name', 'email', 'phone', 'role', 'company_id', 'branch_id',
+                    'department', 'position', 'national_number', 'certificate_expiry',
+                    'license_expiry', 'id_expiry', 'birth_date', 'gender', 
+                    'is_certificate_valid', 'is_license_valid', 'is_id_valid'
+                ]))->filter(fn($value) => filled($value))->toArray()
+            );
+
+            if ($request->has('password')) {
+                $user->password = Hash::make($request->input('password'));
+            }
             
             // Handle status and must_change_password
             if ($request->has('status')) {
@@ -630,6 +638,7 @@ class UserController extends Controller
                         'manager_name' => $user->name,
                         'manager_email' => $user->email,
                         'manager_phone' => $user->phone,
+                        'company_id' => $user->company_id,
                     ]);
                 }
             }

@@ -41,7 +41,7 @@ class Company extends Model
                     $builder->whereHas('branches');
                 }
                 elseif($user->role === 'auditor') {
-                    $builder->whereRaw('1 = 0');
+                    $builder->whereHas('visits');
                 }
                 elseif($user->role === 'super_admin') {
                     $builder->whereRaw('1 = 1');

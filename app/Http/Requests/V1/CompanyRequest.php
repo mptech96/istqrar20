@@ -4,6 +4,7 @@ namespace App\Http\Requests\V1;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rules\Password;
+use Illuminate\Validation\Rule;
 
 class CompanyRequest extends FormRequest
 {
@@ -24,22 +25,40 @@ class CompanyRequest extends FormRequest
             'address' => ['required', 'string'],
             'contact_person' => ['required', 'string', 'max:255'],
             'logo' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
-            'subscription_start' => ['required', 'date'],
+            'subscription_start' => ['required', 'date', 'after_or_equal:today'],
             'subscription_end' => ['required', 'date', 'after:subscription_start'],
             'subscription_status' => ['required', 'string', 'in:active,inactive,suspended'],
             'category' => ['required', 'string', 'max:100'],
-            //'status' => ['boolean'],
-            //'is_verified' => ['boolean'],
             
-            // Company Manager User data
-            'user_name' => ['required', 'string', 'max:255'],
-            'user_email' => ['required', 'email', 'unique:users,email'],
-            'user_password' => ['required', 'confirmed', Password::min(8)],
-            'user_phone' => ['required', 'string', 'max:20'],
+            // Company Manager User data - Conditional validation based on user_id
+            'user_id' => ['nullable', 'integer', 'exists:users,id'],
+            'user_name' => [
+                Rule::when($this->filled('user_id'), 
+                    ['sometimes', 'nullable', 'string', 'max:255'],  // إذا كان user_id موجوداً: اختياري
+                    ['required', 'string', 'max:255']                // إذا كان user_id غير موجود: إجباري
+                )
+            ],
+            'user_email' => [
+                Rule::when($this->filled('user_id'),
+                    ['sometimes', 'nullable', 'email', Rule::unique('users', 'email')->ignore($this->user_id)],
+                    ['required', 'email', 'unique:users,email']
+                )
+            ],
+            'user_password' => [
+                Rule::when($this->filled('user_id'),
+                    ['sometimes', 'nullable', 'confirmed', Password::min(8)],  // اختياري مع إمكانية التعديل
+                    ['required', 'confirmed', Password::min(8)]                 // إجباري عند الإنشاء
+                )
+            ],
+            'user_phone' => [
+                Rule::when($this->filled('user_id'),
+                    ['sometimes', 'nullable', 'string', 'max:20'],
+                    ['required', 'string', 'max:20']
+                )
+            ],
             'user_personal_photo' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
             'user_birth_date' => ['nullable', 'date', 'before:-18 years'],
             'user_gender' => ['nullable', 'integer', 'in:1,2,3'],
-            //'user_status' => ['boolean'],
         ];
     }
 
