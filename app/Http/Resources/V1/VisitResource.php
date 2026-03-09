@@ -30,6 +30,14 @@ class VisitResource extends JsonResource
             'estimated_duration_formatted' => $this->estimated_duration ? $this->formatDuration($this->estimated_duration) : null,
             'actual_duration' => $this->actual_duration,
             'actual_duration_formatted' => $this->actual_duration ? $this->formatDuration($this->actual_duration) : null,
+
+            'start_latitude' => $this->start_latitude,
+            'start_longitude' => $this->start_longitude,
+            'end_latitude' => $this->end_latitude,
+            'end_longitude' => $this->end_longitude,
+            'location_url' => $this->location_url,
+            'location_address' => $this->location_address,
+
             
             // النتائج
             'total_score' => (float) $this->total_score,

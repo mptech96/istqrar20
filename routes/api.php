@@ -16,7 +16,7 @@ Route::namespace('App\Http\Controllers\V1')->middleware(['throttle:60,1', 'api']
             // Authentication
             Route::prefix('companies')->controller(CompanyController::class)->group(function () {
                 Route::get('/', 'index');
-                Route::get('/create', 'create');
+                Route::get('/create', 'create')->middleware(['user.role:super_admin']);
                 Route::post('/', 'store')->middleware(['user.role:super_admin']);
                 Route::put('/{company}', 'update')->middleware(['user.role:super_admin']);
                 Route::get('/{company}', 'show');
@@ -28,19 +28,19 @@ Route::namespace('App\Http\Controllers\V1')->middleware(['throttle:60,1', 'api']
             
             Route::prefix('branches')->controller(BranchController::class)->group(function () {
                 Route::get('/', 'index');
-                Route::get('/create', 'create')->middleware(['user.role:super_admin,company_admin']);
-                Route::post('/', 'store')->middleware(['user.role:super_admin,company_admin']);
-                Route::put('/{branch}', 'update')->middleware(['user.role:super_admin,company_admin']);
+                Route::get('/create', 'create')->middleware(['user.role:super_admin']);
+                Route::post('/', 'store')->middleware(['user.role:super_admin']);
+                Route::put('/{branch}', 'update')->middleware(['user.role:super_admin']);
                 Route::get('/{branch}', 'show');
-                Route::delete('/{branch}', 'destroy')->middleware(['user.role:company_admin']);
-                Route::post('/{id}/restore', 'restore')->middleware(['user.role:company_admin']);
+                Route::delete('/{branch}', 'destroy')->middleware(['user.role:super_admin']);
+                Route::post('/{id}/restore', 'restore')->middleware(['user.role:super_admin']);
                 Route::get('/{branch}/statistics', 'statistics');
             });
             
             Route::prefix('users')->controller(UserController::class)->group(function () {
                 Route::get('/', 'index');
-                Route::get('/create', 'create');
-                Route::post('/un-block/{email}', 'unBlockUser');
+                Route::get('/create', 'create')->middleware(['user.role:super_admin']);
+                Route::post('/un-block/{email}', 'unBlockUser')->middleware(['user.role:super_admin']);
                 Route::post('/', 'store')->middleware(['user.role:super_admin']);
                 Route::get('/{user}/documents-expiry', 'documentsExpiry');
                 Route::put('/{user}', 'update')->middleware(['user.role:super_admin']);
@@ -92,7 +92,7 @@ Route::namespace('App\Http\Controllers\V1')->middleware(['throttle:60,1', 'api']
             });
             
             Route::prefix('/questions')->controller(QuestionController::class)->group(function () {
-                Route::get('create', 'create');
+                Route::get('create', 'create')->middleware(['user.role:super_admin']);
             });
     
             Route::prefix('visits')->controller(VisitController::class)->group(function () {
@@ -174,7 +174,7 @@ Route::namespace('App\Http\Controllers\V1')->middleware(['throttle:60,1', 'api']
             
             Route::prefix('dashboard')->controller(DashboardController::class)->group(function () {
                 //Route::get('/', 'index');
-                Route::get('/super-admin', 'superAdminDashboard');
+                Route::get('/super-admin', 'superAdminDashboard')->middleware(['user.role:super_admin']);
                 Route::get('/company-admin', 'companyAdminDashboard');
                 Route::get('/branch-manager', 'branchManagerDashboard');
                 Route::get('/auditor', 'auditorDashboard');
@@ -182,7 +182,7 @@ Route::namespace('App\Http\Controllers\V1')->middleware(['throttle:60,1', 'api']
             
             Route::prefix('reports')->controller(ReportController::class)->group(function () {
                 //Route::get('/', 'index');
-                Route::get('/super-admin', 'superAdminReport');
+                Route::get('/super-admin', 'superAdminReport')->middleware(['user.role:super_admin']);
                 Route::get('/company-admin', 'companyAdminReport');
                 Route::get('/branch-manager', 'branchManagerReport');
                 Route::get('/auditor', 'auditorReport');
