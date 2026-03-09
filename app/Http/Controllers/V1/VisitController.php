@@ -1097,12 +1097,12 @@ class VisitController extends Controller
             'message' => 'تم استعادة الزيارة بنجاح'
         ]);
     }
-    
+        
     #[OA\Post(
         path: '/api/v1/visits/{visit}/start',
         operationId: 'startVisit',
         summary: 'بدء الزيارة',
-        description: 'تسجيل وقت بدء الزيارة الفعلي',
+        description: 'تسجيل وقت بدء الزيارة الفعلي مع تحديد موقع بدء الزيارة',
         tags: ['Visits'],
         security: [['bearerAuth' => []]],
         parameters: [
@@ -1114,14 +1114,50 @@ class VisitController extends Controller
                 schema: new OA\Schema(type: 'integer', example: 1)
             ),
         ],
-        /*requestBody: new OA\RequestBody(
+        requestBody: new OA\RequestBody(
+            required: true,
             content: new OA\JsonContent(
                 type: 'object',
+                required: ['start_latitude', 'start_longitude'],
                 properties: [
-                    new OA\Property(property: 'visit_date', type: 'string', format: 'date', example: '2026-02-10', description: 'تاريخ الزيارة الفعلي'),
+                    // حقول الموقع - مطلوبة
+                    new OA\Property(
+                        property: 'start_latitude', 
+                        type: 'number', 
+                        format: 'float',
+                        example: 24.7136, 
+                        description: 'خط العرض عند بدء الزيارة (مطلوب)',
+                        minimum: -90,
+                        maximum: 90
+                    ),
+                    new OA\Property(
+                        property: 'start_longitude', 
+                        type: 'number', 
+                        format: 'float',
+                        example: 46.6753, 
+                        description: 'خط الطول عند بدء الزيارة (مطلوب)',
+                        minimum: -180,
+                        maximum: 180
+                    ),
+                    // حقول اختيارية
+                    new OA\Property(
+                        property: 'location_url', 
+                        type: 'string', 
+                        format: 'uri',
+                        example: 'https://maps.google.com/?q=24.7136,46.6753', 
+                        description: 'رابط موقع جوجل ماب (اختياري)'
+                    ),
+                    new OA\Property(
+                        property: 'location_address', 
+                        type: 'string', 
+                        example: 'الرياض - حي المروج - شارع العليا', 
+                        description: 'العنوان الكامل للموقع (اختياري)'
+                    ),
+                    // حقل التاريخ (اختياري)
+                    //new OA\Property(property: 'visit_date', type: 'string', format: 'date', example: '2026-03-10', description: 'تاريخ الزيارة الفعلي (اختياري - سيتم استخدام تاريخ اليوم إذا لم يتم إرساله)'),
                 ]
             )
-        ),*/
+        ),
         responses: [
             new OA\Response(
                 response: 200,
@@ -1136,9 +1172,14 @@ class VisitController extends Controller
                                 new OA\Property(property: 'id', type: 'integer', example: 1),
                                 new OA\Property(property: 'status', type: 'string', example: 'in_progress'),
                                 new OA\Property(property: 'status_text', type: 'string', example: 'قيد التنفيذ'),
-                                new OA\Property(property: 'actual_start_time', type: 'string', format: 'date-time', example: '2026-02-10T09:05:00Z'),
-                                new OA\Property(property: 'visit_date', type: 'string', format: 'date', example: '2026-02-10'),
-                                new OA\Property(property: 'updated_at', type: 'string', format: 'date-time', example: '2026-02-10T09:05:00Z'),
+                                new OA\Property(property: 'actual_start_time', type: 'string', format: 'date-time', example: '2026-03-10T09:05:00Z'),
+                                new OA\Property(property: 'visit_date', type: 'string', format: 'date', example: '2026-03-10'),
+                                // حقول الموقع في الاستجابة
+                                new OA\Property(property: 'start_latitude', type: 'number', example: 24.7136),
+                                new OA\Property(property: 'start_longitude', type: 'number', example: 46.6753),
+                                new OA\Property(property: 'location_url', type: 'string', example: 'https://maps.google.com/?q=24.7136,46.6753'),
+                                new OA\Property(property: 'location_address', type: 'string', example: 'الرياض - حي المروج - شارع العليا'),
+                                new OA\Property(property: 'updated_at', type: 'string', format: 'date-time', example: '2026-03-10T09:05:00Z'),
                             ]
                         ),
                         new OA\Property(property: 'message', type: 'string', example: 'تم بدء الزيارة بنجاح'),
@@ -1166,6 +1207,34 @@ class VisitController extends Controller
                 )
             ),
             new OA\Response(
+                response: 422,
+                description: 'خطأ في التحقق من صحة البيانات',
+                content: new OA\JsonContent(
+                    type: 'object',
+                    properties: [
+                        new OA\Property(property: 'message', type: 'string', example: 'The given data was invalid.'),
+                        new OA\Property(
+                            property: 'errors',
+                            type: 'object',
+                            properties: [
+                                new OA\Property(
+                                    property: 'start_latitude',
+                                    type: 'array',
+                                    items: new OA\Items(type: 'string'),
+                                    example: ['خط العرض مطلوب لتسجيل موقع بدء الزيارة.']
+                                ),
+                                new OA\Property(
+                                    property: 'start_longitude',
+                                    type: 'array',
+                                    items: new OA\Items(type: 'string'),
+                                    example: ['خط الطول مطلوب لتسجيل موقع بدء الزيارة.']
+                                ),
+                            ]
+                        ),
+                    ]
+                )
+            ),
+            new OA\Response(
                 response: 401,
                 description: 'غير مصرح به',
                 content: new OA\JsonContent(
@@ -1177,35 +1246,44 @@ class VisitController extends Controller
             ),
         ]
     )]
-    public function start(Visit $visit)
+    public function start(StartVisitRequest $request, Visit $visit)
     {
-        
+        // التحقق من وجود وقت بدء سابق
         if ($visit->actual_start_time) {
             $endTime = Carbon::parse($visit->actual_start_time)
-            ->addMinutes($visit->estimated_duration);
-            if ($endTime->isPast()){
+                ->addMinutes($visit->estimated_duration);
+            if ($endTime->isPast()) {
                 return response()->json([
                     'message' => __tr('The evaluation period has ended.')
                 ], 400);
             }
         }
         
+        // التحقق من حالة الزيارة
         if (!in_array($visit->status, ['scheduled', 'draft'])) {
             return response()->json([
                 'message' => 'لا يمكن بدء الزيارة في حالتها الحالية'
             ], 400);
         }
         
+        // التحقق من تاريخ الزيارة المجدول
         if ($visit->scheduled_date->toDateString() != now()->toDateString()) {
             return response()->json([
                 'message' => 'This action cannot be completed. The scheduled visit date must be today.'
             ], 400);
         }
         
+        // تحديث بيانات الزيارة مع حقول الموقع
+        $validated = $request->validated();
+        
         $visit->update([
             'status' => 'in_progress',
             'actual_start_time' => now(),
             'visit_date' => now()->toDateString(),
+            'start_latitude' => $validated['start_latitude'],
+            'start_longitude' => $validated['start_longitude'],
+            'location_url' => $validated['location_url'] ?? null,
+            'location_address' => $validated['location_address'] ?? null,
         ]);
         
         return response()->json([
@@ -1213,6 +1291,7 @@ class VisitController extends Controller
             'message' => 'تم بدء الزيارة بنجاح'
         ]);
     }
+
     #[OA\Post(
         path: '/api/v1/visits/{visit}/complete',
         operationId: 'completeVisit',

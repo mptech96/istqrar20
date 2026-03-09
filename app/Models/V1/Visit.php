@@ -24,6 +24,14 @@ class Visit extends Model
         'completed_at',
         'estimated_duration',
         'actual_duration',
+
+        'start_latitude',
+        'start_longitude',
+        'end_latitude',
+        'end_longitude',
+        'location_url',
+        'location_address',
+
         'total_score',
         'max_possible_score',
         'percentage',

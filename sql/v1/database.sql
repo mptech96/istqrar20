@@ -297,6 +297,14 @@ CREATE TABLE IF NOT EXISTS `visits` (
     `estimated_duration` int(11) DEFAULT NULL COMMENT 'بالدقائق',
     `actual_duration` int(11) DEFAULT NULL COMMENT 'بالدقائق',
     
+    `start_latitude` decimal(10,8) DEFAULT NULL COMMENT 'خط العرض عند بدء الزيارة',
+    `start_longitude` decimal(11,8) DEFAULT NULL COMMENT 'خط الطول عند بدء الزيارة',
+    `end_latitude` decimal(10,8) DEFAULT NULL COMMENT 'خط العرض عند انتهاء الزيارة',
+    `end_longitude` decimal(11,8) DEFAULT NULL COMMENT 'خط الطول عند انتهاء الزيارة',
+    `location_url` varchar(500) DEFAULT NULL COMMENT 'رابط موقع جوجل ماب',
+    `location_address` text DEFAULT NULL COMMENT 'العنوان المستخرج من الموقع',
+    
+
     -- النتائج
     `total_score` decimal(5,2) DEFAULT 0.00,
     `max_possible_score` int(11) DEFAULT 100,
@@ -332,7 +340,9 @@ CREATE TABLE IF NOT EXISTS `visits` (
     INDEX `idx_visit_scheduled` (`scheduled_date`),
     INDEX `idx_visit_date` (`visit_date`),
     INDEX `idx_visit_approved` (`approved_at`),
-    INDEX `idx_visit_category` (`category`)
+    INDEX `idx_visit_category` (`category`),
+    INDEX `idx_visit_location` (`start_latitude`, `start_longitude`)
+    
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- جدول الإجابات

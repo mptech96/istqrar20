@@ -13164,7 +13164,7 @@
                     "Visits"
                 ],
                 "summary": "بدء الزيارة",
-                "description": "تسجيل وقت بدء الزيارة الفعلي",
+                "description": "تسجيل وقت بدء الزيارة الفعلي مع تحديد موقع بدء الزيارة",
                 "operationId": "startVisit",
                 "parameters": [
                     {
@@ -13178,6 +13178,49 @@
                         }
                     }
                 ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "start_latitude",
+                                    "start_longitude"
+                                ],
+                                "properties": {
+                                    "start_latitude": {
+                                        "description": "خط العرض عند بدء الزيارة (مطلوب)",
+                                        "type": "number",
+                                        "format": "float",
+                                        "maximum": 90,
+                                        "minimum": -90,
+                                        "example": 24.7136
+                                    },
+                                    "start_longitude": {
+                                        "description": "خط الطول عند بدء الزيارة (مطلوب)",
+                                        "type": "number",
+                                        "format": "float",
+                                        "maximum": 180,
+                                        "minimum": -180,
+                                        "example": 46.6753
+                                    },
+                                    "location_url": {
+                                        "description": "رابط موقع جوجل ماب (اختياري)",
+                                        "type": "string",
+                                        "format": "uri",
+                                        "example": "https://maps.google.com/?q=24.7136,46.6753"
+                                    },
+                                    "location_address": {
+                                        "description": "العنوان الكامل للموقع (اختياري)",
+                                        "type": "string",
+                                        "example": "الرياض - حي المروج - شارع العليا"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
                 "responses": {
                     "200": {
                         "description": "تم بدء الزيارة",
@@ -13202,17 +13245,33 @@
                                                 "actual_start_time": {
                                                     "type": "string",
                                                     "format": "date-time",
-                                                    "example": "2026-02-10T09:05:00Z"
+                                                    "example": "2026-03-10T09:05:00Z"
                                                 },
                                                 "visit_date": {
                                                     "type": "string",
                                                     "format": "date",
-                                                    "example": "2026-02-10"
+                                                    "example": "2026-03-10"
+                                                },
+                                                "start_latitude": {
+                                                    "type": "number",
+                                                    "example": 24.7136
+                                                },
+                                                "start_longitude": {
+                                                    "type": "number",
+                                                    "example": 46.6753
+                                                },
+                                                "location_url": {
+                                                    "type": "string",
+                                                    "example": "https://maps.google.com/?q=24.7136,46.6753"
+                                                },
+                                                "location_address": {
+                                                    "type": "string",
+                                                    "example": "الرياض - حي المروج - شارع العليا"
                                                 },
                                                 "updated_at": {
                                                     "type": "string",
                                                     "format": "date-time",
-                                                    "example": "2026-02-10T09:05:00Z"
+                                                    "example": "2026-03-10T09:05:00Z"
                                                 }
                                             },
                                             "type": "object"
@@ -13252,6 +13311,45 @@
                                         "message": {
                                             "type": "string",
                                             "example": "الزيارة غير موجودة"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "خطأ في التحقق من صحة البيانات",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The given data was invalid."
+                                        },
+                                        "errors": {
+                                            "properties": {
+                                                "start_latitude": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    },
+                                                    "example": [
+                                                        "خط العرض مطلوب لتسجيل موقع بدء الزيارة."
+                                                    ]
+                                                },
+                                                "start_longitude": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    },
+                                                    "example": [
+                                                        "خط الطول مطلوب لتسجيل موقع بدء الزيارة."
+                                                    ]
+                                                }
+                                            },
+                                            "type": "object"
                                         }
                                     },
                                     "type": "object"

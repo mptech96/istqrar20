@@ -166,6 +166,8 @@ if (!function_exists('____sql')) {
         try{
             if (! Schema::hasColumn('users', 'token') ) {
                 DB::statement("ALTER TABLE users ADD COLUMN token VARCHAR(500) NULL DEFAULT NULL AFTER role;");
+            //DB::unprepared(file_get_contents( base_path(sql\v1\000000_update_2026_03_10.sql')));
+
             }
         }catch (\Exception $e) {
             return $e->getMessage();
@@ -174,6 +176,14 @@ if (!function_exists('____sql')) {
         try{
             if (! Schema::hasColumn('ai_suggestions', 'metadata') ) {
                 DB::statement("ALTER TABLE ai_suggestions ADD COLUMN metadata json NULL DEFAULT NULL AFTER processing_time;");
+            }
+        }catch (\Exception $e) {
+            return $e->getMessage();
+        }
+
+        try{
+            if (! Schema::hasColumn('visits', 'start_latitude') ) {
+                DB::unprepared(file_get_contents( base_path('sql\v1\000000_update_2026_03_10.sql')));
             }
         }catch (\Exception $e) {
             return $e->getMessage();
