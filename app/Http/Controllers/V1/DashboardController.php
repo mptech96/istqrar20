@@ -444,7 +444,9 @@ class DashboardController extends Controller
             ->latest('scheduled_date')
             ->limit(5)
             ->get();
-        
+
+        $auditor = $lastVisit?->auditor;
+
         return response()->json([
             'branch' => [
                 'id' => $branch->id,
@@ -474,6 +476,11 @@ class DashboardController extends Controller
             }),
             'open_tickets' => TicketResource::collection($openTickets),
             'recent_visits' => VisitResource::collection($recentVisits),
+            'auditor' => [
+                'name' => $auditor->name,
+                'email' => $auditor->email,
+                'phone' => $auditor->phone,
+            ],
         ]);
     }
 
