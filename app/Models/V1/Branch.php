@@ -36,10 +36,10 @@ class Branch extends Model
                 $user = auth()->user();
                 
                 if($user->role === 'company_admin') {
-                    $builder->whereHas('company');
+                    $builder->where('company_id', $user->company_id);
                 }
                 elseif($user->role === 'branch_manager') {
-                    $builder->whereHas('manager');
+                    $builder->where('manager_user_id', $user->id);
                 }
                 elseif($user->role === 'auditor') {
                     $builder->whereHas('visits');

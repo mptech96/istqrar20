@@ -71,7 +71,7 @@ class Visit extends Model
                         ->where('status', 'completed');
                 }
                 elseif($user->role === 'branch_manager') {
-                    $builder->whereHas('branch')
+                    $builder->where('branch_id', $user->branch_id)
                         ->where('status', 'completed');
                 }
                 elseif($user->role === 'auditor') {

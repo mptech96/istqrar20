@@ -75,7 +75,9 @@ class User extends Authenticatable
                         ->orWhere('company_id', $user->company_id);
                 }
                 elseif($user->role === 'branch_manager') {
-                    $builder->where('id', $user->id);
+                    $builder->where('id', $user->id)
+                        ->orWhereHas('visits');
+
                 }
                 elseif($user->role === 'auditor') {
                     $builder->where('id', $user->id);
@@ -103,6 +105,11 @@ class User extends Authenticatable
     public function branch()
     {
         return $this->belongsTo(Branch::class);
+    }
+    
+    public function visits()
+    {
+        return $this->hasMany(Visit::class, 'auditor_id');
     }
 
     public function creator()

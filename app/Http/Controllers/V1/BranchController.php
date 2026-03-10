@@ -580,19 +580,22 @@ class BranchController extends Controller
         }
         
         // Update manager user if manager info changed
-        if ($branch->manager_user_id && 
-            ($request->has('manager_user_id') || $request->has('manager_email') || $request->has('manager_name') || $request->has('manager_phone'))) {
-            
-            $manager = User::find($branch->manager_user_id);
-            if ($manager) {
-                $manager->update([
-                    'name' => $request->input('manager_name', $manager->name),
-                    'email' => $request->input('manager_email', $manager->email),
-                    'phone' => $request->input('manager_phone', $manager->phone),
-                    'branch_id' =>  $branch->id,
-                ]);
-            }
+       
+        $manager = User::find($branch->manager_user_id);
+        if ($manager) {
+            $manager->update([
+                'name' => $request->input('manager_name', $manager->name),
+                'email' => $request->input('manager_email', $manager->email),
+                'phone' => $request->input('manager_phone', $manager->phone),
+                'branch_id' =>  $branch->id,
+            ]);
+            $branch->update([
+                'manager_name' => $manager->name,
+                'manager_email' => $manager->email,
+                'manager_phone' => $manager->phone,
+            ]);
         }
+        
         
         return response()->json([
             'data' => new BranchResource($branch->load(['company', 'manager'])),

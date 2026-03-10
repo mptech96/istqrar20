@@ -58,17 +58,17 @@ class Ticket extends Model
                 $user = auth()->user();
                 
                 if ($user->role === 'company_admin') {
-                    $builder->where(function ($q) use ($user) {
-                        $q->where('company_id', $user->company_id)
-                          ->orWhere('created_by', $user->id);
-                    });
+                    $builder->where('company_id', $user->company_id)
+                        ->orWhere('created_by', $user->id);
+
                 } elseif ($user->role === 'branch_manager') {
-                    $builder->where(function ($q) use ($user) {
-                        $q->where('branch_id', $user->branch_id)
-                          ->orWhere('created_by', $user->id);
-                    });
+                    $builder->where('branch_id', $user->branch_id)
+                       ->orWhere('created_by', $user->id);
+
                 } elseif ($user->role === 'auditor') {
-                    $builder->where('created_by', $user->id);
+                    $builder->where('created_by', $user->id)
+                       ->orWhere('assigned_to', $user->id);
+
                 } elseif ($user->role === 'super_admin') {
                     $builder->whereRaw('1 = 1');
                 } else {

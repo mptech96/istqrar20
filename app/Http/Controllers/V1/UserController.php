@@ -606,7 +606,7 @@ class UserController extends Controller
             }
             
             // Handle status and must_change_password
-            if ($request->has('status')) {
+            if ($request->filled('status')) {
                 $user->status = $request->input('status');
             }
             
