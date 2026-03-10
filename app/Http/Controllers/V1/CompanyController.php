@@ -184,8 +184,8 @@ class CompanyController extends Controller
      #[OA\Get(
         path: '/api/v1/companies/create',
         operationId: 'addCompany',
-        summary: 'عرض تفاصيل المستخدمين',
-        description: 'استرجا المستخدمين',
+        summary: 'بيانات انشاء شركة',
+        description: 'استرجاع بيانات لانشاء شركة',
         tags: ['Companies'],
         security: [['bearerAuth' => []]],
         responses: [

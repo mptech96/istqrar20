@@ -5061,6 +5061,12 @@ namespace App\Models\V1 {
      * @property float|null $percentage
      * @property integer|null $max_possible_score
      * @property float|null $total_score
+     * @property string|null $location_address
+     * @property string|null $location_url
+     * @property float|null $end_longitude
+     * @property float|null $end_latitude
+     * @property float|null $start_longitude
+     * @property float|null $start_latitude
      * @property integer|null $actual_duration
      * @property integer|null $estimated_duration
      * @property \Illuminate\Support\Carbon|null $completed_at
@@ -5094,6 +5100,12 @@ namespace App\Models\V1 {
      * @method static \Illuminate\Database\Eloquent\Builder<Visit>|Visit whereCompletedAt($value)
      * @method static \Illuminate\Database\Eloquent\Builder<Visit>|Visit whereEstimatedDuration($value)
      * @method static \Illuminate\Database\Eloquent\Builder<Visit>|Visit whereActualDuration($value)
+     * @method static \Illuminate\Database\Eloquent\Builder<Visit>|Visit whereStartLatitude($value)
+     * @method static \Illuminate\Database\Eloquent\Builder<Visit>|Visit whereStartLongitude($value)
+     * @method static \Illuminate\Database\Eloquent\Builder<Visit>|Visit whereEndLatitude($value)
+     * @method static \Illuminate\Database\Eloquent\Builder<Visit>|Visit whereEndLongitude($value)
+     * @method static \Illuminate\Database\Eloquent\Builder<Visit>|Visit whereLocationUrl($value)
+     * @method static \Illuminate\Database\Eloquent\Builder<Visit>|Visit whereLocationAddress($value)
      * @method static \Illuminate\Database\Eloquent\Builder<Visit>|Visit whereTotalScore($value)
      * @method static \Illuminate\Database\Eloquent\Builder<Visit>|Visit whereMaxPossibleScore($value)
      * @method static \Illuminate\Database\Eloquent\Builder<Visit>|Visit wherePercentage($value)

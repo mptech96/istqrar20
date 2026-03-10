@@ -212,8 +212,8 @@ class BranchController extends Controller
      #[OA\Get(
         path: '/api/v1/branches/create',
         operationId: 'addBranches',
-        summary: 'عرض تفاصيل المستخدمين',
-        description: 'استرجا المستخدمين',
+        summary: 'بيانات انشاء فرع',
+        description: 'استراع بيانات لانشاء فرع',
         tags: ['Branches'],
         security: [['bearerAuth' => []]],
         responses: [
@@ -359,7 +359,7 @@ class BranchController extends Controller
                 $manager = User::find($request->user_id);
                 $manager->update([
                     'company_id' => $company->id,
-                    'role' => 'branch_manager',
+                    //'role' => 'branch_manager',
 
                 ]);
             }

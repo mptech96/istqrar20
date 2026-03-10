@@ -2220,8 +2220,8 @@
                 "tags": [
                     "Branches"
                 ],
-                "summary": "عرض تفاصيل المستخدمين",
-                "description": "استرجا المستخدمين",
+                "summary": "بيانات انشاء فرع",
+                "description": "استراع بيانات لانشاء فرع",
                 "operationId": "addBranches",
                 "responses": {
                     "200": {
@@ -4221,8 +4221,8 @@
                 "tags": [
                     "Companies"
                 ],
-                "summary": "عرض تفاصيل المستخدمين",
-                "description": "استرجا المستخدمين",
+                "summary": "بيانات انشاء شركة",
+                "description": "استرجاع بيانات لانشاء شركة",
                 "operationId": "addCompany",
                 "responses": {
                     "200": {
