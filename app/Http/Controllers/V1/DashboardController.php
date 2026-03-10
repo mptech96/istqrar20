@@ -477,9 +477,9 @@ class DashboardController extends Controller
             'open_tickets' => TicketResource::collection($openTickets),
             'recent_visits' => VisitResource::collection($recentVisits),
             'auditor' => [
-                'name' => $auditor->name,
-                'email' => $auditor->email,
-                'phone' => $auditor->phone,
+                'name' => $auditor?->name,
+                'email' => $auditor?->email,
+                'phone' => $auditor?->phone,
             ],
         ]);
     }
