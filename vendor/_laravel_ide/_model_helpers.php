@@ -4687,6 +4687,8 @@ namespace App\Models\V1 {
      * @property int $id
      * @property-read \App\Models\V1\Company $company
      * @property-read \App\Models\V1\Branch $branch
+     * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\V1\Visit> $visits
+     * @property-read int|null $visits_count
      * @property-read \App\Models\V1\User $creator
      * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\V1\Statistic> $statistics
      * @property-read int|null $statistics_count

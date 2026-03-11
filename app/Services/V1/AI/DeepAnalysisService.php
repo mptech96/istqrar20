@@ -289,39 +289,58 @@ class DeepAnalysisService
     protected function generateDetailedRecommendations(array $data): array
     {
         $prompt = $this->buildRecommendationsPrompt($data);
-
         $response = $this->callAI($prompt, 'recommendations');
 
+        // إضافة قيم افتراضية للعناصر المفقودة
+        $immediateActions = array_map(function ($action) {
+            return [
+                'task' => $action['task'] ?? 'مهمة غير محددة',
+                'estimated_impact' => $action['estimated_impact'] ?? 0,
+                'priority' => 'high',
+                'timeline' => 'خلال 24-48 ساعة',
+                'responsible' => $action['responsible'] ?? 'مدير الفرع',
+                'resources' => $action['resources'] ?? [],
+            ];
+        }, $response['immediate_actions'] ?? []);
+
+        $shortTerm = array_map(function ($action) {
+            return [
+                'task' => $action['task'] ?? 'مهمة غير محددة',
+                'estimated_impact' => $action['estimated_impact'] ?? 0,
+                'priority' => 'medium',
+                'timeline' => 'خلال أسبوع',
+                'responsible' => $action['responsible'] ?? 'مدير الفرع',
+                'resources' => $action['resources'] ?? [],
+            ];
+        }, $response['short_term'] ?? []);
+
+        $longTerm = array_map(function ($action) {
+            return [
+                'task' => $action['task'] ?? 'مهمة غير محددة',
+                'estimated_impact' => $action['estimated_impact'] ?? 0,
+                'priority' => 'low',
+                'timeline' => 'شهر - 3 أشهر',
+                'responsible' => $action['responsible'] ?? 'مدير الفرع',
+                'resources' => $action['resources'] ?? [],
+            ];
+        }, $response['long_term'] ?? []);
+
+        $quickWins = array_map(function ($win) {
+            return [
+                'task' => $win['task'] ?? 'فرصة سريعة',
+                'estimated_impact' => $win['estimated_impact'] ?? 0,
+                'impact' => 'high',
+                'effort' => 'low',
+                'timeline' => 'خلال 24 ساعة',
+                'responsible' => $win['responsible'] ?? 'مدير الفرع',
+            ];
+        }, $response['quick_wins'] ?? []);
+
         return [
-            'immediate_actions' => array_map(function ($action) {
-                return array_merge($action, [
-                    'priority' => 'high',
-                    'timeline' => 'خلال 24-48 ساعة',
-                ]);
-            }, $response['immediate_actions'] ?? []),
-            
-            'short_term' => array_map(function ($action) {
-                return array_merge($action, [
-                    'priority' => 'medium',
-                    'timeline' => 'خلال أسبوع',
-                ]);
-            }, $response['short_term'] ?? []),
-            
-            'long_term' => array_map(function ($action) {
-                return array_merge($action, [
-                    'priority' => 'low',
-                    'timeline' => 'شهر - 3 أشهر',
-                ]);
-            }, $response['long_term'] ?? []),
-            
-            'quick_wins' => array_map(function ($win) {
-                return array_merge($win, [
-                    'impact' => 'high',
-                    'effort' => 'low',
-                    'timeline' => 'خلال 24 ساعة',
-                ]);
-            }, $response['quick_wins'] ?? []),
-            
+            'immediate_actions' => $immediateActions,
+            'short_term' => $shortTerm,
+            'long_term' => $longTerm,
+            'quick_wins' => $quickWins,
             'training_needs' => $response['training_needs'] ?? [],
             'resource_needs' => $response['resource_needs'] ?? [],
             'process_changes' => $response['process_changes'] ?? [],
@@ -372,17 +391,17 @@ class DeepAnalysisService
     protected function createActionPlan(array $data): array
     {
         $prompt = $this->buildActionPlanPrompt($data);
-
         $response = $this->callAI($prompt, 'action_plan');
 
         $plan = [];
 
-        // تجميع المهام حسب الأولوية
+        // تجميع المهام حسب الأولوية مع التحقق من وجود المفاتيح
         foreach (['high', 'medium', 'low'] as $priority) {
-            if (isset($response[$priority . '_priority'])) {
-                foreach ($response[$priority . '_priority'] as $task) {
+            $key = $priority . '_priority';
+            if (isset($response[$key]) && is_array($response[$key])) {
+                foreach ($response[$key] as $task) {
                     $plan[] = [
-                        'task' => $task['task'] ?? '',
+                        'task' => $task['task'] ?? 'مهمة غير محددة',
                         'priority' => $priority,
                         'responsible' => $task['responsible'] ?? 'مدير الفرع',
                         'timeline' => $task['timeline'] ?? $this->getDefaultTimeline($priority),
@@ -436,8 +455,11 @@ class DeepAnalysisService
 
         // توصيات رئيسية
         $summary .= "📋 أبرز التوصيات:\n";
-        foreach (array_slice($analyses['recommendations']['immediate_actions'] ?? [], 0, 3) as $rec) {
-            $summary .= "  • {$rec['task']} (تأثير: +{$rec['estimated_impact']} نقاط)\n";
+        $immediateActions = $analyses['recommendations']['immediate_actions'] ?? [];
+        foreach (array_slice($immediateActions, 0, 3) as $rec) {
+            $task = $rec['task'] ?? 'توصية غير محددة';
+            $impact = isset($rec['estimated_impact']) ? " (+{$rec['estimated_impact']} نقاط)" : '';
+            $summary .= "  • {$task}{$impact}\n";
         }
 
         return $summary;
@@ -763,7 +785,7 @@ class DeepAnalysisService
             'summary' => $analyses['summary'] ?? 'تحليل شامل للزيارة',
             'confidence' => 90,
             'ai_provider' => 'openai',
-            'ai_model' => 'gpt-4',
+            'ai_model' => setting('deep_analysis_model', 'gpt-3.5-turbo', 'ai'),
             'tokens_used' => $metadata['tokens_used'],
             'processing_time' => $metadata['processing_time'],
             'metadata' => [

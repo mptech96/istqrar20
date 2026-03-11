@@ -1,0 +1,1 @@
+ALTER TABLE `ai_suggestions` MODIFY `statistic_id` bigint(20) unsigned NULL;

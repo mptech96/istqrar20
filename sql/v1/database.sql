@@ -727,7 +727,7 @@ CREATE TABLE IF NOT EXISTS `ai_suggestions` (
     `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
 
     -- الربط مع الإحصائيات
-    `statistic_id` bigint(20) unsigned NOT NULL,
+    `statistic_id` bigint(20) unsigned NULL,
     `metric_name` varchar(100) NOT NULL,
     `record_date` date NOT NULL,
     `period_type` enum('daily','weekly','monthly','quarterly','yearly') NOT NULL,

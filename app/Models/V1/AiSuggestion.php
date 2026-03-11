@@ -678,25 +678,5 @@ class AiSuggestion extends Model
                     : 0;
             }
         });
-
-        // بعد الإنشاء
-        static::created(function ($suggestion) {
-            // تسجيل إنشاء الاقتراح
-            activity()
-                ->performedOn($suggestion)
-                ->causedBy(auth()->user())
-                ->log('تم إنشاء اقتراح ذكاء اصطناعي جديد');
-        });
-
-        // بعد التحديث
-        static::updated(function ($suggestion) {
-            if ($suggestion->wasChanged('is_applied') && $suggestion->is_applied) {
-                // تسجيل تطبيق الاقتراح
-                activity()
-                    ->performedOn($suggestion)
-                    ->causedBy(auth()->user())
-                    ->log('تم تطبيق اقتراح الذكاء الاصطناعي');
-            }
-        });
     }
 }
