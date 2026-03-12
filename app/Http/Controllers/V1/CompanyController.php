@@ -239,7 +239,7 @@ class CompanyController extends Controller
                     required: [
                         'name', 'email', 'phone', 'commercial_registration', 'city', 'address',
                         'contact_person', 'subscription_start', 'subscription_end',
-                        'subscription_status', 'category', 
+                        'subscription_status', 'category', 'max_allowed_users', 'max_allowed_branches',
                         //'user_name', 'user_email', 'user_password', 'user_password_confirmation'
                     ],
                     properties: [
@@ -251,6 +251,8 @@ class CompanyController extends Controller
                         new OA\Property(property: 'address', type: 'string', example: 'حي النخيل، شارع الملك فهد'),
                         new OA\Property(property: 'contact_person', type: 'string', example: 'أحمد محمد'),
                         new OA\Property(property: 'logo', type: 'string', format: 'binary'),
+                        new OA\Property(property: 'max_allowed_users', type: 'integer',example: 2, description: 'عدد المستخدمين المسموح للشركة'),
+                        new OA\Property(property: 'max_allowed_branches', type: 'integer',example: 1, description: 'عدد الفروع المسموح للشركة'),
                         new OA\Property(property: 'subscription_start', type: 'string', format: 'date', example: '2024-01-01'),
                         new OA\Property(property: 'subscription_end', type: 'string', format: 'date', example: '2024-12-31'),
                         new OA\Property(
@@ -347,6 +349,10 @@ class CompanyController extends Controller
                 'subscription_end' => $request->input('subscription_end'),
                 'subscription_status' => $request->input('subscription_status'),
                 'category' => $request->input('category'),
+
+                'max_allowed_users' => $request->input('max_allowed_users'),
+                'max_allowed_branches' => $request->input('max_allowed_branches'),
+
                 //'status' => $request->input('status', true),
                 //'is_verified' => $request->input('is_verified', false),
             ]);
@@ -484,6 +490,8 @@ class CompanyController extends Controller
                         new OA\Property(property: 'address', type: 'string', example: 'حي الصفا، شارع الأمير سلطان'),
                         new OA\Property(property: 'contact_person', type: 'string', example: 'محمد أحمد'),
                         new OA\Property(property: 'logo', type: 'string', format: 'binary', description: 'شعار الشركة'),
+                        new OA\Property(property: 'max_allowed_users', type: 'integer',example: 2, description: 'عدد المستخدمين المسموح للشركة'),
+                        new OA\Property(property: 'max_allowed_branches', type: 'integer',example: 1, description: 'عدد الفروع المسموح للشركة'),
                         new OA\Property(property: 'user_id', type: 'integer', example: 2),
 
                         new OA\Property(
@@ -542,39 +550,96 @@ class CompanyController extends Controller
             'name' => ['sometimes', 'string', 'max:255'],
             'email' => ['sometimes', 'email', 'unique:companies,email,' . $company->id],
             'phone' => ['sometimes', 'string', 'max:20'],
+            'commercial_registration' => ['sometimes', 'string', 'max:50', 'unique:companies,commercial_registration,' . $company->id],
+            'city' => ['sometimes', 'string', 'max:100'],
+            'address' => ['sometimes', 'string'],
+            'contact_person' => ['sometimes', 'string', 'max:255'],
             'logo' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
-            'status' => ['nullable'],
-            'subscription_status' => ['nullable', 'string', 'in:active,inactive,suspended'],
-            'user_id' => ['nullable', 'integer', 'exists:users,id'],
-
+            'subscription_start' => ['sometimes', 'date'],
+            'subscription_end' => ['sometimes', 'date', 'after:subscription_start'],
+            'subscription_status' => ['sometimes', 'string', 'in:active,expired,suspended,pending'],
+            'max_allowed_users' => ['sometimes', 'integer', 'min:0'],
+            'max_allowed_branches' => ['sometimes', 'integer', 'min:0'],
+            'status' => ['sometimes'],
+            'is_verified' => ['sometimes', 'boolean'],
+            'user_id' => ['sometimes', 'nullable', 'integer', 'exists:users,id'],
         ]);
-    
-        $request->merge([
-            'status' => filter_var($request->input('status', false), FILTER_VALIDATE_BOOLEAN)
-        ]);
 
+        // تجهيز البيانات باستخدام collect - فقط الحقول الموجودة وغير الفارغة
+        $data = collect($request->only([
+            'name', 'email', 'phone', 'commercial_registration', 'city',
+            'address', 'contact_person', 'subscription_start', 'subscription_end',
+            'subscription_status', 'max_allowed_users', 'max_allowed_branches', 'is_verified'
+        ]))->filter(fn($value) => filled($value))->toArray();
+
+        // معالجة خاصة لحقل status (boolean)
+        if ($request->has('status')) {
+            $data['status'] = filter_var($request->input('status'), FILTER_VALIDATE_BOOLEAN);
+        }
+
+        // معالجة الشعار
         if ($request->hasFile('logo')) {
+            // حذف الشعار القديم إذا وجد
             if ($company->logo) {
                 delete_file_req($company->logo, base_path('public/uploads/companies/logos/'));
             }
+            // رفع الشعار الجديد
             $logoPath = __saveFile($request->file('logo'), base_path('public/uploads/companies/logos/'));
-            $company->logo = $logoPath;
+            $data['logo'] = $logoPath;
+        } elseif ($request->has('logo') && $request->input('logo') === null) {
+            // إذا أرسل logo بقيمة null، نحذف الشعار
+            if ($company->logo) {
+                delete_file_req($company->logo, base_path('public/uploads/companies/logos/'));
+            }
+            $data['logo'] = null;
         }
-        
-        $company->update($request->only([
-            'name', 'email', 'phone', 'subscription_status', 'status'
-        ]));
 
-        if($request->filled('user_id')){
-            $manager = User::find($request->user_id);
-            $manager->update([
-                'company_id' => $company->id,
-                'role' => 'company_admin',
+        // تحديث البيانات إذا وجدت
+        if (!empty($data)) {
+            $company->update($data);
+        }
 
+        // تحديث مدير الشركة
+        if ($request->has('user_id')) {
+            $this->updateCompanyManager($request, $company);
+        }
+
+        return new CompanyResource($company->load(['manager']));
+    }
+
+    /**
+     * تحديث مدير الشركة
+     */
+    private function updateCompanyManager(Request $request, Company $company): void
+    {
+        // إذا كانت القيمة فارغة، نريد إزالة المدير
+        if (!$request->filled('user_id')) {
+            if ($company->manager) {
+                $company->manager->update([
+                    'company_id' => null,
+                ]);
+            }
+            return;
+        }
+
+        // تعيين مدير جديد
+        $newManager = User::find($request->user_id);
+        if (!$newManager) {
+            return;
+        }
+
+        // إزالة المدير القديم إذا كان مختلفاً
+        if ($company->manager && $company->manager->id != $newManager->id) {
+            $company->manager->update([
+                'company_id' => null,
             ]);
         }
-        
-        return new CompanyResource($company->load(['manager']));
+
+        // تعيين المدير الجديد
+        $newManager->update([
+            'company_id' => $company->id,
+            'role' => 'company_admin',
+        ]);
     }
     
     #[OA\Delete(

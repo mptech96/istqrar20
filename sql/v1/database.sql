@@ -10,6 +10,9 @@ CREATE TABLE IF NOT EXISTS `companies` (
     `address` text DEFAULT NULL,
     `contact_person` varchar(255) DEFAULT NULL,
     `logo` varchar(500) DEFAULT NULL,
+
+    `max_allowed_users` int(11) DEFAULT 0 COMMENT 'عدد المستخدمين المسموح بإضافتهم',
+    `max_allowed_branches` int(11) DEFAULT 0 COMMENT 'عدد الفروع المسموح بإضافتها',
     
     -- الاشتراك
     `subscription_start` date DEFAULT NULL,

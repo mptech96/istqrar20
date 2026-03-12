@@ -193,6 +193,14 @@ if (!function_exists('____sql')) {
             return $e->getMessage();
         }
         
+        try{
+            if (! Schema::hasColumn('companies', 'max_allowed_users') ) {
+                DB::unprepared(file_get_contents( base_path('sql\v1\000000_update_2026_03_12.sql')));
+            }
+        }catch (\Exception $e) {
+            return $e->getMessage();
+        }
+        
     }
 
 }

@@ -4014,7 +4014,9 @@
                                     "subscription_start",
                                     "subscription_end",
                                     "subscription_status",
-                                    "category"
+                                    "category",
+                                    "max_allowed_users",
+                                    "max_allowed_branches"
                                 ],
                                 "properties": {
                                     "name": {
@@ -4049,6 +4051,16 @@
                                     "logo": {
                                         "type": "string",
                                         "format": "binary"
+                                    },
+                                    "max_allowed_users": {
+                                        "description": "عدد المستخدمين المسموح للشركة",
+                                        "type": "integer",
+                                        "example": 2
+                                    },
+                                    "max_allowed_branches": {
+                                        "description": "عدد الفروع المسموح للشركة",
+                                        "type": "integer",
+                                        "example": 1
                                     },
                                     "subscription_start": {
                                         "type": "string",
@@ -4435,6 +4447,16 @@
                                         "description": "شعار الشركة",
                                         "type": "string",
                                         "format": "binary"
+                                    },
+                                    "max_allowed_users": {
+                                        "description": "عدد المستخدمين المسموح للشركة",
+                                        "type": "integer",
+                                        "example": 2
+                                    },
+                                    "max_allowed_branches": {
+                                        "description": "عدد الفروع المسموح للشركة",
+                                        "type": "integer",
+                                        "example": 1
                                     },
                                     "user_id": {
                                         "type": "integer",

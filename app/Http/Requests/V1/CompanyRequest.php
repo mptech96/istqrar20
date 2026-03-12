@@ -25,6 +25,9 @@ class CompanyRequest extends FormRequest
             'address' => ['required', 'string'],
             'contact_person' => ['required', 'string', 'max:255'],
             'logo' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
+            'max_allowed_users' => ['nullable', 'integer', 'min:2'],
+            'max_allowed_branches' => ['nullable', 'integer', 'min:1'],
+
             'subscription_start' => ['required', 'date', 'after_or_equal:today'],
             'subscription_end' => ['required', 'date', 'after:subscription_start'],
             'subscription_status' => ['required', 'string', 'in:active,inactive,suspended'],

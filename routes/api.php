@@ -28,9 +28,9 @@ Route::namespace('App\Http\Controllers\V1')->middleware(['throttle:60,1', 'api']
             
             Route::prefix('branches')->controller(BranchController::class)->group(function () {
                 Route::get('/', 'index');
-                Route::get('/create', 'create')->middleware(['user.role:super_admin']);
-                Route::post('/', 'store')->middleware(['user.role:super_admin']);
-                Route::put('/{branch}', 'update')->middleware(['user.role:super_admin']);
+                Route::get('/create', 'create')->middleware(['user.role:super_admin,company_admin']);
+                Route::post('/', 'store')->middleware(['user.role:super_admin,company_admin']);
+                Route::put('/{branch}', 'update')->middleware(['user.role:super_admin,company_admin']);
                 Route::get('/{branch}', 'show');
                 Route::delete('/{branch}', 'destroy')->middleware(['user.role:super_admin']);
                 Route::post('/{id}/restore', 'restore')->middleware(['user.role:super_admin']);

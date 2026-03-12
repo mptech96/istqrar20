@@ -15,6 +15,8 @@ class StoreBranchRequest extends FormRequest
 
     public function rules(): array
     {
+        $user = auth()->user();
+
         return [
             // Branch data
             'company_id' => ['required', 'exists:companies,id'],
@@ -31,7 +33,40 @@ class StoreBranchRequest extends FormRequest
             // Statistics
             'category' => ['required', 'string', 'max:255'],
             'compliance_score' => ['nullable', 'numeric', 'between:0,100'],
-            
+            'company_branch_limit' => [
+                function ($attribute, $value, $fail) use($user) {
+                    $companyId = request('company_id');
+                    
+                    // تحديد الشركة المطلوب التحقق منها
+                    if ($user && $user->role === 'company_admin') {
+                        // company_admin يضيف مستخدم لشركته فقط
+                        $company = $user->company;
+                    } elseif ($user && $user->role === 'super_admin' && $companyId) {
+                        // super_admin يمكنه إضافة مستخدم لأي شركة
+                        $company = Company::find($companyId);
+                    } else {
+                        // لا يوجد تحقق من الحد
+                        return;
+                    }
+                    
+                    // تحقق من وجود الشركة
+                    if (!$company) {
+                        $fail('الشركة غير موجودة');
+                        return;
+                    }
+                    
+                    $max_allowed_branches = $company->max_allowed_branches;
+                    
+                    // إذا كان max_allowed_branches = 0 يعني غير محدود
+                    if ($max_allowed_branches > 0) {
+                        $countUser = $company->branches()->count();
+                        
+                        if ($countUser >= $max_allowed_branches) {
+                            $fail('هذه الشركة تجاوزت الحد الأقصى المسموح به من الفروع (' . $max_allowed_branches . ')');
+                        }
+                    }
+                }
+            ],
             // Branch Manager User data
             'user_id' => ['nullable', 'integer', 'exists:users,id'],
 

@@ -19,6 +19,9 @@ class CompanyResource extends JsonResource
             'address' => $this->address,
             'contact_person' => $this->contact_person,
             'logo' => $this->logo ? asset('uploads/companies/logos/' . $this->logo) : null,
+            'max_allowed_users' => $this->max_allowed_users,
+            'max_allowed_branches' => $this->max_allowed_branches,
+
             'subscription_start' => $this->subscription_start,
             'subscription_end' => $this->subscription_end,
             'subscription_status' => $this->subscription_status,

@@ -13,7 +13,7 @@ class Company extends Model
 
     protected $fillable = [
         'name', 'email', 'phone', 'commercial_registration',
-        'city', 'address', 'contact_person', 'logo',
+        'city', 'address', 'contact_person', 'logo', 'max_allowed_users', 'max_allowed_branches',
         'subscription_start', 'subscription_end', 'subscription_status',
         'total_branches', 'overall_score', 'category',
         'status', 'is_verified'
