@@ -77,10 +77,10 @@ class DeepAnalysisController extends Controller
         $maxRequests = setting('max_daily_deep_analysis', 5, 'ai');
 
         if ($requestsToday >= $maxRequests) {
-            // return response()->json([
-            //     'message' => "لقد تجاوزت حد التحليلات اليومي ({$maxRequests} تحليل)",
-            //     'next_reset' => now()->endOfDay()->toIso8601String(),
-            // ], 429);
+            return response()->json([
+                'message' => "لقد تجاوزت حد التحليلات اليومي ({$maxRequests} تحليل)",
+                'next_reset' => now()->endOfDay()->toIso8601String(),
+            ], 429);
         }
 
         // التحقق من وجود تحليل حديث
@@ -90,7 +90,7 @@ class DeepAnalysisController extends Controller
             ->latest()
             ->first();
 
-        if (!$recentAnalysis && !$request->boolean('force')) {
+        if ($recentAnalysis && !$request->boolean('force')) {
             return response()->json([
                 'message' => 'يوجد تحليل حديث لهذه الزيارة. استخدم force=true لإعادة التحليل',
                 'data' => new AiSuggestionResource($recentAnalysis),
