@@ -181,21 +181,36 @@ if (!function_exists('____sql')) {
 
         try{
             if (! Schema::hasColumn('visits', 'start_latitude') ) {
-                DB::unprepared(file_get_contents( base_path('sql\v1\000000_update_2026_03_10.sql')));
+                //DB::unprepared(file_get_contents( base_path('sql\v1\000000_update_2026_03_10.sql')));
+                DB::statement("ALTER TABLE `visits`
+                    ADD COLUMN `start_latitude` decimal(10,8) DEFAULT NULL COMMENT 'خط العرض عند بدء الزيارة' AFTER `actual_duration`,
+                    ADD COLUMN `start_longitude` decimal(11,8) DEFAULT NULL COMMENT 'خط الطول عند بدء الزيارة' AFTER `start_latitude`,
+                    ADD COLUMN `end_latitude` decimal(10,8) DEFAULT NULL COMMENT 'خط العرض عند انتهاء الزيارة' AFTER `start_longitude`,
+                    ADD COLUMN `end_longitude` decimal(11,8) DEFAULT NULL COMMENT 'خط الطول عند انتهاء الزيارة' AFTER `end_latitude`,
+                    ADD COLUMN `location_url` varchar(500) DEFAULT NULL COMMENT 'رابط موقع جوجل ماب' AFTER `end_longitude`,
+                    ADD COLUMN `location_address` text DEFAULT NULL COMMENT 'العنوان المستخرج من الموقع' AFTER `location_url`,
+                    ADD INDEX `idx_visit_location` (`start_latitude`, `start_longitude`);"
+                );
+
             }
         }catch (\Exception $e) {
             return $e->getMessage();
         }
         
         try{
-            DB::unprepared(file_get_contents( base_path('sql\v1\000000_update_2026_03_11.sql')));
+            //DB::unprepared(file_get_contents( base_path('sql\v1\000000_update_2026_03_11.sql')));
+            DB::statement("ALTER TABLE `ai_suggestions` MODIFY `statistic_id` bigint(20) unsigned NULL;");
         }catch (\Exception $e) {
             return $e->getMessage();
         }
         
         try{
             if (! Schema::hasColumn('companies', 'max_allowed_users') ) {
-                DB::unprepared(file_get_contents( base_path('sql\v1\000000_update_2026_03_12.sql')));
+                //DB::unprepared(file_get_contents( base_path('sql\v1\000000_update_2026_03_12.sql')));
+                DB::statement("ALTER TABLE `companies`
+                    ADD COLUMN `max_allowed_users` int(11) DEFAULT 2 AFTER `logo`,
+                    ADD COLUMN `max_allowed_branches` int(11) DEFAULT 1 AFTER `max_allowed_users`;"
+                );
             }
         }catch (\Exception $e) {
             return $e->getMessage();
