@@ -36,8 +36,6 @@ class UpdateUserRequest extends FormRequest
             'birth_date' => ['nullable', 'date', 'before:-18 years'],
             'gender' => ['nullable', 'string', 'in:male,female,other'],
             
-            // Status
-            'status' => ['nullable', 'integer', 'in:0,1,2'],
             'must_change_password' => ['nullable', 'boolean'],
         ];
 

@@ -892,3 +892,26 @@ CREATE TABLE IF NOT EXISTS `login_attempts` (
     INDEX `login_attempts_email_index` (`email`),
     INDEX `login_attempts_ip_address_index` (`ip_address`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+CREATE TABLE IF NOT EXISTS `service_requests_tbl` (
+    `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY COMMENT 'Primary key',
+    `request_type` VARCHAR(50) NOT NULL COMMENT 'package_request | contact_message',
+    `package_name` VARCHAR(255) NULL COMMENT 'اسم الباقة المختارة إن وجد',
+    `customer_name` VARCHAR(255) NOT NULL COMMENT 'اسم العميل',
+    `company_name` VARCHAR(255) NULL COMMENT 'اسم المنشأة أو الشركة',
+    `phone` VARCHAR(50) NOT NULL COMMENT 'رقم الجوال',
+    `email` VARCHAR(255) NULL COMMENT 'البريد الإلكتروني',
+    `subject` VARCHAR(255) NULL COMMENT 'عنوان الطلب أو الرسالة',
+    `message` TEXT NULL COMMENT 'تفاصيل الطلب أو الرسالة',
+    `status` VARCHAR(50) NOT NULL DEFAULT 'new' COMMENT 'new | in_review | closed',
+    `admin_notes` TEXT NULL COMMENT 'ملاحظات الأدمن',
+    `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `deleted_at` TIMESTAMP NULL DEFAULT NULL,
+    INDEX `idx_request_type` (`request_type`),
+    INDEX `idx_status` (`status`),
+    INDEX `idx_phone` (`phone`),
+    INDEX `idx_email` (`email`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+COMMENT='تخزين طلبات الباقات ورسائل التواصل من واجهة الموقع';

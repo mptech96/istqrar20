@@ -84,7 +84,7 @@ use OpenApi\Attributes as OA;
 
 #[OA\Tag(
     name: "AI Analysis",
-    description: "قيد التطوير"
+    description: "اداة الذكاء الاصطناعي"
 )]
 
 #[OA\Tag(
@@ -99,6 +99,11 @@ use OpenApi\Attributes as OA;
 #[OA\Tag(
     name: "Reports",
     description: "التقارير"
+)]
+
+#[OA\Tag(
+    name: "Service Requests",
+    description: "ادارة الطلبات"
 )]
 
 class SwaggerDefinitions{}

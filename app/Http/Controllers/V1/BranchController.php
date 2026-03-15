@@ -279,7 +279,6 @@ class BranchController extends Controller
                         new OA\Property(property: 'longitude', type: 'number', format: 'float', example: 46.6753),
                         new OA\Property(property: 'category', type: 'string', example: 'رئيسي'),
                         new OA\Property(property: 'compliance_score', type: 'number', format: 'float', example: 0.00),
-                        new OA\Property(property: 'status', type: 'boolean', example: true),
                         
                         // Branch Manager User data
                         new OA\Property(property: 'user_id', type: 'integer', example: 2, description: 'في حال اضفت معرف المدير  يمكن تخطي باقي بيانات المدير'),
@@ -374,6 +373,7 @@ class BranchController extends Controller
                     'gender' => $request->input('user_gender'),
                     'company_id' => $company->id,
                     'role' => 'branch_manager',
+                    'status' => false,
                 ]);
             }
             
@@ -394,7 +394,7 @@ class BranchController extends Controller
                 'manager_phone' => $manager->phone,
                 'category' => $request->input('category'),
                 'compliance_score' => $request->input('compliance_score', 0.00),
-                'status' => true, // Always active when created
+                'status' => false, // Always active when created
             ]);
             
             // Update user with branch_id
@@ -512,7 +512,6 @@ class BranchController extends Controller
                     new OA\Property(property: 'total_visits', type: 'integer', example: 12),
                     new OA\Property(property: 'last_visit_date', type: 'string', format: 'date', example: '2024-01-15'),
                     new OA\Property(property: 'next_scheduled_visit', type: 'string', format: 'date', example: '2024-02-15'),
-                    new OA\Property(property: 'status', type: 'boolean', example: true),
 
                     new OA\Property(property: 'manager_user_id', type: 'integer', example: 2),
                     new OA\Property(property: 'manager_name', type: 'string', example: 'مدير الفرع (محدث)'),
@@ -574,10 +573,10 @@ class BranchController extends Controller
         );
         
         // Handle status update
-        if ($request->has('status')) {
-            $branch->status = filter_var($request->input('status'), FILTER_VALIDATE_BOOLEAN);
-            $branch->save();
-        }
+        // if ($request->has('status')) {
+        //     $branch->status = filter_var($request->input('status'), FILTER_VALIDATE_BOOLEAN);
+        //     $branch->save();
+        // }
         
         // Update manager user if manager info changed
        
@@ -739,6 +738,100 @@ class BranchController extends Controller
         ]);
     }
     
+
+    #[OA\Patch(
+        path: '/api/v1/branches/{branch}/active',
+        operationId: 'activBranch',
+        summary: 'تفعيل فرع',
+        //description: '',
+        tags: ['Branches'],
+        security: [['bearerAuth' => []]],
+        parameters: [
+            new OA\Parameter(
+                name: 'branch',
+                description: 'معرف الفرع',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(type: 'integer', example: 1)
+            ),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'تم تفعيل الفرع بنجاح',
+                content: new OA\JsonContent(
+                    type: 'object',
+                    properties: [
+                        new OA\Property(property: 'message', type: 'string', example: 'تم تفعيل الفرع بنجاح'),
+                      
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 404,
+                description: 'الفرع غير موجود'
+            ),
+        ]
+    )]
+    public function active($id)
+    {
+        $branch = Branch::withTrashed()->findOrFail($id);
+        $branch->status = 1;
+        $branch->save();
+        
+        return response()->json([
+            'message' => 'تم تفعيل الفرع'
+        ], 200);
+    }
+
+    #[OA\Patch(
+        path: '/api/v1/branches/{branch}/unactive',
+        operationId: 'unactiveBranch',
+        summary: 'الغاء تفعيل فرع',
+        //description: '',
+        tags: ['Branches'],
+        security: [['bearerAuth' => []]],
+        parameters: [
+            new OA\Parameter(
+                name: 'branch',
+                description: 'معرف الفرع',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(type: 'integer', example: 1)
+            ),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'تم الغاء تفعيل الفرع بنجاح',
+                content: new OA\JsonContent(
+                    type: 'object',
+                    properties: [
+                        new OA\Property(property: 'message', type: 'string', example: 'تم الغاء تفعيل الفرع بنجاح'),
+                      
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 404,
+                description: 'الفرع غير موجود'
+            ),
+        ]
+    )]
+    
+    public function unactive($id)
+    {
+        $branch = Branch::withTrashed()->findOrFail($id);
+        $branch->status = 0;
+        $branch->save();
+        
+        return response()->json([
+            'message' => 'تم الغاء تفعيل الفرع'
+        ], 200);
+    }
+
+
+
     #[OA\Get(
         path: '/api/v1/branches/{branch}/statistics',
         operationId: 'getBranchStatistics',

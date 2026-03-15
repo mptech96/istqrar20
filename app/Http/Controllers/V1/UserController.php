@@ -236,7 +236,6 @@ class UserController extends Controller
                         new OA\Property(property: 'id_expiry', type: 'string', format: 'date', example: '2025-12-31'),
                         new OA\Property(property: 'birth_date', type: 'string', format: 'date', example: '1990-01-01'),
                         new OA\Property(property: 'gender', type: 'string', enum: ['male', 'female', 'other'], example: 'male'),
-                        new OA\Property(property: 'status', type: 'integer', enum: [0, 1, 2], example: 1),
                         new OA\Property(property: 'must_change_password', type: 'boolean', example: false),
                     ]
                 )
@@ -328,7 +327,7 @@ class UserController extends Controller
                 'position' => $request->input('position'),
                 'birth_date' => $request->input('birth_date'),
                 'gender' => $request->input('gender'),
-                'status' => $request->input('status', 1),
+                'status' => 0,
                 'must_change_password' => $request->input('must_change_password', false),
                 'created_by' => Auth::id(),
             ];
@@ -371,7 +370,7 @@ class UserController extends Controller
             ], 201);
         });
     }
-    
+
     #[OA\Post(
         path: '/api/v1/users/un-block/{email}',
         operationId: 'unBlockUser',
@@ -510,7 +509,6 @@ class UserController extends Controller
                         new OA\Property(property: 'id_expiry', type: 'string', format: 'date', example: '2025-12-31'),
                         new OA\Property(property: 'birth_date', type: 'string', format: 'date', example: '1990-01-01'),
                         new OA\Property(property: 'gender', type: 'string', enum: ['male', 'female', 'other'], example: 'male'),
-                        new OA\Property(property: 'status', type: 'integer', enum: [0, 1, 2], example: 1),
                         new OA\Property(property: 'must_change_password', type: 'boolean', example: false),
                     ]
                 )
@@ -606,9 +604,9 @@ class UserController extends Controller
             }
             
             // Handle status and must_change_password
-            if ($request->filled('status')) {
-                $user->status = $request->input('status');
-            }
+            // if ($request->filled('status')) {
+            //     $user->status = $request->input('status');
+            // }
             
             if ($request->has('must_change_password')) {
                 $user->must_change_password = filter_var($request->input('must_change_password'), FILTER_VALIDATE_BOOLEAN);
@@ -809,7 +807,100 @@ class UserController extends Controller
             'message' => 'تم استعادة المستخدم بنجاح'
         ]);
     }
+
+
+    #[OA\Patch(
+        path: '/api/v1/users/{user}/active',
+        operationId: 'activeUser',
+        summary: 'تفعيل مستخدم',
+        //description: '',
+        tags: ['Users'],
+        security: [['bearerAuth' => []]],
+        parameters: [
+            new OA\Parameter(
+                name: 'user',
+                description: 'معرف المستخدم',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(type: 'integer', example: 1)
+            ),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'تم تفعيل المستخدم بنجاح',
+                content: new OA\JsonContent(
+                    type: 'object',
+                    properties: [
+                        new OA\Property(property: 'message', type: 'string', example: 'تم تفعيل المستخدم بنجاح'),
+                      
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 404,
+                description: 'المستخدم غير موجود'
+            ),
+        ]
+    )]
+    public function active($id)
+    {
+        $user = User::withTrashed()->findOrFail($id);
+        $user->status = 1;
+        $user->save();
+        
+        return response()->json([
+            'message' => 'تم تفعيل المستخدم'
+        ], 200);
+    }
+
+    #[OA\Patch(
+        path: '/api/v1/users/{user}/unactive',
+        operationId: 'unactiveUser',
+        summary: 'الغاء تفعيل مستخدم',
+        //description: '',
+        tags: ['Users'],
+        security: [['bearerAuth' => []]],
+        parameters: [
+            new OA\Parameter(
+                name: 'user',
+                description: 'معرف المستخدم',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(type: 'integer', example: 1)
+            ),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'تم الغاء تفعيل المستخدم بنجاح',
+                content: new OA\JsonContent(
+                    type: 'object',
+                    properties: [
+                        new OA\Property(property: 'message', type: 'string', example: 'تم الغاء تفعيل المستخدم بنجاح'),
+                      
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 404,
+                description: 'المستخدم غير موجود'
+            ),
+        ]
+    )]
     
+    public function unactive($id)
+    {
+        $user = User::withTrashed()->findOrFail($id);
+        $user->status = 0;
+        $user->save();
+        
+        return response()->json([
+            'message' => 'تم الغاء تفعيل المستخدم'
+        ], 200);
+    }
+
+
     #[OA\Get(
         path: '/api/v1/users/{user}/documents-expiry',
         operationId: 'getUserDocumentsExpiry',

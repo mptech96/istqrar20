@@ -6,5 +6,6 @@
     "the user must be of the following role: company_admin": "The user must be of the following role: company_admin",
     "the user must be of the following role: super_admin8": "The user must be of the following role: super_admin8",
     "this user is not authorized": "This user is not authorized",
-    "the user must be of the following role: ": "The user must be of the following role: "
+    "the user must be of the following role: ": "The user must be of the following role: ",
+    "user does not have permission to perform this action.": "User does not have permission to perform this action."
 }

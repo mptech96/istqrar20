@@ -34,8 +34,6 @@ class UpdateBranchRequest extends FormRequest
             'last_visit_date' => ['nullable', 'date'],
             'next_scheduled_visit' => ['nullable', 'date'],
             
-            // Status
-            'status' => ['nullable', 'boolean'],
             
             // Manager update
             'manager_user_id' => ['nullable', 'integer', 'exists:users,id'],

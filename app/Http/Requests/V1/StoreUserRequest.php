@@ -38,8 +38,6 @@ class StoreUserRequest extends FormRequest
             'birth_date' => ['nullable', 'date', 'before:-18 years'],
             'gender' => ['nullable', 'string', 'in:male,female,other'],
             
-            // Status
-            'status' => ['nullable', 'integer', 'in:0,1,2'],
             'must_change_password' => ['nullable', 'boolean'],
         ];
         // Add user limit validation for company users
@@ -224,7 +222,6 @@ class StoreUserRequest extends FormRequest
             'position' => 'المسمى الوظيفي',
             'birth_date' => 'تاريخ الميلاد',
             'gender' => 'الجنس',
-            'status' => 'الحالة',
             'national_number' => 'الرقم الوطني',
             'municipality_certificate' => 'شهادة البلدية',
             'driving_license' => 'رخصة القيادة',
@@ -246,13 +243,6 @@ class StoreUserRequest extends FormRequest
                 'branch_id' => null,
             ]);
         }
-        // Add any necessary data preparation here
-        if (!$this->has('status')) {
-            $this->merge([
-                'status' => 1, // Default to active
-            ]);
-        }
-
         if (!$this->has('must_change_password')) {
             $this->merge([
                 'must_change_password' => true, // Force password change on first login

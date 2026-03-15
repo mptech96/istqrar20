@@ -22,7 +22,11 @@ class UserRole
         }
 
         if (!in_array($user->role, $roles)) {
-            return response()->json(['status' => false, 'message' => __tr('The user must be of the following role: ' . implode(',', $roles))], 401);
+            return response()->json([
+                'status' => false,
+                'message' => __tr('User does not have permission to perform this action.'),
+                'role' => implode(',', $roles)
+            ], 401);
         }
 
         return $next($request);

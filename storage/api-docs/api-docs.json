@@ -2078,10 +2078,6 @@
                                         "format": "float",
                                         "example": 0
                                     },
-                                    "status": {
-                                        "type": "boolean",
-                                        "example": true
-                                    },
                                     "user_id": {
                                         "description": "في حال اضفت معرف المدير  يمكن تخطي باقي بيانات المدير",
                                         "type": "integer",
@@ -2464,10 +2460,6 @@
                                         "format": "date",
                                         "example": "2024-02-15"
                                     },
-                                    "status": {
-                                        "type": "boolean",
-                                        "example": true
-                                    },
                                     "manager_user_id": {
                                         "type": "integer",
                                         "example": 2
@@ -2712,6 +2704,100 @@
                                                 }
                                             },
                                             "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "الفرع غير موجود"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/branches/{branch}/active": {
+            "patch": {
+                "tags": [
+                    "Branches"
+                ],
+                "summary": "تفعيل فرع",
+                "operationId": "activBranch",
+                "parameters": [
+                    {
+                        "name": "branch",
+                        "in": "path",
+                        "description": "معرف الفرع",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "تم تفعيل الفرع بنجاح",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "تم تفعيل الفرع بنجاح"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "الفرع غير موجود"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/branches/{branch}/unactive": {
+            "patch": {
+                "tags": [
+                    "Branches"
+                ],
+                "summary": "الغاء تفعيل فرع",
+                "operationId": "unactiveBranch",
+                "parameters": [
+                    {
+                        "name": "branch",
+                        "in": "path",
+                        "description": "معرف الفرع",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "تم الغاء تفعيل الفرع بنجاح",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "تم الغاء تفعيل الفرع بنجاح"
                                         }
                                     },
                                     "type": "object"
@@ -4085,10 +4171,6 @@
                                         "type": "string",
                                         "example": "تقنية المعلومات"
                                     },
-                                    "status": {
-                                        "type": "boolean",
-                                        "example": true
-                                    },
                                     "is_verified": {
                                         "type": "boolean",
                                         "example": false
@@ -4136,10 +4218,6 @@
                                             3
                                         ],
                                         "example": 1
-                                    },
-                                    "user_status": {
-                                        "type": "boolean",
-                                        "example": true
                                     }
                                 },
                                 "type": "object"
@@ -4471,10 +4549,6 @@
                                         ],
                                         "example": "active"
                                     },
-                                    "status": {
-                                        "type": "boolean",
-                                        "example": true
-                                    },
                                     "is_verified": {
                                         "type": "boolean",
                                         "example": true
@@ -4719,6 +4793,100 @@
                     },
                     "404": {
                         "description": "الشركة غير موجودة"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/companies/{company}/active": {
+            "patch": {
+                "tags": [
+                    "Companies"
+                ],
+                "summary": "تفعيل شركة",
+                "operationId": "activCompany",
+                "parameters": [
+                    {
+                        "name": "company",
+                        "in": "path",
+                        "description": "معرف الشركة",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "تم تفعيل الشركة بنجاح",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "تم تفعيل الشركة بنجاح"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "الشركة غير موجود"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/companies/{company}/unactive": {
+            "patch": {
+                "tags": [
+                    "Companies"
+                ],
+                "summary": "الغاء تفعيل شركة",
+                "operationId": "unactivCompany",
+                "parameters": [
+                    {
+                        "name": "company",
+                        "in": "path",
+                        "description": "معرف الشركة",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "تم الغاء تفعيل الشركة بنجاح",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "تم الغاء تفعيل الشركة بنجاح"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "الشركة غير موجود"
                     }
                 },
                 "security": [
@@ -8017,6 +8185,355 @@
                 ]
             }
         },
+        "/api/v1/service-requests": {
+            "get": {
+                "tags": [
+                    "Service Requests"
+                ],
+                "summary": "عرض قائمة الطلبات",
+                "operationId": "17ca7afd3661345dd57a3bc6ff7e2e33",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "default": 15
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "request_type",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "package_request",
+                                "contact_message"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "new",
+                                "in_review",
+                                "closed"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "sort_by",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "default": "created_at",
+                            "enum": [
+                                "customer_name",
+                                "phone",
+                                "status",
+                                "created_at"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "sort_order",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "default": "desc",
+                            "enum": [
+                                "asc",
+                                "desc"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "قائمة الطلبات"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Service Requests"
+                ],
+                "summary": "إنشاء طلب جديد",
+                "operationId": "13c56220d265b3d449d4e6a9d2068253",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "request_type",
+                                    "customer_name",
+                                    "phone"
+                                ],
+                                "properties": {
+                                    "request_type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "package_request",
+                                            "contact_message"
+                                        ]
+                                    },
+                                    "package_name": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "customer_name": {
+                                        "type": "string"
+                                    },
+                                    "company_name": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "phone": {
+                                        "type": "string"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "nullable": true
+                                    },
+                                    "subject": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "message": {
+                                        "type": "string",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "تم الإنشاء"
+                    },
+                    "422": {
+                        "description": "بيانات غير صالحة"
+                    }
+                }
+            }
+        },
+        "/api/v1/service-requests/{serviceRequest}": {
+            "get": {
+                "tags": [
+                    "Service Requests"
+                ],
+                "summary": "عرض تفاصيل طلب",
+                "operationId": "7dcfa6b619fc960095ee85f4317a0b9c",
+                "parameters": [
+                    {
+                        "name": "serviceRequest",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "تفاصيل الطلب"
+                    },
+                    "404": {
+                        "description": "غير موجود"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Service Requests"
+                ],
+                "summary": "تحديث طلب",
+                "operationId": "de1f97614ee0d69fbafe7b1ca9287189",
+                "parameters": [
+                    {
+                        "name": "serviceRequest",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "request_type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "package_request",
+                                            "contact_message"
+                                        ]
+                                    },
+                                    "package_name": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "customer_name": {
+                                        "type": "string"
+                                    },
+                                    "company_name": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "phone": {
+                                        "type": "string"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "nullable": true
+                                    },
+                                    "subject": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "message": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "enum": [
+                                            "new",
+                                            "in_review",
+                                            "closed"
+                                        ]
+                                    },
+                                    "admin_notes": {
+                                        "type": "string",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "تم التحديث"
+                    },
+                    "404": {
+                        "description": "غير موجود"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Service Requests"
+                ],
+                "summary": "حذف طلب (ناعم)",
+                "operationId": "ae0f55109f65eea3368fd211dca308bf",
+                "parameters": [
+                    {
+                        "name": "serviceRequest",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "force",
+                        "in": "query",
+                        "description": "حذف نهائي",
+                        "schema": {
+                            "type": "boolean",
+                            "default": false
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "تم الحذف"
+                    },
+                    "404": {
+                        "description": "غير موجود"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/service-requests/{serviceRequest}/restore": {
+            "post": {
+                "tags": [
+                    "Service Requests"
+                ],
+                "summary": "استعادة طلب محذوف",
+                "operationId": "4d02a8b0857aaf02a4287e0a1996a29e",
+                "parameters": [
+                    {
+                        "name": "serviceRequest",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "تمت الاستعادة"
+                    },
+                    "404": {
+                        "description": "غير موجود"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/v1/settings": {
             "get": {
                 "tags": [
@@ -10758,15 +11275,6 @@
                                         ],
                                         "example": "male"
                                     },
-                                    "status": {
-                                        "type": "integer",
-                                        "enum": [
-                                            0,
-                                            1,
-                                            2
-                                        ],
-                                        "example": 1
-                                    },
                                     "must_change_password": {
                                         "type": "boolean",
                                         "example": false
@@ -11095,15 +11603,6 @@
                                         ],
                                         "example": "male"
                                     },
-                                    "status": {
-                                        "type": "integer",
-                                        "enum": [
-                                            0,
-                                            1,
-                                            2
-                                        ],
-                                        "example": 1
-                                    },
                                     "must_change_password": {
                                         "type": "boolean",
                                         "example": false
@@ -11326,6 +11825,100 @@
                                                 }
                                             },
                                             "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "المستخدم غير موجود"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/users/{user}/active": {
+            "patch": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "تفعيل مستخدم",
+                "operationId": "activeUser",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "path",
+                        "description": "معرف المستخدم",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "تم تفعيل المستخدم بنجاح",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "تم تفعيل المستخدم بنجاح"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "المستخدم غير موجود"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/users/{user}/unactive": {
+            "patch": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "الغاء تفعيل مستخدم",
+                "operationId": "unactiveUser",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "path",
+                        "description": "معرف المستخدم",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "تم الغاء تفعيل المستخدم بنجاح",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "تم الغاء تفعيل المستخدم بنجاح"
                                         }
                                     },
                                     "type": "object"
@@ -14371,7 +14964,7 @@
         },
         {
             "name": "AI Analysis",
-            "description": "قيد التطوير"
+            "description": "اداة الذكاء الاصطناعي"
         },
         {
             "name": "Settings",
@@ -14384,6 +14977,10 @@
         {
             "name": "Reports",
             "description": "التقارير"
+        },
+        {
+            "name": "Service Requests",
+            "description": "ادارة الطلبات"
         }
     ]
 }

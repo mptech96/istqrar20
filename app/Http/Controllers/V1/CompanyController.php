@@ -262,7 +262,6 @@ class CompanyController extends Controller
                             example: 'active'
                         ),
                         new OA\Property(property: 'category', type: 'string', example: 'تقنية المعلومات'),
-                        new OA\Property(property: 'status', type: 'boolean', example: true),
                         new OA\Property(property: 'is_verified', type: 'boolean', example: false),
                         
                         new OA\Property(property: 'user_id', type: 'integer', example: 2, description: 'في حال اضفت معرف المدير  يمكن تخطي باقي بيانات المدير'),
@@ -274,7 +273,6 @@ class CompanyController extends Controller
                         new OA\Property(property: 'user_personal_photo', type: 'file', format: 'binary'),
                         new OA\Property(property: 'user_birth_date', type: 'string', format: 'date', example: '1990-01-01'),
                         new OA\Property(property: 'user_gender', type: 'integer', enum: [1, 2, 3], example: 1),
-                        new OA\Property(property: 'user_status', type: 'boolean', example: true),
     
                     ]
                 )
@@ -353,7 +351,7 @@ class CompanyController extends Controller
                 'max_allowed_users' => $request->input('max_allowed_users'),
                 'max_allowed_branches' => $request->input('max_allowed_branches'),
 
-                //'status' => $request->input('status', true),
+                'status' => false,
                 //'is_verified' => $request->input('is_verified', false),
             ]);
             
@@ -381,7 +379,7 @@ class CompanyController extends Controller
                     'personal_photo' => $personal_photoPath,
                     'birth_date' => $request->input('user_birth_date'),
                     'gender' => $request->input('user_gender'),
-                    //'status' => $request->input('user_status', true),
+                    'status' => false,
                     //'company_id' => $company->id,
                     //'created_by' => ,
                     'role' => 'company_admin',
@@ -500,7 +498,6 @@ class CompanyController extends Controller
                             enum: ['active', 'inactive', 'suspended'],
                             example: 'active'
                         ),
-                        new OA\Property(property: 'status', type: 'boolean', example: true),
                         new OA\Property(property: 'is_verified', type: 'boolean', example: true),
                     ]
                 )
@@ -560,7 +557,7 @@ class CompanyController extends Controller
             'subscription_status' => ['sometimes', 'string', 'in:active,expired,suspended,pending'],
             'max_allowed_users' => ['sometimes', 'integer', 'min:0'],
             'max_allowed_branches' => ['sometimes', 'integer', 'min:0'],
-            'status' => ['sometimes'],
+            //'status' => ['sometimes'],
             'is_verified' => ['sometimes', 'boolean'],
             'user_id' => ['sometimes', 'nullable', 'integer', 'exists:users,id'],
         ]);
@@ -573,9 +570,9 @@ class CompanyController extends Controller
         ]))->filter(fn($value) => filled($value))->toArray();
 
         // معالجة خاصة لحقل status (boolean)
-        if ($request->has('status')) {
-            $data['status'] = filter_var($request->input('status'), FILTER_VALIDATE_BOOLEAN);
-        }
+        // if ($request->has('status')) {
+        //     $data['status'] = filter_var($request->input('status'), FILTER_VALIDATE_BOOLEAN);
+        // }
 
         // معالجة الشعار
         if ($request->hasFile('logo')) {
@@ -753,6 +750,98 @@ class CompanyController extends Controller
         return new CompanyResource($company);
     }
     
+    #[OA\Patch(
+        path: '/api/v1/companies/{company}/active',
+        operationId: 'activCompany',
+        summary: 'تفعيل شركة',
+        //description: '',
+        tags: ['Companies'],
+        security: [['bearerAuth' => []]],
+        parameters: [
+            new OA\Parameter(
+                name: 'company',
+                description: 'معرف الشركة',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(type: 'integer', example: 1)
+            ),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'تم تفعيل الشركة بنجاح',
+                content: new OA\JsonContent(
+                    type: 'object',
+                    properties: [
+                        new OA\Property(property: 'message', type: 'string', example: 'تم تفعيل الشركة بنجاح'),
+                      
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 404,
+                description: 'الشركة غير موجود'
+            ),
+        ]
+    )]
+    public function active($id)
+    {
+        $company = Company::withTrashed()->findOrFail($id);
+        $company->status = 1;
+        $company->save();
+        
+        return response()->json([
+            'message' => 'تم تفعيل الشركة'
+        ], 200);
+    }
+
+    #[OA\Patch(
+        path: '/api/v1/companies/{company}/unactive',
+        operationId: 'unactivCompany',
+        summary: 'الغاء تفعيل شركة',
+        //description: '',
+        tags: ['Companies'],
+        security: [['bearerAuth' => []]],
+        parameters: [
+            new OA\Parameter(
+                name: 'company',
+                description: 'معرف الشركة',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(type: 'integer', example: 1)
+            ),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'تم الغاء تفعيل الشركة بنجاح',
+                content: new OA\JsonContent(
+                    type: 'object',
+                    properties: [
+                        new OA\Property(property: 'message', type: 'string', example: 'تم الغاء تفعيل الشركة بنجاح'),
+                      
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 404,
+                description: 'الشركة غير موجود'
+            ),
+        ]
+    )]
+    
+    public function unactive($id)
+    {
+        $company = Company::withTrashed()->findOrFail($id);
+        $company->status = 0;
+        $company->save();
+        
+        return response()->json([
+            'message' => 'تم الغاء تفعيل الشركة'
+        ], 200);
+    }
+
+
     #[OA\Get(
         path: '/api/v1/companies/{company}/statistics',
         operationId: 'getCompanyStatistics',

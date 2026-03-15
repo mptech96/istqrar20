@@ -22,6 +22,8 @@ Route::namespace('App\Http\Controllers\V1')->middleware(['throttle:60,1', 'api']
                 Route::get('/{company}', 'show');
                 Route::delete('/{company}', 'destroy')->middleware(['user.role:super_admin']);
                 Route::post('/{id}/restore', 'restore')->middleware(['user.role:super_admin']);
+                Route::patch('/{id}/active', 'active')->middleware(['user.role:super_admin']);
+                Route::patch('/{id}/unactive', 'unactive')->middleware(['user.role:super_admin']);
                 Route::get('/{company}/statistics', 'statistics');
     
             });
@@ -34,6 +36,8 @@ Route::namespace('App\Http\Controllers\V1')->middleware(['throttle:60,1', 'api']
                 Route::get('/{branch}', 'show');
                 Route::delete('/{branch}', 'destroy')->middleware(['user.role:super_admin']);
                 Route::post('/{id}/restore', 'restore')->middleware(['user.role:super_admin']);
+                Route::patch('/{id}/active', 'active')->middleware(['user.role:super_admin']);
+                Route::patch('/{id}/unactive', 'unactive')->middleware(['user.role:super_admin']);
                 Route::get('/{branch}/statistics', 'statistics');
             });
             
@@ -47,6 +51,8 @@ Route::namespace('App\Http\Controllers\V1')->middleware(['throttle:60,1', 'api']
                 Route::get('/{user}', 'show');
                 Route::delete('/{user}', 'destroy')->middleware(['user.role:super_admin']);
                 Route::post('/{id}/restore', 'restore')->middleware(['user.role:super_admin']);
+                Route::patch('/{id}/active', 'active')->middleware(['user.role:super_admin']);
+                Route::patch('/{id}/unactive', 'unactive')->middleware(['user.role:super_admin']);
                 Route::get('/{user}/statistics', 'statistics');
             });
             
@@ -202,6 +208,22 @@ Route::namespace('App\Http\Controllers\V1')->middleware(['throttle:60,1', 'api']
             
         });
         
+        Route::prefix('service-requests')->controller(ServiceRequestController::class)->group(function () {
+
+            Route::middleware(['api-module-priority', 'throttle:60,1'])->group(function () {
+                Route::post('', 'store');
+            });
+
+            Route::middleware(['api-token-priority', 'user.role:super_admin'])->group(function () {
+                Route::get('', 'index');
+                Route::put('/{serviceRequest}', 'update');
+                Route::get('/{serviceRequest}', 'show');
+                Route::delete('/{serviceRequest}', 'destroy');
+                Route::post('/{id}/restore', 'restore');
+            });
+
+        });
+
         Route::get('/docs', function () {
             return redirect('/api/v1/documentation');
         });
