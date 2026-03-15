@@ -50,10 +50,10 @@ class BranchResource extends JsonResource
             'deleted_at' => $this->deleted_at?->format('Y-m-d | h:i:s A'),
             
             // Relationships
-            //'company' => new CompanyResource($this->whenLoaded('company')),
-            //'manager' => new UserResource($this->whenLoaded('manager')),
-            //'users' => UserResource::collection($this->whenLoaded('users')),
-            //'visits' => VisitResource::collection($this->whenLoaded('visits')),
+            'company' => new CompanyResource($this->whenLoaded('company')),
+            'manager' => new UserResource($this->whenLoaded('manager')),
+            'users' => UserResource::collection($this->whenLoaded('users')),
+            'visits' => VisitResource::collection($this->whenLoaded('visits')),
         ];
     }
 
