@@ -27,19 +27,35 @@ class StoreAnswerRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'visit_id.exists' => 'الزيارة غير موجودة.',
-            'question_id.exists' => 'السؤال غير موجود.',
-            'corrective_deadline.after_or_equal' => 'يجب أن يكون تاريخ التصحيح اليوم أو بعده.',
+            'question_id.required' => 'حقل معرف السؤال مطلوب.',
+            'question_id.exists' => 'السؤال المحدد غير موجود.',
+            
+            'answer_value.required' => 'حقل قيمة الإجابة مطلوب.',
+            
+            'score.numeric' => 'حقل الدرجة يجب أن يكون رقماً.',
+            'score.min' => 'الدرجة يجب أن تكون 0 على الأقل.',
+            
+            'comment.string' => 'حقل التعليق يجب أن يكون نصاً.',
+            
+            'auditor_comment.string' => 'حقل تعليق المدقق يجب أن يكون نصاً.',
+            
+            'corrective_action.string' => 'حقل الإجراء التصحيحي يجب أن يكون نصاً.',
+            
+            'corrective_deadline.date' => 'حقل الموعد النهائي للإجراء التصحيحي يجب أن يكون تاريخاً صحيحاً.',
+            'corrective_deadline.after_or_equal' => 'الموعد النهائي للإجراء التصحيحي يجب أن يكون اليوم أو تاريخ لاحق.',
         ];
     }
 
     public function attributes(): array
     {
         return [
-            'visit_id' => 'الزيارة',
-            'question_id' => 'السؤال',
+            'question_id' => 'معرف السؤال',
             'answer_value' => 'قيمة الإجابة',
-            'corrective_deadline' => 'موعد التصحيح',
+            'score' => 'الدرجة',
+            'comment' => 'تعليق',
+            'auditor_comment' => 'تعليق المدقق',
+            'corrective_action' => 'الإجراء التصحيحي',
+            'corrective_deadline' => 'الموعد النهائي للإجراء التصحيحي',
         ];
     }
 }

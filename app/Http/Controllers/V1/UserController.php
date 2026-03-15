@@ -327,7 +327,7 @@ class UserController extends Controller
                 'position' => $request->input('position'),
                 'birth_date' => $request->input('birth_date'),
                 'gender' => $request->input('gender'),
-                'status' => 0,
+                'status' => auth()->user()->role === 'super_admin' ? 1 : 0,
                 'must_change_password' => $request->input('must_change_password', false),
                 'created_by' => Auth::id(),
             ];

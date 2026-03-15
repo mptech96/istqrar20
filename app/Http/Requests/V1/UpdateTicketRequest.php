@@ -29,14 +29,39 @@ class UpdateTicketRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'subject.max' => 'عنوان التذكرة يجب ألا يتجاوز 255 حرف',
-            'priority.in' => 'الأولوية غير صالحة',
-            'department.in' => 'القسم غير صالح',
-            'assigned_to.exists' => 'المستخدم غير موجود',
-            'status.in' => 'الحالة غير صالحة',
-            'resolution.required_if' => 'الحل مطلوب عند إغلاق التذكرة',
-            'customer_satisfaction.min' => 'التقييم يجب أن يكون بين 1 و 5',
-            'customer_satisfaction.max' => 'التقييم يجب أن يكون بين 1 و 5',
+            'subject.string' => 'حقل الموضوع يجب أن يكون نصاً.',
+            'subject.max' => 'حقل الموضوع لا يتجاوز 255 حرفاً.',
+            
+            'description.string' => 'حقل الوصف يجب أن يكون نصاً.',
+            
+            'priority.in' => 'الأولوية يجب أن تكون أحد: منخفضة، متوسطة، عالية، حرجة.',
+            
+            'department.in' => 'القسم يجب أن يكون أحد: دعم، فني، جودة، فوترة، مشرفين.',
+            
+            'assigned_to.exists' => 'المستخدم المعين غير موجود.',
+            
+            'status.in' => 'الحالة يجب أن تكون أحد: مفتوحة، قيد التنفيذ، في انتظار العميل، محلولة، مغلقة، مُصعدة.',
+            
+            'resolution.string' => 'حقل الحل يجب أن يكون نصاً.',
+            'resolution.required_if' => 'حقل الحل مطلوب عندما تكون الحالة "محلولة" أو "مغلقة".',
+            
+            'customer_satisfaction.integer' => 'حقل تقييم رضا العميل يجب أن يكون رقماً صحيحاً.',
+            'customer_satisfaction.min' => 'تقييم رضا العميل يجب أن يكون 1 على الأقل.',
+            'customer_satisfaction.max' => 'تقييم رضا العميل لا يتجاوز 5.',
+        ];
+    }
+
+    public function attributes(): array
+    {
+        return [
+            'subject' => 'الموضوع',
+            'description' => 'الوصف',
+            'priority' => 'الأولوية',
+            'department' => 'القسم',
+            'assigned_to' => 'المعين',
+            'status' => 'الحالة',
+            'resolution' => 'الحل',
+            'customer_satisfaction' => 'تقييم رضا العميل',
         ];
     }
 }

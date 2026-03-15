@@ -31,19 +31,7 @@ class StoreCriteriaRequest extends FormRequest
             'ranges.*.description' => ['nullable', 'string'],
         ];
     }
-
-    public function messages(): array
-    {
-        return [
-            'weight.max' => 'الوزن يجب أن يكون بين 0 و 100.',
-            'ranges.required' => 'يجب إضافة نطاقات تقييم على الأقل.',
-            'ranges.*.min_score.max' => 'الحد الأدنى للنقاط يجب أن يكون بين 0 و 100.',
-            'ranges.*.max_score.max' => 'الحد الأقصى للنقاط يجب أن يكون بين 0 و 100.',
-            'ranges.*.color.regex' => 'صيغة اللون غير صحيحة. استخدم صيغة HEX (#RRGGBB أو #RGB).',
-            'ranges.*.min_score.lte' => 'الحد الأدنى للنقاط يجب أن يكون أقل من أو يساوي الحد الأقصى.',
-            'ranges.*.max_score.gte' => 'الحد الأقصى للنقاط يجب أن يكون أكبر من أو يساوي الحد الأدنى.',
-        ];
-    }
+    
 
     public function withValidator($validator)
     {
@@ -94,17 +82,72 @@ class StoreCriteriaRequest extends FormRequest
         });
     }
 
+    public function messages(): array
+    {
+        return [
+            // Criteria data - بيانات المعيار
+            'name.required' => 'حقل اسم المعيار مطلوب.',
+            'name.string' => 'حقل اسم المعيار يجب أن يكون نصاً.',
+            'name.max' => 'حقل اسم المعيار لا يتجاوز 255 حرفاً.',
+            
+            'description.string' => 'حقل الوصف يجب أن يكون نصاً.',
+            
+            'category.required' => 'حقل التصنيف مطلوب.',
+            'category.string' => 'حقل التصنيف يجب أن يكون نصاً.',
+            'category.max' => 'حقل التصنيف لا يتجاوز 100 حرفاً.',
+            
+            'weight.required' => 'حقل الوزن مطلوب.',
+            'weight.numeric' => 'حقل الوزن يجب أن يكون رقماً.',
+            'weight.min' => 'الوزن يجب أن يكون 0 على الأقل.',
+            'weight.max' => 'الوزن لا يتجاوز 100.',
+            
+            'is_active.boolean' => 'حقل نشط يجب أن يكون قيمة منطقية (true/false).',
+            
+            'sort_order.integer' => 'حقل ترتيب الفرز يجب أن يكون رقماً صحيحاً.',
+            'sort_order.min' => 'ترتيب الفرز يجب أن يكون 0 على الأقل.',
+            
+            // Criteria ranges array - مصفوفة نطاقات المعيار
+            'ranges.required' => 'حقل النطاقات مطلوب.',
+            'ranges.array' => 'حقل النطاقات يجب أن يكون مصفوفة.',
+            'ranges.min' => 'يجب توفير نطاق واحد على الأقل.',
+            
+            'ranges.*.name.required' => 'حقل اسم النطاق مطلوب.',
+            'ranges.*.name.string' => 'حقل اسم النطاق يجب أن يكون نصاً.',
+            'ranges.*.name.max' => 'حقل اسم النطاق لا يتجاوز 100 حرفاً.',
+            
+            'ranges.*.min_score.required' => 'حقل الحد الأدنى للدرجة مطلوب.',
+            'ranges.*.min_score.integer' => 'حقل الحد الأدنى للدرجة يجب أن يكون رقماً صحيحاً.',
+            'ranges.*.min_score.min' => 'الحد الأدنى للدرجة يجب أن يكون 0 على الأقل.',
+            'ranges.*.min_score.max' => 'الحد الأدنى للدرجة لا يتجاوز 100.',
+            
+            'ranges.*.max_score.required' => 'حقل الحد الأقصى للدرجة مطلوب.',
+            'ranges.*.max_score.integer' => 'حقل الحد الأقصى للدرجة يجب أن يكون رقماً صحيحاً.',
+            'ranges.*.max_score.min' => 'الحد الأقصى للدرجة يجب أن يكون 0 على الأقل.',
+            'ranges.*.max_score.max' => 'الحد الأقصى للدرجة لا يتجاوز 100.',
+            
+            'ranges.*.color.string' => 'حقل اللون يجب أن يكون نصاً.',
+            'ranges.*.color.max' => 'حقل اللون لا يتجاوز 10 أحرف.',
+            'ranges.*.color.regex' => 'صيغة اللون غير صحيحة. يجب أن تكون بصيغة hex مثل #FFF أو #FFFFFF.',
+            
+            'ranges.*.description.string' => 'حقل وصف النطاق يجب أن يكون نصاً.',
+        ];
+    }
+
     public function attributes(): array
     {
         return [
             'name' => 'اسم المعيار',
-            'category' => 'الفئة',
+            'description' => 'الوصف',
+            'category' => 'التصنيف',
             'weight' => 'الوزن',
-            'ranges' => 'نطاقات التقييم',
+            'is_active' => 'نشط',
+            'sort_order' => 'ترتيب الفرز',
+            'ranges' => 'النطاقات',
             'ranges.*.name' => 'اسم النطاق',
-            'ranges.*.min_score' => 'الحد الأدنى للنقاط',
-            'ranges.*.max_score' => 'الحد الأقصى للنقاط',
-            'ranges.*.color' => 'لون النطاق',
+            'ranges.*.min_score' => 'الحد الأدنى للدرجة',
+            'ranges.*.max_score' => 'الحد الأقصى للدرجة',
+            'ranges.*.color' => 'اللون',
+            'ranges.*.description' => 'وصف النطاق',
         ];
     }
 }

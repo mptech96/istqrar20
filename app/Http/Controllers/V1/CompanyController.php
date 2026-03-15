@@ -351,7 +351,7 @@ class CompanyController extends Controller
                 'max_allowed_users' => $request->input('max_allowed_users'),
                 'max_allowed_branches' => $request->input('max_allowed_branches'),
 
-                'status' => false,
+                'status' =>auth()->user()->role === 'super_admin' ? true : false,
                 //'is_verified' => $request->input('is_verified', false),
             ]);
             
@@ -379,7 +379,7 @@ class CompanyController extends Controller
                     'personal_photo' => $personal_photoPath,
                     'birth_date' => $request->input('user_birth_date'),
                     'gender' => $request->input('user_gender'),
-                    'status' => false,
+                    'status' => auth()->user()->role === 'super_admin' ? true : false,
                     //'company_id' => $company->id,
                     //'created_by' => ,
                     'role' => 'company_admin',

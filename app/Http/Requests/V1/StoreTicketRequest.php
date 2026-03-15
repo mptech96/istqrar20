@@ -32,19 +32,50 @@ class StoreTicketRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'user_type.required' => 'نوع المستخدم مطلوب',
-            'user_type.in' => 'نوع المستخدم غير صالح',
-            'company_id.exists' => 'الشركة غير موجودة',
-            'branch_id.exists' => 'الفرع غير موجود',
-            'visit_id.exists' => 'الزيارة غير موجودة',
-            'subject.required' => 'عنوان التذكرة مطلوب',
-            'subject.max' => 'عنوان التذكرة يجب ألا يتجاوز 255 حرف',
-            'description.required' => 'وصف التذكرة مطلوب',
-            'ticket_type.required' => 'نوع التذكرة مطلوب',
-            'ticket_type.in' => 'نوع التذكرة غير صالح',
-            'priority.in' => 'الأولوية غير صالحة',
-            'department.in' => 'القسم غير صالح',
-            'attachments.*.max' => 'الملف كبير جداً (الحد الأقصى 10 ميجابايت)',
+            'user_type.required' => 'حقل نوع المستخدم مطلوب.',
+            'user_type.in' => 'نوع المستخدم يجب أن يكون أحد: شركة، فرع، مدقق، مشرف، جودة.',
+            
+            'company_id.exists' => 'الشركة المحددة غير موجودة.',
+            
+            'branch_id.exists' => 'الفرع المحدد غير موجود.',
+            
+            'visit_id.exists' => 'الزيارة المحددة غير موجودة.',
+            
+            'subject.required' => 'حقل الموضوع مطلوب.',
+            'subject.string' => 'حقل الموضوع يجب أن يكون نصاً.',
+            'subject.max' => 'حقل الموضوع لا يتجاوز 255 حرفاً.',
+            
+            'description.required' => 'حقل الوصف مطلوب.',
+            'description.string' => 'حقل الوصف يجب أن يكون نصاً.',
+            
+            'ticket_type.required' => 'حقل نوع التذكرة مطلوب.',
+            'ticket_type.in' => 'نوع التذكرة يجب أن يكون أحد: نزاع، شكوى، طلب، استفسار، فني، ملاحظات.',
+            
+            'priority.in' => 'الأولوية يجب أن تكون أحد: منخفضة، متوسطة، عالية، حرجة.',
+            
+            'department.in' => 'القسم يجب أن يكون أحد: دعم، فني، جودة، فوترة، مشرفين.',
+            
+            'attachments.array' => 'حقل المرفقات يجب أن يكون مصفوفة.',
+            
+            'attachments.*.file' => 'كل مرفق يجب أن يكون ملفاً.',
+            'attachments.*.max' => 'حجم الملف لا يتجاوز 10 ميجابايت.',
+        ];
+    }
+
+    public function attributes(): array
+    {
+        return [
+            'user_type' => 'نوع المستخدم',
+            'company_id' => 'الشركة',
+            'branch_id' => 'الفرع',
+            'visit_id' => 'الزيارة',
+            'subject' => 'الموضوع',
+            'description' => 'الوصف',
+            'ticket_type' => 'نوع التذكرة',
+            'priority' => 'الأولوية',
+            'department' => 'القسم',
+            'attachments' => 'المرفقات',
+            'attachments.*' => 'الملف المرفق',
         ];
     }
 }

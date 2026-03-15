@@ -192,19 +192,76 @@ class StoreUserRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'birth_date.before' => 'يجب أن يكون عمر المستخدم 18 عامًا على الأقل.',
-            'national_number.unique' => 'الرقم الوطني مسجل مسبقًا.',
+            // Basic information - المعلومات الأساسية
+            'name.required' => 'حقل الاسم مطلوب.',
+            'name.string' => 'حقل الاسم يجب أن يكون نصاً.',
+            'name.max' => 'حقل الاسم لا يتجاوز 255 حرفاً.',
+            
+            'email.required' => 'حقل البريد الإلكتروني مطلوب.',
+            'email.email' => 'صيغة البريد الإلكتروني غير صحيحة.',
+            'email.unique' => 'البريد الإلكتروني مستخدم بالفعل.',
+            
+            'password.required' => 'حقل كلمة المرور مطلوب.',
+            'password.confirmed' => 'تأكيد كلمة المرور غير متطابق.',
+            'password.min' => 'كلمة المرور يجب أن تكون 8 أحرف على الأقل.',
+            
+            'phone.required' => 'حقل رقم الهاتف مطلوب.',
+            'phone.string' => 'حقل رقم الهاتف يجب أن يكون نصاً.',
+            'phone.max' => 'حقل رقم الهاتف لا يتجاوز 20 رقماً.',
+            
+            // Role and assignment - الدور والتعيين
+            'role.required' => 'حقل الدور مطلوب.',
+            'role.string' => 'حقل الدور يجب أن يكون نصاً.',
             'role.in' => 'الدور يجب أن يكون أحد: super_admin, auditor, company_admin, branch_manager',
+            
+            // Company and branch - الشركة والفرع
+            'department.string' => 'حقل القسم يجب أن يكون نصاً.',
+            'department.max' => 'حقل القسم لا يتجاوز 100 حرفاً.',
+            
+            'position.string' => 'حقل المسمى الوظيفي يجب أن يكون نصاً.',
+            'position.max' => 'حقل المسمى الوظيفي لا يتجاوز 100 حرفاً.',
+            
+            'company_id.exists' => 'الشركة المحددة غير موجودة.',
+            'branch_id.exists' => 'الفرع المحدد غير موجود.',
+            
+            // Personal information - المعلومات الشخصية
+            'birth_date.date' => 'حقل تاريخ الميلاد يجب أن يكون تاريخاً صحيحاً.',
+            'birth_date.before' => 'يجب أن يكون عمر المستخدم 18 عامًا على الأقل.',
+            
+            'gender.string' => 'حقل الجنس يجب أن يكون نصاً.',
             'gender.in' => 'الجنس يجب أن يكون أحد: male, female, other',
             
-            // Custom messages for file uploads
+            'national_number.string' => 'حقل الرقم الوطني يجب أن يكون نصاً.',
+            'national_number.max' => 'حقل الرقم الوطني لا يتجاوز 50 حرفاً.',
+            'national_number.unique' => 'الرقم الوطني مسجل مسبقًا.',
+            
+            'must_change_password.boolean' => 'حقل تغيير كلمة المرور يجب أن يكون قيمة منطقية (true/false).',
+            
+            // Auditor-specific validation - التحقق الخاص بالمراجع
+            'municipality_certificate.file' => 'شهادة البلدية يجب أن تكون ملفاً.',
             'municipality_certificate.mimes' => 'شهادة البلدية يجب أن تكون من نوع: pdf, jpg, jpeg, png',
             'municipality_certificate.max' => 'حجم شهادة البلدية لا يتجاوز 5 ميجابايت',
+            
+            'driving_license.file' => 'رخصة القيادة يجب أن تكون ملفاً.',
             'driving_license.mimes' => 'رخصة القيادة يجب أن تكون من نوع: pdf, jpg, jpeg, png',
             'driving_license.max' => 'حجم رخصة القيادة لا يتجاوز 5 ميجابايت',
+            
             'personal_photo.image' => 'الصورة الشخصية يجب أن تكون صورة',
             'personal_photo.mimes' => 'الصورة الشخصية يجب أن تكون من نوع: jpg, jpeg, png',
             'personal_photo.max' => 'حجم الصورة الشخصية لا يتجاوز 2 ميجابايت',
+            
+            // Document expiry dates - تواريخ انتهاء المستندات
+            'certificate_expiry.date' => 'تاريخ انتهاء الشهادة يجب أن يكون تاريخاً صحيحاً.',
+            'license_expiry.date' => 'تاريخ انتهاء الرخصة يجب أن يكون تاريخاً صحيحاً.',
+            'id_expiry.date' => 'تاريخ انتهاء الهوية يجب أن يكون تاريخاً صحيحاً.',
+            
+            // Document validity - صلاحية المستندات
+            'is_certificate_valid.boolean' => 'حقل صلاحية الشهادة يجب أن يكون قيمة منطقية (true/false).',
+            'is_license_valid.boolean' => 'حقل صلاحية الرخصة يجب أن يكون قيمة منطقية (true/false).',
+            'is_id_valid.boolean' => 'حقل صلاحية الهوية يجب أن يكون قيمة منطقية (true/false).',
+            
+            // Custom validation message for user limit - رسالة مخصصة للتحقق من حد المستخدمين
+            'user_limit_validation.required' => 'يجب التحقق من حد المستخدمين المسموح به.',
         ];
     }
 
@@ -243,9 +300,14 @@ class StoreUserRequest extends FormRequest
                 'branch_id' => null,
             ]);
         }
+        
         if (!$this->has('must_change_password')) {
             $this->merge([
                 'must_change_password' => true, // Force password change on first login
+            ]);
+        } else {
+            $this->merge([
+                'must_change_password' => filter_var($this->input('must_change_password'), FILTER_VALIDATE_BOOLEAN),
             ]);
         }
 

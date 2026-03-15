@@ -237,10 +237,10 @@ class Visit extends Model
 
     private function determineCategory(float $percentage): string
     {
-        if ($percentage >= 90) return 'A';
-        if ($percentage >= 80) return 'B';
-        if ($percentage >= 70) return 'C';
-        if ($percentage >= 60) return 'D';
-        return 'F';
+        if ($percentage >= 90) return 'ممتاز';
+        if ($percentage >= 80) return 'جيد جدا';
+        if ($percentage >= 70) return 'جيد';
+        if ($percentage >= 60) return 'مقبول';
+        return 'ضعيف';
     }
 }

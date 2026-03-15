@@ -1,4 +1,5 @@
 {
     "the user must be of the following role: company_admin": "The user must be of the following role: company_admin",
-    "user does not have permission to perform this action.": "المستخدم لا يملك صلاحية تنفيذ هذا الاجراء."
+    "user does not have permission to perform this action.": "المستخدم لا يملك صلاحية تنفيذ هذا الاجراء.",
+    "not found": "Not Found"
 }

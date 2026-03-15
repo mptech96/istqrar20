@@ -373,7 +373,7 @@ class BranchController extends Controller
                     'gender' => $request->input('user_gender'),
                     'company_id' => $company->id,
                     'role' => 'branch_manager',
-                    'status' => false,
+                    'status' => auth()->user()->role === 'super_admin' ? true : false,
                 ]);
             }
             
@@ -394,7 +394,7 @@ class BranchController extends Controller
                 'manager_phone' => $manager->phone,
                 'category' => $request->input('category'),
                 'compliance_score' => $request->input('compliance_score', 0.00),
-                'status' => false, // Always active when created
+                'status' => auth()->user()->role === 'super_admin' ? true : false,
             ]);
             
             // Update user with branch_id

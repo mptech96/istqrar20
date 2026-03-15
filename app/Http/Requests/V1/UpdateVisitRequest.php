@@ -32,19 +32,54 @@ class UpdateVisitRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'status.in' => 'حالة الزيارة غير صالحة.',
-            'category.in' => 'الفئة غير صالحة.',
-            'percentage.max' => 'النسبة المئوية يجب أن تكون بين 0 و 100.',
+            'scheduled_date.date' => 'حقل التاريخ المجدول يجب أن يكون تاريخاً صحيحاً.',
+            
+            'scheduled_time.date_format' => 'صيغة الوقت المجدول غير صحيحة. يجب أن تكون HH:MM (مثال: 14:30).',
+            
+            'estimated_duration.integer' => 'حقل المدة التقديرية يجب أن يكون رقماً صحيحاً.',
+            'estimated_duration.min' => 'المدة التقديرية يجب أن تكون دقيقة واحدة على الأقل.',
+            'estimated_duration.max' => 'المدة التقديرية لا تتجاوز 480 دقيقة (8 ساعات).',
+            
+            'auditor_notes.string' => 'حقل ملاحظات المدقق يجب أن يكون نصاً.',
+            
+            'branch_feedback.string' => 'حقل تقييم الفرع يجب أن يكون نصاً.',
+            
+            'internal_notes.string' => 'حقل الملاحظات الداخلية يجب أن يكون نصاً.',
+            
+            'status.in' => 'حالة الزيارة يجب أن تكون أحد: مسودة, مجدولة, قيد التنفيذ, مكتملة, ملغية, قيد المراجعة, معتمدة, مرفوضة.',
+            
+            'rejection_reason.string' => 'حقل سبب الرفض يجب أن يكون نصاً.',
+            
+            // رسائل الحقول المُعلقة - يمكن تفعيلها لاحقاً
+            // 'total_score.numeric' => 'حقل الدرجة الإجمالية يجب أن يكون رقماً.',
+            // 'total_score.min' => 'الدرجة الإجمالية يجب أن تكون 0 على الأقل.',
+            // 'total_score.max' => 'الدرجة الإجمالية لا تتجاوز 1000.',
+            
+            // 'percentage.numeric' => 'حقل النسبة المئوية يجب أن يكون رقماً.',
+            // 'percentage.min' => 'النسبة المئوية يجب أن تكون 0 على الأقل.',
+            // 'percentage.max' => 'النسبة المئوية لا تتجاوز 100.',
+            
+            // 'category.in' => 'التصنيف يجب أن يكون أحد: A, B, C, D, F.',
+            
+            // 'approved_by.exists' => 'المعتمد المحدد غير موجود.',
         ];
     }
 
     public function attributes(): array
     {
         return [
-            'status' => 'حالة الزيارة',
-            'total_score' => 'الدرجة الكلية',
-            'percentage' => 'النسبة المئوية',
-            'category' => 'الفئة',
+            'scheduled_date' => 'التاريخ المجدول',
+            'scheduled_time' => 'الوقت المجدول',
+            'estimated_duration' => 'المدة التقديرية',
+            'auditor_notes' => 'ملاحظات المدقق',
+            'branch_feedback' => 'تقييم الفرع',
+            'internal_notes' => 'الملاحظات الداخلية',
+            'status' => 'الحالة',
+            'rejection_reason' => 'سبب الرفض',
+            // 'total_score' => 'الدرجة الإجمالية',
+            // 'percentage' => 'النسبة المئوية',
+            // 'category' => 'التصنيف',
+            // 'approved_by' => 'المعتمد',
         ];
     }
 }

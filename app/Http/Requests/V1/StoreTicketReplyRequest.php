@@ -24,8 +24,25 @@ class StoreTicketReplyRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'message.required' => 'نص الرد مطلوب',
-            'attachments.*.max' => 'الملف كبير جداً (الحد الأقصى 10 ميجابايت)',
+            'message.required' => 'حقل الرسالة مطلوب.',
+            'message.string' => 'حقل الرسالة يجب أن يكون نصاً.',
+            
+            'is_internal.boolean' => 'حقل داخلي يجب أن يكون قيمة منطقية (true/false).',
+            
+            'attachments.array' => 'حقل المرفقات يجب أن يكون مصفوفة.',
+            
+            'attachments.*.file' => 'كل مرفق يجب أن يكون ملفاً.',
+            'attachments.*.max' => 'حجم الملف لا يتجاوز 10 ميجابايت.',
+        ];
+    }
+
+    public function attributes(): array
+    {
+        return [
+            'message' => 'الرسالة',
+            'is_internal' => 'داخلي',
+            'attachments' => 'المرفقات',
+            'attachments.*' => 'الملف المرفق',
         ];
     }
 }
