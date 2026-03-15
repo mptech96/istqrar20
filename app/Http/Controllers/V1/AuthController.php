@@ -85,7 +85,7 @@ class AuthController extends Controller
                 ]);
             }
             
-            $user->tokens()->delete();
+            //$user->tokens()->delete();
             
             $user->update([
                 'last_login_at' => now(),
@@ -135,7 +135,7 @@ class AuthController extends Controller
     public function logout(Request $request)
     {
         $cookie = Cookie::forget('auth_token');
-        $request->user()->tokens()->delete();
+        //$request->user()->tokens()->delete();
         return response()->json([
             'success' => true,
             'message' => 'تم تسجيل الخروج بنجاح'
