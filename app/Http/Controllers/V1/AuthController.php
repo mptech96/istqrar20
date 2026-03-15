@@ -136,11 +136,21 @@ class AuthController extends Controller
     {
         $cookie = Cookie::forget('auth_token');
         //$request->user()->tokens()->delete();
+        //$request->user()->currentAccessToken()->delete();
         return response()->json([
             'success' => true,
             'message' => 'تم تسجيل الخروج بنجاح'
-        ])->withCookie($cookie);
-        //$request->user()->currentAccessToken()->delete();
+        ])->withCookie(Cookie::make(
+            'auth_token',
+            '',
+            null,
+            null,    // path
+            null,    // domain
+            true,    // secure (HTTPS only)
+            true,    // httpOnly
+            false,   // raw
+            'none' // sameSite
+        ));
     }
 
     // ------------------------ ME ------------------------
