@@ -35,7 +35,7 @@ class BranchResource extends JsonResource
             'compliance' => $this->getCategoryText($percentage),
             'compliance_formatted' => $percentage ? number_format($percentage, 2) . '%' : null,
 
-            //'category' => $this->category,
+            'category' => $this->category,
             'total_visits' => $this->total_visits,
             'last_visit_date' => $this->last_visit_date?->format('Y-m-d'),
             'next_scheduled_visit' => $this->next_scheduled_visit?->format('Y-m-d'),
