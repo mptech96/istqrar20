@@ -473,7 +473,7 @@ class VisitController extends Controller
     {
         return response()->json([
             'branches' => Branch::select(['id', 'name'])->get(),
-            'auditors' => User::select(['id', 'name'])->get(),
+            'auditors' => User::auditors()->select(['id', 'name'])->get(),
             'checklists' => Checklist::select(['id', 'name'])->get(),
         ]);
     }

@@ -153,6 +153,21 @@ class User extends Authenticatable
         return $query->where('role', 'auditor');
     }
 
+    public function scopeSuperAdmins($query)
+    {
+        return $query->where('role', 'super_admin');
+    }
+
+    public function scopeCompanyAdmins($query)
+    {
+        return $query->where('role', 'company_admin');
+    }
+
+    public function scopeBranchManagers($query)
+    {
+        return $query->where('role', 'branch_manager');
+    }
+
     public function scopeWithExpiredDocuments($query)
     {
         $today = now()->format('Y-m-d');

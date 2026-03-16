@@ -217,7 +217,7 @@ class CompanyController extends Controller
     public function create()
     {
         return response()->json([
-            'users' => User::select(['id', 'name'])->latest()->get()
+            'users' => User::companyAdmins()->select(['id', 'name'])->latest()->get()
         ]);        
     }
 

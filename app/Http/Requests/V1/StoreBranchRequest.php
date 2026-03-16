@@ -27,8 +27,8 @@ class StoreBranchRequest extends FormRequest
             // Location
             'city' => ['required', 'string', 'max:100'],
             'address' => ['required', 'string'],
-            'latitude' => ['nullable', 'numeric', 'between:-90,90'],
-            'longitude' => ['nullable', 'numeric', 'between:-180,180'],
+            'latitude' => ['required', 'numeric', 'between:-90,90'],
+            'longitude' => ['required', 'numeric', 'between:-180,180'],
             
             // Statistics
             'category' => ['required', 'string', 'max:255'],

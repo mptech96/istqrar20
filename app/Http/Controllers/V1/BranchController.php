@@ -245,7 +245,7 @@ class BranchController extends Controller
     public function create()
     {
         return response()->json([
-            'users' => User::select(['id', 'name'])->latest()->get(),
+            'users' => User::branchManagers()->select(['id', 'name'])->latest()->get(),
             'companies' => Company::select(['id', 'name'])->latest()->get(),
         ]);        
     }

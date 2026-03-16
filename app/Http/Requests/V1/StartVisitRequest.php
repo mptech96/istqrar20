@@ -27,9 +27,8 @@ class StartVisitRequest extends FormRequest
             // حقول الموقع - مطلوبة عند بدء الزيارة
             'start_latitude' => ['required', 'numeric', 'between:-90,90'],
             'start_longitude' => ['required', 'numeric', 'between:-180,180'],
-            'location_url' => ['nullable', 'url', 'max:300'],
+            'location_url' => ['nullable', 'url', 'max:500'],
             'location_address' => ['nullable', 'string', 'max:1000'],
-
         ];
 
         // إضافة التحقق من وقت بدء الزيارة
@@ -72,11 +71,70 @@ class StartVisitRequest extends FormRequest
                     }
                 },
             ];
+
+             $rules['location_distance_validation'] = [
+                'required',
+                function ($attribute, $value, $fail) use ($visit) {
+                    // التحقق من وجود إحداثيات الموقع في الطلب
+                    if (!$this->has('start_latitude') || !$this->has('start_longitude')) {
+                        return; // سيتم التحقق منها بواسطة القواعد الأخرى
+                    }
+
+                    $userLat = $this->input('start_latitude');
+                    $userLng = $this->input('start_longitude');
+                    $branch = $visit->branch;
+                    // التحقق من وجود إحداثيات الموقع في نموذج الزيارة
+                    if (!$branch->latitude || !$branch->longitude) {
+                        $fail("عذراً، لم يتم تحديد إحداثيات موقع الفرع '" . ($branch->name ?? 'الفرع') . "' بعد. الرجاء التواصل مع الإدارة لتحديث بيانات موقع الفرع والمحاولة مرة أخرى.");
+                        return; // لا يوجد موقع محدد للزيارة للمقارنة
+                    }
+
+                    // حساب المسافة باستخدام صيغة Haversine
+                    $distance = $this->calculateDistance(
+                        $userLat, 
+                        $userLng, 
+                        $branch->latitude, 
+                        $branch->longitude
+                    );
+
+                    // السماح بمسافة 1 كيلومتر (1000 متر)
+                    $maxDistance = 1; // كيلومتر
+
+                    if ($distance > $maxDistance) {
+                        $fail("أنت بعيد عن موقع الزيارة المحدد بمسافة " . number_format($distance, 2) . " كم. يجب أن تكون على بعد كيلومتر واحد كحد أقصى لبدء الزيارة.");
+                    }
+                },
+            ];
         }
 
         return $rules;
     }
+    
+    /**
+     * Calculate distance between two points using Haversine formula
+     * 
+     * @param float $lat1
+     * @param float $lon1
+     * @param float $lat2
+     * @param float $lon2
+     * @return float Distance in kilometers
+     */
+    private function calculateDistance(float $lat1, float $lon1, float $lat2, float $lon2): float
+    {
+        if (($lat1 == $lat2) && ($lon1 == $lon2)) {
+            return 0;
+        }
 
+        $theta = $lon1 - $lon2;
+        $dist = sin(deg2rad($lat1)) * sin(deg2rad($lat2)) + 
+                cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * cos(deg2rad($theta));
+        $dist = acos($dist);
+        $dist = rad2deg($dist);
+        $miles = $dist * 60 * 1.1515;
+        
+        // Convert miles to kilometers
+        return $miles * 1.609344;
+    }
     /**
      * Get the visit instance from route parameter safely.
      */
@@ -147,6 +205,7 @@ class StartVisitRequest extends FormRequest
         // إضافة الوقت الحالي للتحقق (للقاعدة المخصصة)
         $this->merge([
             'start_time_validation' => now(),
+            'location_distance_validation' => true
         ]);
     }
 
