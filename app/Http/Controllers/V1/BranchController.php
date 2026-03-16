@@ -265,7 +265,7 @@ class BranchController extends Controller
                 schema: new OA\Schema(
                     type: 'object',
                     required: [
-                        'company_id', 'name', 'email', 'phone', 'city', 'address', 'category',
+                        'company_id', 'name', 'email', 'phone', 'city', 'address', 'category', 'latitude', 'longitude'
                         //'user_name', 'user_email', 'user_password', 'user_password_confirmation', 'user_phone'
                     ],
                     properties: [
