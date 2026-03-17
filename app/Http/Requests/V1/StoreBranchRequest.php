@@ -100,7 +100,7 @@ class StoreBranchRequest extends FormRequest
             'user_phone' => [
                 Rule::when($this->filled('user_id'),
                     ['sometimes', 'nullable', 'string', 'max:20'],
-                    ['required', 'string', 'max:20']
+                    ['required', 'string', 'max:20', function ($attribute, $value, $fail) {if (!preg_match('/^[0-9+\-\s]+$/', $value)) {$fail('يرجى إدخال رقم هاتف صحيح');}}]
                 )
             ],
             

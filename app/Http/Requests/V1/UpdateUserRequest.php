@@ -20,7 +20,7 @@ class UpdateUserRequest extends FormRequest
             // Basic information
             'name' => ['sometimes', 'string', 'max:255'],
             'email' => ['sometimes', 'email', 'unique:users,email,' . $userId],
-            'phone' => ['sometimes', 'string', 'max:20'],
+            'phone' => ['sometimes', 'string', 'max:20', function ($attribute, $value, $fail) {if (!preg_match('/^[0-9+\-\s]+$/', $value)) {$fail('يرجى إدخال رقم هاتف صحيح');}}],
             'password' => ['sometimes', 'confirmed', Password::min(8)],
             
             // Role and assignment

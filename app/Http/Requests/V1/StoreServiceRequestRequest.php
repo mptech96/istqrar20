@@ -19,7 +19,7 @@ class StoreServiceRequestRequest extends FormRequest
             'package_name' => ['nullable', 'string', 'max:255'],
             'customer_name' => ['required', 'string', 'max:255'],
             'company_name' => ['nullable', 'string', 'max:255'],
-            'phone' => ['required', 'string', 'max:50'],
+            'phone' => ['required', 'string', 'max:50', function ($attribute, $value, $fail) {if (!preg_match('/^[0-9+\-\s]+$/', $value)) {$fail('يرجى إدخال رقم هاتف صحيح');}}],
             'email' => ['nullable', 'email', 'max:255'],
             'subject' => ['nullable', 'string', 'max:255'],
             'message' => ['nullable', 'string'],

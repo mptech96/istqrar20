@@ -19,7 +19,7 @@ class CompanyRequest extends FormRequest
             // Company data
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'unique:companies,email'],
-            'phone' => ['required', 'string', 'max:20'],
+            'phone' => ['required', 'string', 'max:20', function ($attribute, $value, $fail) {if (!preg_match('/^[0-9+\-\s]+$/', $value)) {$fail('يرجى إدخال رقم هاتف صحيح');}}],
             'commercial_registration' => ['required', 'string', 'max:100', 'unique:companies,commercial_registration'],
             'city' => ['required', 'string', 'max:100'],
             'address' => ['required', 'string'],
@@ -56,7 +56,7 @@ class CompanyRequest extends FormRequest
             'user_phone' => [
                 Rule::when($this->filled('user_id'),
                     ['sometimes', 'nullable', 'string', 'max:20'],
-                    ['required', 'string', 'max:20']
+                    ['required', 'string', 'max:20', function ($attribute, $value, $fail) {if (!preg_match('/^[0-9+\-\s]+$/', $value)) {$fail('يرجى إدخال رقم هاتف صحيح');}}]
                 )
             ],
             'user_personal_photo' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],

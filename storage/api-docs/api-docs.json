@@ -2031,7 +2031,9 @@
                                     "phone",
                                     "city",
                                     "address",
-                                    "category"
+                                    "category",
+                                    "latitude",
+                                    "longitude"
                                 ],
                                 "properties": {
                                     "company_id": {

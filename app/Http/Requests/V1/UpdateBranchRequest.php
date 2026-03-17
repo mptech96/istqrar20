@@ -19,7 +19,7 @@ class UpdateBranchRequest extends FormRequest
             // Branch data
             'name' => ['sometimes', 'string', 'max:255'],
             'email' => ['sometimes', 'email', 'unique:branches,email,' . $branchId],
-            'phone' => ['sometimes', 'string', 'max:20'],
+            'phone' => ['sometimes', 'string', 'max:20', function ($attribute, $value, $fail) {if (!preg_match('/^[0-9+\-\s]+$/', $value)) {$fail('يرجى إدخال رقم هاتف صحيح');}}],
             
             // Location
             'city' => ['sometimes', 'string', 'max:100'],
