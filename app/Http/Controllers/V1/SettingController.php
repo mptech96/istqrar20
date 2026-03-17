@@ -360,12 +360,18 @@ class SettingController extends Controller
     )]
     public function update(UpdateSettingRequest $request, Setting $setting)
     {
+        // $setting->update($request->only([
+        //     'group', 'key', 'value', 'type', 'data_type',
+        //     'validation_rules', 'options', 'label', 'description',
+        //     'placeholder', 'sort_order', 'is_public', 'is_encrypted', 'is_required'
+        // ]));
+        
         $setting->update($request->only([
-            'group', 'key', 'value', 'type', 'data_type',
+            'value', 'type', 'data_type',
             'validation_rules', 'options', 'label', 'description',
             'placeholder', 'sort_order', 'is_public', 'is_encrypted', 'is_required'
         ]));
-        
+
         return response()->json([
             'data' => new SettingResource($setting),
             'message' => 'تم تحديث الإعداد بنجاح'
@@ -401,7 +407,7 @@ class SettingController extends Controller
     )]
     public function destroy(Setting $setting)
     {
-        $setting->delete();
+        //$setting->delete();
         
         return response()->json([
             'data' => new SettingResource($setting),
@@ -446,11 +452,11 @@ class SettingController extends Controller
     )]
     public function bulkUpdate(BulkUpdateSettingsRequest $request)
     {
-        DB::transaction(function () use ($request) {
-            foreach ($request->input('settings') as $item) {
-                Setting::set($item['key'], $item['value'], $item['group']);
-            }
-        });
+        // DB::transaction(function () use ($request) {
+        //     foreach ($request->input('settings') as $item) {
+        //         Setting::set($item['key'], $item['value'], $item['group']);
+        //     }
+        // });
         
         return response()->json([
             'message' => 'تم تحديث الإعدادات بنجاح'
@@ -487,31 +493,31 @@ class SettingController extends Controller
     )]
     public function import(Request $request)
     {
-        $request->validate([
-            'file' => ['required', 'file', 'mimes:json', 'max:2048'],
-            'override' => ['nullable', 'boolean'],
-        ]);
+        // $request->validate([
+        //     'file' => ['required', 'file', 'mimes:json', 'max:2048'],
+        //     'override' => ['nullable', 'boolean'],
+        // ]);
         
-        $file = $request->file('file');
-        $content = json_decode(file_get_contents($file), true);
+        // $file = $request->file('file');
+        // $content = json_decode(file_get_contents($file), true);
         
-        if (!is_array($content)) {
-            return response()->json([
-                'message' => 'ملف JSON غير صالح'
-            ], 422);
-        }
+        // if (!is_array($content)) {
+        //     return response()->json([
+        //         'message' => 'ملف JSON غير صالح'
+        //     ], 422);
+        // }
         
-        DB::transaction(function () use ($content, $request) {
-            $override = $request->boolean('override', false);
+        // DB::transaction(function () use ($content, $request) {
+        //     $override = $request->boolean('override', false);
             
-            foreach ($content as $group => $settings) {
-                foreach ($settings as $key => $value) {
-                    if ($override || !Setting::has($key, $group)) {
-                        Setting::set($key, $value, $group);
-                    }
-                }
-            }
-        });
+        //     foreach ($content as $group => $settings) {
+        //         foreach ($settings as $key => $value) {
+        //             if ($override || !Setting::has($key, $group)) {
+        //                 Setting::set($key, $value, $group);
+        //             }
+        //         }
+        //     }
+        // });
         
         return response()->json([
             'message' => 'تم استيراد الإعدادات بنجاح'
