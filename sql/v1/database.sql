@@ -915,3 +915,36 @@ CREATE TABLE IF NOT EXISTS `service_requests_tbl` (
     INDEX `idx_email` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
 COMMENT='تخزين طلبات الباقات ورسائل التواصل من واجهة الموقع';
+
+
+CREATE TABLE IF NOT EXISTS `notification_templates` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `type` varchar(50) NOT NULL,
+  `locale` varchar(10) NOT NULL DEFAULT 'ar',
+  `title_template` varchar(255) NOT NULL,
+  `body_template` text NOT NULL,
+  `is_active` tinyint(1) DEFAULT 1,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_type_locale` (`type`,`locale`),
+  KEY `idx_active_templates` (`is_active`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='قوالب إشعارات مخصصة حسب اللغة والنوع';
+
+
+CREATE TABLE IF NOT EXISTS `notifications` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` bigint(20) unsigned NOT NULL,
+  `notification_template_id` bigint(20) unsigned NOT NULL,
+  `title` varchar(255) NOT NULL,
+  `body` text NOT NULL,
+  `data` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`data`)),
+  `scheduled_date` timestamp DEFAULT current_timestamp(),
+  `read_at` timestamp NULL DEFAULT NULL,
+  `model` varchar(200) DEFAULT NULL,
+  `url` VARCHAR(1000) NULL,
+  `created_at` timestamp NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `idx_user_notification` (`user_id`),
+  KEY `idx_created_notification` (`created_at`),
+  CONSTRAINT `notifications_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
+  CONSTRAINT `notifications_ibfk_2` FOREIGN KEY (`notification_template_id`) REFERENCES `notification_templates` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='جدول الإشعارات المرتبطة بأنواع إشعار محددة';

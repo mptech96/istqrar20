@@ -71,16 +71,16 @@ class User extends Authenticatable
                 $user = auth()->user();
                 
                 if($user->role === 'company_admin') {
-                    $builder->where('id', $user->id)
+                    $builder->where('users.id', $user->id)
                         ->orWhere('company_id', $user->company_id);
                 }
                 elseif($user->role === 'branch_manager') {
-                    $builder->where('id', $user->id)
+                    $builder->where('users.id', $user->id)
                         ->orWhereHas('visits');
 
                 }
                 elseif($user->role === 'auditor') {
-                    $builder->where('id', $user->id);
+                    $builder->where('users.id', $user->id);
                 }
                 elseif($user->role === 'super_admin') {
                     $builder->whereRaw('1 = 1');
