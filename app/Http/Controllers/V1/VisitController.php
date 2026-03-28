@@ -613,6 +613,8 @@ class VisitController extends Controller
             'status' => 'scheduled',
             'max_possible_score' => Checklist::find($request->input('checklist_id'))->total_score ?? 100,
         ]);
+
+        app(\App\Services\V1\NotificationService::class)->visit_scheduled($visit);
         
         return response()->json([
             'data' => new VisitResource($visit->load(['branch', 'auditor', 'checklist'])),
@@ -1286,6 +1288,8 @@ class VisitController extends Controller
             'location_address' => $validated['location_address'] ?? null,
         ]);
         
+        app(\App\Services\V1\NotificationService::class)->visit_started($visit);
+        
         return response()->json([
             'data' => new VisitResource($visit),
             'message' => 'تم بدء الزيارة بنجاح'
@@ -1433,6 +1437,8 @@ class VisitController extends Controller
             
             app(VisitAnalysisService::class)->generate($visit);
             app(SyncEnterpriseStatisticsEngine::class)->updateFromVisit($visit);
+
+            app(\App\Services\V1\NotificationService::class)->visit_completed($visit);
             
             //return \App\Models\V1\VisitAnalysis::get();
             

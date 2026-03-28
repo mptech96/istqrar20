@@ -3199,29 +3199,39 @@ namespace App\Models\V1 {
     /**
      * App\Models\V1\Notification
      *
-     * @property \Illuminate\Support\Carbon|null $updated_at
      * @property \Illuminate\Support\Carbon|null $created_at
-     * @property string|null $read_at
      * @property string|null $url
-     * @property string|null $data
-     * @property string $message
+     * @property string|null $entity_type
+     * @property mixed $entity_id
+     * @property \Illuminate\Support\Carbon|null $read_at
+     * @property \Illuminate\Support\Carbon $scheduled_date
+     * @property string $body
      * @property string $title
-     * @property string $type
+     * @property mixed $notification_template_id
      * @property mixed $user_id
      * @property int $id
+     * @property-read mixed $is_read
+     * @property-read \App\Models\V1\Notification $entity
+     * @property-read \App\Models\V1\User $user
+     * @property-read \App\Models\V1\NotificationTemplate $template
      * @method static \Illuminate\Database\Eloquent\Builder<Notification>|Notification whereId($value)
      * @method static \Illuminate\Database\Eloquent\Builder<Notification>|Notification whereUserId($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Notification>|Notification whereType($value)
+     * @method static \Illuminate\Database\Eloquent\Builder<Notification>|Notification whereNotificationTemplateId($value)
      * @method static \Illuminate\Database\Eloquent\Builder<Notification>|Notification whereTitle($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Notification>|Notification whereMessage($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Notification>|Notification whereData($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Notification>|Notification whereUrl($value)
+     * @method static \Illuminate\Database\Eloquent\Builder<Notification>|Notification whereBody($value)
+     * @method static \Illuminate\Database\Eloquent\Builder<Notification>|Notification whereScheduledDate($value)
      * @method static \Illuminate\Database\Eloquent\Builder<Notification>|Notification whereReadAt($value)
+     * @method static \Illuminate\Database\Eloquent\Builder<Notification>|Notification whereEntityId($value)
+     * @method static \Illuminate\Database\Eloquent\Builder<Notification>|Notification whereEntityType($value)
+     * @method static \Illuminate\Database\Eloquent\Builder<Notification>|Notification whereUrl($value)
      * @method static \Illuminate\Database\Eloquent\Builder<Notification>|Notification whereCreatedAt($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Notification>|Notification whereUpdatedAt($value)
      * @method static \Illuminate\Database\Eloquent\Builder<Notification>|Notification newModelQuery()
      * @method static \Illuminate\Database\Eloquent\Builder<Notification>|Notification newQuery()
      * @method static \Illuminate\Database\Eloquent\Builder<Notification>|Notification query()
+     * @method static \Illuminate\Database\Eloquent\Builder<Notification>|Notification unread() {@see App\Models\V1\Notification::scopeUnread()}
+     * @method static \Illuminate\Database\Eloquent\Builder<Notification>|Notification read() {@see App\Models\V1\Notification::scopeRead()}
+     * @method static \Illuminate\Database\Eloquent\Builder<Notification>|Notification scheduled() {@see App\Models\V1\Notification::scopeScheduled()}
+     * @method static \Illuminate\Database\Eloquent\Builder<Notification>|Notification sent() {@see App\Models\V1\Notification::scopeSent()}
      * @method static mixed select($columns)
      * @method static mixed selectSub($query, $as)
      * @method static mixed selectExpression($expression, $as)
@@ -3532,21 +3542,24 @@ namespace App\Models\V1 {
     /**
      * App\Models\V1\NotificationTemplate
      *
-     * @property \Illuminate\Support\Carbon|null $updated_at
-     * @property \Illuminate\Support\Carbon|null $created_at
-     * @property string $message_template
+     * @property boolean|null $is_active
+     * @property string $body_template
      * @property string $title_template
+     * @property string $locale
      * @property string $type
      * @property int $id
+     * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\V1\Notification> $notifications
+     * @property-read int|null $notifications_count
      * @method static \Illuminate\Database\Eloquent\Builder<NotificationTemplate>|NotificationTemplate whereId($value)
      * @method static \Illuminate\Database\Eloquent\Builder<NotificationTemplate>|NotificationTemplate whereType($value)
+     * @method static \Illuminate\Database\Eloquent\Builder<NotificationTemplate>|NotificationTemplate whereLocale($value)
      * @method static \Illuminate\Database\Eloquent\Builder<NotificationTemplate>|NotificationTemplate whereTitleTemplate($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<NotificationTemplate>|NotificationTemplate whereMessageTemplate($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<NotificationTemplate>|NotificationTemplate whereCreatedAt($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<NotificationTemplate>|NotificationTemplate whereUpdatedAt($value)
+     * @method static \Illuminate\Database\Eloquent\Builder<NotificationTemplate>|NotificationTemplate whereBodyTemplate($value)
+     * @method static \Illuminate\Database\Eloquent\Builder<NotificationTemplate>|NotificationTemplate whereIsActive($value)
      * @method static \Illuminate\Database\Eloquent\Builder<NotificationTemplate>|NotificationTemplate newModelQuery()
      * @method static \Illuminate\Database\Eloquent\Builder<NotificationTemplate>|NotificationTemplate newQuery()
      * @method static \Illuminate\Database\Eloquent\Builder<NotificationTemplate>|NotificationTemplate query()
+     * @method static \Illuminate\Database\Eloquent\Builder<NotificationTemplate>|NotificationTemplate active() {@see App\Models\V1\NotificationTemplate::scopeActive()}
      * @method static mixed select($columns)
      * @method static mixed selectSub($query, $as)
      * @method static mixed selectExpression($expression, $as)

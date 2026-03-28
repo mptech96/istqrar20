@@ -6527,6 +6527,193 @@
                 ]
             }
         },
+        "/api/v1/notifications": {
+            "get": {
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "عرض قائمة الإشعارات",
+                "description": "استرجاع إشعارات المستخدم الحالي (أو جميع الإشعارات للمشرف)",
+                "operationId": "getNotifications",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "default": 15
+                        }
+                    },
+                    {
+                        "name": "read",
+                        "in": "query",
+                        "description": "تصفية مقروءة/غير مقروءة",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "description": "نوع الإشعار (مرتبط بالقالب)",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "from_date",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "to_date",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "قائمة الإشعارات"
+                    },
+                    "401": {
+                        "description": "غير مصرح به"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/notifications/{notification}": {
+            "get": {
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "عرض تفاصيل إشعار",
+                "operationId": "getNotification",
+                "parameters": [
+                    {
+                        "name": "notification",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "تفاصيل الإشعار"
+                    },
+                    "404": {
+                        "description": "الإشعار غير موجود"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "حذف إشعار",
+                "operationId": "deleteNotification",
+                "parameters": [
+                    {
+                        "name": "notification",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "تم حذف الإشعار بنجاح"
+                    },
+                    "404": {
+                        "description": "الإشعار غير موجود"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/notifications/{notification}/read": {
+            "patch": {
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "تحديد إشعار كمقروء",
+                "operationId": "markNotificationRead",
+                "parameters": [
+                    {
+                        "name": "notification",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "تم تحديث الإشعار كمقروء"
+                    },
+                    "404": {
+                        "description": "الإشعار غير موجود"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/notifications/mark-all-read": {
+            "post": {
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "تحديد جميع إشعارات المستخدم كمقروءة",
+                "description": "Bulk mark as read for current user",
+                "operationId": "markAllNotificationsRead",
+                "responses": {
+                    "200": {
+                        "description": "تم تحديث جميع الإشعارات كمقروءة"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/v1/checklists/{checklist}/questions": {
             "get": {
                 "tags": [
@@ -14983,6 +15170,10 @@
         {
             "name": "Service Requests",
             "description": "ادارة الطلبات"
+        },
+        {
+            "name": "Notifications",
+            "description": "الاشعارات"
         }
     ]
 }

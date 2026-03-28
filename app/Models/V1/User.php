@@ -80,7 +80,16 @@ class User extends Authenticatable
 
                 }
                 elseif($user->role === 'auditor') {
-                    $builder->where('users.id', $user->id);
+                    $visits = Visit::get();
+                    $ids = \App\Models\User::where('users.id', $user->id)
+                        ->orWhere(function($q) use($visits) {
+                            $q->where('role', 'company_admin')
+                                ->whereIn('company_id', $visits->map(fn($visit) => $visit->company?->id));
+                        })
+                        ->orWhereIn('id', $visits->map(fn($visit) => $visit->branch?->manager_user_id))
+                        ->pluck('id');
+
+                    $builder->whereIn('users.id', $ids);
                 }
                 elseif($user->role === 'super_admin') {
                     $builder->whereRaw('1 = 1');

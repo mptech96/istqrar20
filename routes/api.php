@@ -193,7 +193,12 @@ Route::namespace('App\Http\Controllers\V1')->middleware(['throttle:60,1', 'api']
                 Route::get('/branch-manager', 'branchManagerReport');
                 Route::get('/auditor', 'auditorReport');
             });
-            
+
+            Route::prefix('notifications')->controller(NotificationController::class)->group(function () {
+                Route::get('/', 'index');
+                
+            });
+
         });
         
         Route::prefix('auth')->controller(AuthController::class)->group(function () {

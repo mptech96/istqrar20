@@ -90,7 +90,9 @@ class ServiceRequestController extends Controller
         $data['status'] = $data['status'] ?? 'new';
 
         $serviceRequest = ServiceRequest::create($data);
-
+        
+        app(\App\Services\V1\NotificationService::class)->service_request($serviceRequest);
+        
         return response()->json([
             'data' => new ServiceRequestResource($serviceRequest),
             'message' => 'تم إنشاء الطلب بنجاح'

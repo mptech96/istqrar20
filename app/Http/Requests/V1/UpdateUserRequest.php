@@ -66,6 +66,25 @@ class UpdateUserRequest extends FormRequest
         return $rules;
     }
 
+    private function shouldValidateUserLimit($user): bool
+    {
+        if (!$user) {
+            return false;
+        }
+
+        // Company admin always needs validation
+        if ($user->role === 'company_admin') {
+            return true;
+        }
+
+        // Super admin only needs validation if company_id is provided
+        if ($user->role === 'super_admin' && $this->input('company_id')) {
+            return true;
+        }
+
+        return false;
+    }
+    
     public function messages(): array
     {
         return [
@@ -166,4 +185,26 @@ class UpdateUserRequest extends FormRequest
         ];
     }
 
+        protected function prepareForValidation(): void
+    {
+        if (in_array($this->input('role'), ['auditor', 'super_admin'])) {
+            $this->merge([
+                'company_id' => null,
+                'branch_id' => null,
+            ]);
+        }
+        
+        if ($this->has('must_change_password')) {
+            $this->merge([
+                'must_change_password' => filter_var($this->input('must_change_password'), FILTER_VALIDATE_BOOLEAN),
+            ]);
+        }
+
+        // Add validation marker for user limit check
+        if ($this->shouldValidateUserLimit(auth()->user())) {
+            $this->merge([
+                'user_limit_validation' => true,
+            ]);
+        }
+    }
 }

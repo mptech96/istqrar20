@@ -936,10 +936,10 @@ CREATE TABLE IF NOT EXISTS `notifications` (
   `notification_template_id` bigint(20) unsigned NOT NULL,
   `title` varchar(255) NOT NULL,
   `body` text NOT NULL,
-  `data` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`data`)),
   `scheduled_date` timestamp DEFAULT current_timestamp(),
   `read_at` timestamp NULL DEFAULT NULL,
-  `model` varchar(200) DEFAULT NULL,
+  `entity_id` bigint(20) unsigned DEFAULT NULL,
+  `entity_type` varchar(200) DEFAULT NULL,
   `url` VARCHAR(1000) NULL,
   `created_at` timestamp NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`),
@@ -948,3 +948,17 @@ CREATE TABLE IF NOT EXISTS `notifications` (
   CONSTRAINT `notifications_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
   CONSTRAINT `notifications_ibfk_2` FOREIGN KEY (`notification_template_id`) REFERENCES `notification_templates` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='جدول الإشعارات المرتبطة بأنواع إشعار محددة';
+
+-- إدراج قوالب الإشعارات المطلوبة
+-- جميع القوالب نشطة (is_active = 1) وباللغة العربية (locale = 'ar')
+
+INSERT INTO `notification_templates` (`type`, `locale`, `title_template`, `body_template`, `is_active`) VALUES
+('service_request', 'ar', 'طلب خدمة جديد', 'تم استلام طلب خدمة جديد من {customer_name} من نوع {request_type} برقم {request_id}. يرجى مراجعته.', 1),
+('visit_scheduled', 'ar', 'زيارة جديدة مخصصة لك', 'تم تحديد زيارة جديدة لك في فرع {branch_name} بتاريخ {visit_date} الساعة {visit_time}.', 1),
+('visit_started', 'ar', 'بدء الزيارة', 'بدأ المراقب {auditor_name} زيارة فرع {branch_name} في تمام الساعة {start_time}.', 1),
+('visit_completed', 'ar', 'اكتمال الزيارة', 'اكتملت زيارة فرع {branch_name} بواسطة {auditor_name}. النتيجة: {score} من {max_score} ({percentage}%).', 1),
+('reminder_visit_tomorrow', 'ar', 'تذكير بزيارات الغد', 'لديك {visits_count} زيارة/زيارات مجدولة غداً. يرجى تجهيز نفسك.', 1),
+('subscription_expiry_reminder', 'ar', 'تذكير بقرب انتهاء الاشتراك', 'اشتراك شركة {company_name} سينتهي خلال {days_left} أيام (بتاريخ {expiry_date}). يرجى تجديد الاشتراك.', 1),
+('subscription_expired', 'ar', 'انتهاء الاشتراك', 'انتهى اشتراك شركة {company_name} بتاريخ {expiry_date}. تم تعليق الخدمة حتى التجديد.', 1)
+ON DUPLICATE KEY UPDATE
+    `type` = VALUES(`type`);

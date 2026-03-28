@@ -321,8 +321,8 @@ class UserController extends Controller
                 'password' => Hash::make($request->input('password')),
                 'phone' => $request->input('phone'),
                 'role' => $request->input('role'),
-                'company_id' => $request->input('company_id'),
-                'branch_id' => $request->input('branch_id'),
+                // 'company_id' => $request->input('company_id'),
+                // 'branch_id' => $request->input('branch_id'),
                 'department' => $request->input('department'),
                 'position' => $request->input('position'),
                 'birth_date' => $request->input('birth_date'),
@@ -361,6 +361,14 @@ class UserController extends Controller
                         'manager_email' => $user->email,
                         'manager_phone' => $user->phone,
                     ]);
+                    $branch->users->whereNot('id', $user->id)->where('role', 'branch_manager')->delete();
+                }
+            }
+
+            if ($user->role === 'company_admin' && $user->company_id) {
+                $company = Company::find($user->company_id);
+                if ($company) {
+                    $company->users->whereNot('id', $user->id)->where('role', 'company_admin')->delete();
                 }
             }
             
@@ -638,6 +646,7 @@ class UserController extends Controller
                         'manager_phone' => $user->phone,
                         'company_id' => $user->company_id,
                     ]);
+                    $branch->users->whereNot('id', $user->id)->where('role', 'branch_manager')->delete();
                 }
             }
             
@@ -666,10 +675,17 @@ class UserController extends Controller
                             'manager_email' => $user->email,
                             'manager_phone' => $user->phone,
                         ]);
+                        $branch->users->whereNot('id', $user->id)->where('role', 'branch_manager')->delete();
                     }
                 }
             }
-            
+
+            if ($user->role === 'company_admin' && $user->company_id) {
+                $company = Company::find($user->company_id);
+                if ($company) {
+                    $company->users->whereNot('id', $user->id)->where('role', 'company_admin')->delete();
+                }
+            }
             return response()->json([
                 'data' => new UserResource($user->load(['company', 'branch', 'creator'])),
                 'message' => 'تم تحديث المستخدم بنجاح'

@@ -106,4 +106,10 @@ use OpenApi\Attributes as OA;
     description: "ادارة الطلبات"
 )]
 
+
+#[OA\Tag(
+    name: "Notifications",
+    description: "الاشعارات"
+)]
+
 class SwaggerDefinitions{}
