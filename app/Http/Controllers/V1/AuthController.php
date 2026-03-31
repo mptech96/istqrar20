@@ -4,11 +4,13 @@ namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\User;
+use App\Models\User as UserLogin;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use OpenApi\Attributes as OA;
 use Illuminate\Support\Facades\Cookie;
+use Illuminate\Support\Facades\Auth;
+use App\Models\V1\User;
 
 class AuthController extends Controller
 {
@@ -66,11 +68,11 @@ class AuthController extends Controller
                 'password' => 'required',
             ]);
     
-            $user = User::where('email', $request->email)->first();
+            $userLogin = UserLogin::where('email', $request->email)->first();
             
-            //$user->update(['password' => Hash::make($request->password)]);
+            //$userLogin->update(['password' => Hash::make($request->password)]);
             
-            if (!$user || !Hash::check($request->password, $user->password)) {
+            if (!$userLogin || !Hash::check($request->password, $userLogin->password)) {
                 
                 app(\App\Http\Middleware\LoginThrottleMiddleware::class)->handleLoginAttempt($request->email, $request->ip(), false);
                 
@@ -78,28 +80,38 @@ class AuthController extends Controller
                     'email' => ['بيانات الدخول غير صحيحة.']
                 ]);
             }
-    
+
+            Auth::setUser($userLogin);
+
+            $user = User::find($userLogin->id);
+
             if (!$user->status) {
                 throw ValidationException::withMessages([
                     'email' => ['الحساب غير نشط.']
                 ]);
             }
             
-            //$user->tokens()->delete();
+            if (($user->role === 'company_admin' && !$user->company?->getActiveSubscription()) || ($user->role === 'branch_manager' && !$user->branch?->company?->getActiveSubscription())) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'الإشتراك غير صالح'
+                ]);
+            }
+            //$userLogin->tokens()->delete();
             
-            $user->update([
+            $userLogin->update([
                 'last_login_at' => now(),
                 'last_login_ip' => $request->ip()
             ]);
     
-            $token = encrypt($user->createToken("auth_token")->plainTextToken);
+            $token = encrypt($userLogin->createToken("auth_token")->plainTextToken);
             
             app(\App\Http\Middleware\LoginThrottleMiddleware::class)->handleLoginAttempt($request->email, $request->ip(), true);
             
             return response()->json([
                 'success' => true,
                 'data' => [
-                    'user' => $user,
+                    'user' => $userLogin,
                     'token' => $token
                 ],
                 'message' => 'تم تسجيل الدخول بنجاح'

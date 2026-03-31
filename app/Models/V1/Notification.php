@@ -5,6 +5,7 @@ namespace App\Models\V1;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 
 class Notification extends Model
 {
@@ -25,6 +26,22 @@ class Notification extends Model
         'read_at' => 'datetime',
         'created_at' => 'datetime',
     ];
+
+    protected static function booted()
+    {
+        static::addGlobalScope('noti', function (Builder $builder) {
+            if (auth()->check()){
+                
+                $user = auth()->user();
+                $builder->where('user_id', $user->id);
+
+            }
+            else {
+                $builder->whereRaw('1 = 0');
+            }
+        });
+
+    }
 
     public function entity()
     {

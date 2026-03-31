@@ -16,7 +16,7 @@ class Company extends Model
         'city', 'address', 'contact_person', 'logo', 'max_allowed_users', 'max_allowed_branches',
         'subscription_start', 'subscription_end', 'subscription_status',
         'total_branches', 'overall_score', 'category',
-        'status', 'is_verified'
+        'status', 'is_verified', 'ai_support'
     ];
 
     protected $casts = [
@@ -24,6 +24,7 @@ class Company extends Model
         'subscription_end' => 'date',
         'status' => 'boolean',
         'is_verified' => 'boolean',
+        'ai_support' => 'boolean',
         'overall_score' => 'decimal:2'
     ];
     
@@ -123,6 +124,32 @@ class Company extends Model
     public function scopeWithActiveSubscription($query)
     {
         return $query->where('subscription_status', 'active')
-                    ->where('subscription_end', '>', now());
+            ->where('subscription_end', '>', now());
     }
+
+    public function getActiveSubscription()
+    {
+        $company = $this->withActiveSubscription()->first();
+        if($company) {
+            if($company->status == 1) return true;
+        } else {
+            $this->update([
+                'subscription_status' => 'expired'
+            ]);
+        }
+        return false;
+    }
+
+    public function getRemainingSubscriptionDays()
+    {
+        if ($this->subscription_status !== 'active') {
+            return 0;
+        }
+        if (!$this->subscription_end || $this->subscription_end->isPast()) {
+            return 0;
+        }
+        return (Integer) now()->diffInDays($this->subscription_end);
+    }
+
+    
 }

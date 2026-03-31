@@ -47,6 +47,11 @@ class User extends Authenticatable
         ];
     }
     
+    public function visits()
+    {
+        return $this->hasMany(Visit::class, 'auditor_id');
+    }
+
     public function isSuperAdmin()
     {
         return $this->role === 'super_admin';

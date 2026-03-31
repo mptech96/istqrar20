@@ -103,6 +103,7 @@ class CompanyController extends Controller
                                     new OA\Property(property: 'email', type: 'string', example: 'info@company.com'),
                                     new OA\Property(property: 'phone', type: 'string', example: '+966500000000'),
                                     new OA\Property(property: 'status', type: 'boolean', example: true),
+                                    new OA\Property(property: 'ai_support', type: 'boolean', example: false),
                                     new OA\Property(property: 'subscription_status', type: 'string', example: 'active'),
                                     new OA\Property(property: 'subscription_end', type: 'string', format: 'date', example: '2026-12-31'),
                                     new OA\Property(property: 'created_at', type: 'string', format: 'date-time'),
@@ -263,7 +264,8 @@ class CompanyController extends Controller
                         ),
                         new OA\Property(property: 'category', type: 'string', example: 'تقنية المعلومات'),
                         new OA\Property(property: 'is_verified', type: 'boolean', example: false),
-                        
+                        new OA\Property(property: 'ai_support', type: 'boolean', example: false),
+
                         new OA\Property(property: 'user_id', type: 'integer', example: 2, description: 'في حال اضفت معرف المدير  يمكن تخطي باقي بيانات المدير'),
                         new OA\Property(property: 'user_name', type: 'string', example: 'مدير الشركة'),
                         new OA\Property(property: 'user_email', type: 'string', format: 'email', example: 'manager@company.com'),
@@ -347,6 +349,7 @@ class CompanyController extends Controller
                 'subscription_end' => $request->input('subscription_end'),
                 'subscription_status' => $request->input('subscription_status'),
                 'category' => $request->input('category'),
+                'ai_support' => $request->input('ai_support'),
 
                 'max_allowed_users' => $request->input('max_allowed_users'),
                 'max_allowed_branches' => $request->input('max_allowed_branches'),
@@ -492,13 +495,9 @@ class CompanyController extends Controller
                         new OA\Property(property: 'max_allowed_branches', type: 'integer',example: 1, description: 'عدد الفروع المسموح للشركة'),
                         new OA\Property(property: 'user_id', type: 'integer', example: 2),
 
-                        new OA\Property(
-                            property: 'subscription_status',
-                            type: 'string',
-                            enum: ['active', 'inactive', 'suspended'],
-                            example: 'active'
-                        ),
+                        new OA\Property(property: 'subscription_status', type: 'string', enum: ['active', 'inactive', 'suspended'], example: 'active'),
                         new OA\Property(property: 'is_verified', type: 'boolean', example: true),
+                        new OA\Property(property: 'ai_support', type: 'boolean', example: false),
                     ]
                 )
             )
@@ -559,6 +558,7 @@ class CompanyController extends Controller
             'max_allowed_branches' => ['sometimes', 'integer', 'min:0'],
             //'status' => ['sometimes'],
             'is_verified' => ['sometimes', 'boolean'],
+            'ai_support' => ['sometimes', 'boolean'],
             'user_id' => ['sometimes', 'nullable', 'integer', 'exists:users,id'],
         ]);
 
@@ -566,7 +566,7 @@ class CompanyController extends Controller
         $data = collect($request->only([
             'name', 'email', 'phone', 'commercial_registration', 'city',
             'address', 'contact_person', 'subscription_start', 'subscription_end',
-            'subscription_status', 'max_allowed_users', 'max_allowed_branches', 'is_verified'
+            'subscription_status', 'max_allowed_users', 'max_allowed_branches', 'is_verified', 'ai_support'
         ]))->filter(fn($value) => filled($value))->toArray();
 
         // معالجة خاصة لحقل status (boolean)

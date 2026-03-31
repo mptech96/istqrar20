@@ -3996,6 +3996,10 @@
                                                         "type": "boolean",
                                                         "example": true
                                                     },
+                                                    "ai_support": {
+                                                        "type": "boolean",
+                                                        "example": false
+                                                    },
                                                     "subscription_status": {
                                                         "type": "string",
                                                         "example": "active"
@@ -4174,6 +4178,10 @@
                                         "example": "تقنية المعلومات"
                                     },
                                     "is_verified": {
+                                        "type": "boolean",
+                                        "example": false
+                                    },
+                                    "ai_support": {
                                         "type": "boolean",
                                         "example": false
                                     },
@@ -4554,6 +4562,10 @@
                                     "is_verified": {
                                         "type": "boolean",
                                         "example": true
+                                    },
+                                    "ai_support": {
+                                        "type": "boolean",
+                                        "example": false
                                     }
                                 },
                                 "type": "object"
@@ -6620,36 +6632,6 @@
                 "responses": {
                     "200": {
                         "description": "تفاصيل الإشعار"
-                    },
-                    "404": {
-                        "description": "الإشعار غير موجود"
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            },
-            "delete": {
-                "tags": [
-                    "Notifications"
-                ],
-                "summary": "حذف إشعار",
-                "operationId": "deleteNotification",
-                "parameters": [
-                    {
-                        "name": "notification",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "تم حذف الإشعار بنجاح"
                     },
                     "404": {
                         "description": "الإشعار غير موجود"

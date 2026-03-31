@@ -6,6 +6,8 @@ namespace App\Http\Controllers\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\V1\NotificationResource;
 use App\Models\V1\Notification;
+use App\Models\Visit;
+use App\Models\Company;
 use App\Models\V1\NotificationTemplate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -35,14 +37,7 @@ class NotificationController extends Controller
     )]
     public function index(Request $request)
     {
-        $user = auth()->user();
-
-        // Determine query scope: admin sees all, others see only their own
-        if (in_array($user->role, ['super_admin', 'admin'])) {
-            $query = Notification::query();
-        } else {
-            $query = Notification::where('user_id', $user->id);
-        }
+        $query = Notification::query();
 
         // Filter by read/unread
         if ($request->has('read')) {
@@ -68,7 +63,7 @@ class NotificationController extends Controller
             $query->whereDate('created_at', '<=', $request->to_date);
         }
 
-        $notifications = $query->with(['user', 'template'])
+        $notifications = $query->with(['user', 'template', 'entity'])
             ->orderBy('created_at', 'desc')
             ->paginate($request->input('per_page', 15));
 
@@ -144,12 +139,6 @@ class NotificationController extends Controller
     )]
     public function show(Notification $notification)
     {
-        // Check permission: user can view only his own notifications unless admin
-        $user = auth()->user();
-        if (!in_array($user->role, ['super_admin', 'admin']) && $notification->user_id != $user->id) {
-            return response()->json(['message' => 'غير مصرح لك بعرض هذا الإشعار'], 403);
-        }
-
         return new NotificationResource($notification->load(['user', 'template']));
     }
 
@@ -169,11 +158,6 @@ class NotificationController extends Controller
     )]
     public function markAsRead(Notification $notification)
     {
-        $user = auth()->user();
-        if (!in_array($user->role, ['super_admin', 'admin']) && $notification->user_id != $user->id) {
-            return response()->json(['message' => 'غير مصرح لك'], 403);
-        }
-
         $notification->markAsRead();
 
         return response()->json(['message' => 'تم تحديث الإشعار كمقروء']);
@@ -195,11 +179,6 @@ class NotificationController extends Controller
     // )]
     // public function destroy(Notification $notification)
     // {
-    //     $user = auth()->user();
-    //     if (!in_array($user->role, ['super_admin', 'admin']) && $notification->user_id != $user->id) {
-    //         return response()->json(['message' => 'غير مصرح لك'], 403);
-    //     }
-
     //     $notification->delete();
 
     //     return response()->json(['message' => 'تم حذف الإشعار بنجاح']);
@@ -220,9 +199,7 @@ class NotificationController extends Controller
     )]
     public function markAllAsRead()
     {
-        $user = auth()->user();
-        $count = Notification::where('user_id', $user->id)
-            ->whereNull('read_at')
+        $count = Notification::whereNull('read_at')
             ->update(['read_at' => now()]);
 
         return response()->json(['message' => "تم تحديث {$count} إشعار كمقروء"]);
@@ -238,5 +215,36 @@ class NotificationController extends Controller
         }
         
         return $template;
+    }
+
+    public function subscription_expired()
+    {
+        $companies = Company::todaySubscriptionExpired()->get();
+        foreach($companies as $company){
+            if($company->getRemainingSubscriptionDays() == 0){
+                app(\App\Services\V1\NotificationService::class)->subscription_expired($company);
+            }
+        }
+        return response()->json(['status' => true]);
+    }
+
+    public function subscription_expiry_reminder()
+    {
+        $companies = Company::todaySubscriptionExpired()->get();
+        foreach($companies as $company){
+            if($company->getRemainingSubscriptionDays() == 5){
+                app(\App\Services\V1\NotificationService::class)->subscription_expiry_reminder($company);
+            }
+        }
+        return response()->json(['status' => true]);
+    }
+
+    public function reminder_visit_tomorrow()
+    {
+        $visits = Visit::tomorrowVisits()->get();
+        foreach($visits as $visit){
+            app(\App\Services\V1\NotificationService::class)->reminder_visit_tomorrow($visit);
+        }
+        return response()->json(['status' => true]);
     }
 }

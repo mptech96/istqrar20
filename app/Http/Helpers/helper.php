@@ -164,6 +164,14 @@ if (!function_exists('____sql')) {
         }
         
         try{
+            if (! Schema::hasColumn('companies', 'ai_support') ) {
+                DB::statement("ALTER TABLE companies ADD COLUMN ai_support tinyint(1) NOT NULL DEFAULT 0 COMMENT '0: false, 1: true' AFTER is_verified;");
+            }
+        }catch (\Exception $e) {
+            return $e->getMessage();
+        }
+
+        try{
             if (! Schema::hasColumn('users', 'token') ) {
                 DB::statement("ALTER TABLE users ADD COLUMN token VARCHAR(500) NULL DEFAULT NULL AFTER role;");
             }
@@ -216,62 +224,6 @@ if (!function_exists('____sql')) {
             return $e->getMessage();
         }
         
-    }
-
-}
-
-if (!function_exists('__tr')) {
-
-    function __tr($key, $locale = null)
-    {
-        if($locale == null){
-            $locale = \App::getLocale();
-       }
-
-        $langPath = base_path('lang');
-
-        if (!File::exists($langPath)) {
-            File::makeDirectory($langPath, 0755, true);
-        }
-
-        $filePath = $langPath . "/{$locale}.json";
-
-        if (!File::exists($filePath)) {
-            File::put($filePath, json_encode([]));
-        }
-
-        // قراءة الملف الأصلي
-        $translations = json_decode(File::get($filePath), true);
-
-        // تحويل كل المفاتيح إلى lowercase
-        $normalizedTranslations = [];
-        $needsRewrite = false;
-
-        foreach ($translations ?? [] as $existingKey => $value) {
-            $lowerKey = mb_strtolower($existingKey);
-            if ($lowerKey !== $existingKey) {
-                $needsRewrite = true;
-            }
-
-            // نحتفظ بأحدث قيمة في حال التكرار
-            $normalizedTranslations[$lowerKey] = $value;
-        }
-
-        // المفتاح الحالي
-        $normalizedKey = mb_strtolower($key);
-
-        // إذا لم يكن المفتاح موجودًا نضيفه
-        if (!array_key_exists($normalizedKey, $normalizedTranslations)) {
-            $normalizedTranslations[$normalizedKey] = $key;
-            $needsRewrite = true;
-        }
-
-        // نكتب الملف فقط إذا كان هناك تغيير
-        if ($needsRewrite) {
-            File::put($filePath, json_encode($normalizedTranslations, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
-        }
-
-        return $normalizedTranslations[$normalizedKey];
     }
 
 }

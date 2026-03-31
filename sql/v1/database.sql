@@ -26,6 +26,7 @@ CREATE TABLE IF NOT EXISTS `companies` (
     
     `status` tinyint(1) NOT NULL DEFAULT 1 COMMENT '0: inactive, 1: active',
     `is_verified` tinyint(1) NOT NULL DEFAULT 0 COMMENT '0: not verified, 1: verified',
+    `ai_support` tinyint(1) NOT NULL DEFAULT 0 COMMENT '0: false, 1: true',
     
     `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
     `updated_at` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),

@@ -560,11 +560,13 @@ class UserController extends Controller
             ),
         ]
     )]
+    
     public function update(UpdateUserRequest $request, User $user)
     {
         return DB::transaction(function () use ($request, $user) {
             $oldRole = $user->role;
             $oldBranchId = $user->branch_id;
+            $oldCompanyId = $user->company_id;
             
             // Handle file uploads
             if ($request->hasFile('municipality_certificate')) {
@@ -646,7 +648,12 @@ class UserController extends Controller
                         'manager_phone' => $user->phone,
                         'company_id' => $user->company_id,
                     ]);
-                    $branch->users->whereNot('id', $user->id)->where('role', 'branch_manager')->delete();
+                    
+                    // حذف أي مدير فرع آخر في نفس الفرع
+                    User::where('branch_id', $user->branch_id)
+                        ->where('role', 'branch_manager')
+                        ->where('id', '!=', $user->id)
+                        ->delete();
                 }
             }
             
@@ -675,17 +682,31 @@ class UserController extends Controller
                             'manager_email' => $user->email,
                             'manager_phone' => $user->phone,
                         ]);
-                        $branch->users->whereNot('id', $user->id)->where('role', 'branch_manager')->delete();
+                        
+                        // حذف أي مدير فرع آخر في الفرع الجديد
+                        User::where('branch_id', $user->branch_id)
+                            ->where('role', 'branch_manager')
+                            ->where('id', '!=', $user->id)
+                            ->delete();
                     }
                 }
             }
 
+            // Handle company admin logic
             if ($user->role === 'company_admin' && $user->company_id) {
                 $company = Company::find($user->company_id);
                 if ($company) {
-                    $company->users->whereNot('id', $user->id)->where('role', 'company_admin')->delete();
+                    // حذف أي مشرف شركة آخر في نفس الشركة
+                    User::where('company_id', $user->company_id)
+                        ->where('role', 'company_admin')
+                        ->where('id', '!=', $user->id)
+                        ->delete();
                 }
+            } elseif ($oldRole === 'company_admin' && $user->role !== 'company_admin' && $oldCompanyId) {
+                // إذا تم تغيير دور المستخدم من company_admin إلى دور آخر
+                // يمكن إضافة منطق إضافي هنا إذا لزم الأمر
             }
+            
             return response()->json([
                 'data' => new UserResource($user->load(['company', 'branch', 'creator'])),
                 'message' => 'تم تحديث المستخدم بنجاح'

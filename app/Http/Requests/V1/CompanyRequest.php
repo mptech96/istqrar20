@@ -27,6 +27,7 @@ class CompanyRequest extends FormRequest
             'logo' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
             'max_allowed_users' => ['nullable', 'integer', 'min:2'],
             'max_allowed_branches' => ['nullable', 'integer', 'min:1'],
+            'ai_support' => ['nullable', 'boolean'],
 
             'subscription_start' => ['required', 'date', 'after_or_equal:today'],
             'subscription_end' => ['required', 'date', 'after:subscription_start'],
@@ -123,6 +124,8 @@ class CompanyRequest extends FormRequest
             'category.string' => 'حقل التصنيف يجب أن يكون نصاً.',
             'category.max' => 'حقل التصنيف لا يتجاوز 100 حرفاً.',
             
+            'ai_support.boolean' => 'حقل دعم الذكاء الاصطناعي يجب أن يكون قيمة منطقية (true/false).',
+
             // رسائل حقول مدير الشركة
             'user_id.integer' => 'معرف المستخدم يجب أن يكون رقماً صحيحاً.',
             'user_id.exists' => 'المستخدم المحدد غير موجود.',
@@ -153,5 +156,18 @@ class CompanyRequest extends FormRequest
             'user_gender.integer' => 'حقل الجنس يجب أن يكون رقماً صحيحاً.',
             'user_gender.in' => 'قيم الجنس المقبولة هي 1, 2, 3.',
         ];
+    }
+
+    protected function prepareForValidation(): void
+    {
+        if (!$this->has('ai_support')) {
+            $this->merge([
+                'ai_support' => false,
+            ]);
+        } else {
+            $this->merge([
+                'ai_support' => filter_var($this->input('ai_support'), FILTER_VALIDATE_BOOLEAN),
+            ]);
+        }
     }
 }
