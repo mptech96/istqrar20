@@ -9,8 +9,10 @@ class BranchResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
-        $percentage = ($this->visits?->last()?->percentage ?? ($this->compliance_score ? (float) $this->compliance_score : 0.00));
+        // $percentage = ($this->visits?->last()?->percentage ?? ($this->compliance_score ? (float) $this->compliance_score : 0.00));
 
+        $percentage = round($this->visits()->whereYear('created_at', $this->visits()->latest()->value('created_at')?->year ?? now()->year)?->avg('percentage'), 2);
+       
         return [
             'id' => $this->id,
             'company_id' => $this->company_id,

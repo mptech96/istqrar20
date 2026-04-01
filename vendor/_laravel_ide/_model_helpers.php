@@ -1828,6 +1828,7 @@ namespace App\Models\V1 {
      * @property \Illuminate\Support\Carbon|null $deleted_at
      * @property \Illuminate\Support\Carbon|null $updated_at
      * @property \Illuminate\Support\Carbon $created_at
+     * @property boolean $ai_support
      * @property boolean $is_verified
      * @property boolean $status
      * @property string|null $category
@@ -1877,6 +1878,7 @@ namespace App\Models\V1 {
      * @method static \Illuminate\Database\Eloquent\Builder<Company>|Company whereCategory($value)
      * @method static \Illuminate\Database\Eloquent\Builder<Company>|Company whereStatus($value)
      * @method static \Illuminate\Database\Eloquent\Builder<Company>|Company whereIsVerified($value)
+     * @method static \Illuminate\Database\Eloquent\Builder<Company>|Company whereAiSupport($value)
      * @method static \Illuminate\Database\Eloquent\Builder<Company>|Company whereCreatedAt($value)
      * @method static \Illuminate\Database\Eloquent\Builder<Company>|Company whereUpdatedAt($value)
      * @method static \Illuminate\Database\Eloquent\Builder<Company>|Company whereDeletedAt($value)
@@ -6867,6 +6869,7 @@ namespace App\Models {
      * @property \Illuminate\Support\Carbon|null $deleted_at
      * @property \Illuminate\Support\Carbon|null $updated_at
      * @property \Illuminate\Support\Carbon $created_at
+     * @property bool $ai_support
      * @property boolean $is_verified
      * @property boolean $status
      * @property string|null $category
@@ -6906,6 +6909,7 @@ namespace App\Models {
      * @method static \Illuminate\Database\Eloquent\Builder<Company>|Company whereCategory($value)
      * @method static \Illuminate\Database\Eloquent\Builder<Company>|Company whereStatus($value)
      * @method static \Illuminate\Database\Eloquent\Builder<Company>|Company whereIsVerified($value)
+     * @method static \Illuminate\Database\Eloquent\Builder<Company>|Company whereAiSupport($value)
      * @method static \Illuminate\Database\Eloquent\Builder<Company>|Company whereCreatedAt($value)
      * @method static \Illuminate\Database\Eloquent\Builder<Company>|Company whereUpdatedAt($value)
      * @method static \Illuminate\Database\Eloquent\Builder<Company>|Company whereDeletedAt($value)

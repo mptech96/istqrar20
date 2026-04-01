@@ -61,8 +61,12 @@ class DeepAnalysisController extends Controller
     )]
     public function analyze(Request $request, Visit $visit)
     {
+        if(!$visit->company->ai_support) {
+            return response()->json([
+                'message' => 'الخدمة ليست متاحة لك؛ تواصل مع المسؤول لتفعيلها.'
+            ], 403);
+        }
         $user = auth()->user();
-
         // التحقق من صلاحية المستخدم
         if (!$this->canAccessAnalysis($user, $visit)) {
             return response()->json([
