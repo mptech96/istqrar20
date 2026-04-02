@@ -2475,6 +2475,23 @@ class VisitController extends Controller
                                     new OA\Property(property: 'branch', type: 'string', example: 'فرع 1'),
                                     new OA\Property(property: 'auditor', type: 'string', example: 'احمد'),
                                     new OA\Property(property: 'company', type: 'string', example: 'شركة 1'),
+
+                                    new OA\Property(
+                                        property: 'criteria_scores',
+                                        type: 'array',
+                                        items: new OA\Items(
+                                            type: 'object',
+                                            properties: [
+                                                new OA\Property(property: 'criteria_name', type: 'string', example: 'معيار نظافة المطبخ ومناطق التحضير'),
+                                                new OA\Property(property: 'earned_points', type: 'integer', example: 17),
+                                                new OA\Property(property: 'possible_points', type: 'integer', example: 100),
+                                                new OA\Property(property: 'percentage', type: 'integer', example: '1.0'),
+                                                new OA\Property(property: 'level', type: 'string', example: 'ممتاز'),
+                                                new OA\Property(property: 'level_color', type: 'string', example: '#28a745'),
+                                                new OA\Property(property: 'weight', type: 'integer', example: 12.00),
+                                            ]
+                                        )
+                                    ),
                                     new OA\Property(property: 'created_at', type: 'string', format: 'date-time', example: '2026-02-05 02:00:00 AM'),
                                 ]
                             )

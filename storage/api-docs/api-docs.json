@@ -15055,6 +15055,42 @@
                                                         "type": "string",
                                                         "example": "شركة 1"
                                                     },
+                                                    "criteria_scores": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "properties": {
+                                                                "criteria_name": {
+                                                                    "type": "string",
+                                                                    "example": "معيار نظافة المطبخ ومناطق التحضير"
+                                                                },
+                                                                "earned_points": {
+                                                                    "type": "integer",
+                                                                    "example": 17
+                                                                },
+                                                                "possible_points": {
+                                                                    "type": "integer",
+                                                                    "example": 100
+                                                                },
+                                                                "percentage": {
+                                                                    "type": "integer",
+                                                                    "example": "1.0"
+                                                                },
+                                                                "level": {
+                                                                    "type": "string",
+                                                                    "example": "ممتاز"
+                                                                },
+                                                                "level_color": {
+                                                                    "type": "string",
+                                                                    "example": "#28a745"
+                                                                },
+                                                                "weight": {
+                                                                    "type": "integer",
+                                                                    "example": 12
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    },
                                                     "created_at": {
                                                         "type": "string",
                                                         "format": "date-time",
