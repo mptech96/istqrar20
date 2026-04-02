@@ -134,4 +134,11 @@ class Branch extends Model
               ->orWhere('manager_name', 'like', "%{$search}%");
         });
     }
+
+
+    public function getAverageScoreAttribute()
+    {
+        return $this->visits()->whereYear('created_at', $this->visits()->latest()->value('created_at')?->year ?? now()->year)?->avg('percentage');
+    }
+
 }

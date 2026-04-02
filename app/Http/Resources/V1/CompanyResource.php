@@ -33,7 +33,7 @@ class CompanyResource extends JsonResource
             'is_verified' => (bool) $this->is_verified,
             'ai_support' => (bool) $this->ai_support,
             'is_subscription_active' => $this->is_subscription_active,
-            'average_score' => (float) $this->average_score,
+            'average_score' => (float) round($this->average_score, 2),
             'remaining_subscription_days' => $this->getRemainingSubscriptionDays(),
             'created_at' => $this->created_at?->format('Y-m-d | h:m:s A'),
             'updated_at' => $this->updated_at?->format('Y-m-d | h:m:s A'),

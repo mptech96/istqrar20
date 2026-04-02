@@ -97,7 +97,10 @@ class Company extends Model
      */
     public function getAverageScoreAttribute()
     {
-        return $this->branches()->avg('compliance_score') ?? 0.00;
+        return $this->branches->map(function($branch) {
+            return $branch->visits()
+                ->whereYear('created_at', $branch->visits()->latest()->value('created_at')?->year ?? now()->year)?->avg('percentage');
+        })->filter()->avg();
     }
 
     /**
