@@ -243,4 +243,105 @@ class Visit extends Model
         if ($percentage >= 60) return 'مقبول';
         return 'ضعيف';
     }
+
+
+
+    /**
+     * الحصول على تفاصيل النقاط لكل معيار في الزيارة
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function getCriteriaScores(): \Illuminate\Support\Collection
+    {
+        // جلب جميع إجابات الزيارة مع علاقات الأسئلة والمعايير ونطاقات المعايير
+        $answers = $this->answers()
+            ->with(['question.criteria.ranges'])
+            ->get();
+
+        // تجميع النتائج حسب المعيار
+        $criteriaScores = [];
+
+        foreach ($answers as $answer) {
+            $question = $answer->question;
+            if (!$question || !$question->criteria) {
+                continue; // تجاهل الأسئلة غير المرتبطة بمعيار
+            }
+
+            $criteria = $question->criteria;
+            $criteriaId = $criteria->id;
+
+            if (!isset($criteriaScores[$criteriaId])) {
+                $criteriaScores[$criteriaId] = [
+                    'criteria_name' => $criteria->name,
+                    'total_earned' => 0,
+                    'total_possible' => 0,
+                    'weight' => $criteria->weight,
+                ];
+            }
+
+            $criteriaScores[$criteriaId]['total_earned'] += $answer->score ?? 0;
+            $criteriaScores[$criteriaId]['total_possible'] += $question->max_score ?? 0;
+        }
+
+        // حساب النسبة المئوية وتحديد المستوى لكل معيار
+        $results = collect();
+        foreach ($criteriaScores as $data) {
+            $percentage = $data['total_possible'] > 0
+                ? round(($data['total_earned'] / $data['total_possible']) * 100, 2)
+                : 0;
+
+            // البحث عن نطاق المستوى المناسب
+            $level = $this->getCriteriaLevel($percentage, $data['criteria_name']);
+
+            $results->push([
+                'criteria_name' => $data['criteria_name'],
+                'earned_points' => $data['total_earned'],
+                'possible_points' => $data['total_possible'],
+                'percentage' => $percentage,
+                'level' => $level['name'],
+                'level_color' => $level['color'],
+                'weight' => $data['weight'],
+            ]);
+        }
+
+        return $results;
+    }
+
+    /**
+     * تحديد مستوى المعيار بناءً على النسبة المئوية والنطاقات المسجلة
+     *
+     * @param float $percentage
+     * @param string $criteriaName
+     * @return array
+     */
+    private function getCriteriaLevel(float $percentage, string $criteriaName): array
+    {
+        // البحث عن النطاق المناسب من جدول criteria_ranges
+        $range = \App\Models\V1\CriteriaRange::whereHas('criteria', function ($q) use ($criteriaName) {
+            $q->where('name', $criteriaName);
+        })->where('min_score', '<=', $percentage)
+        ->where('max_score', '>=', $percentage)
+        ->first();
+
+        if ($range) {
+            return [
+                'name' => $range->name,
+                'color' => $range->color ?? 'secondary',
+            ];
+        }
+
+        // القيم الافتراضية في حال عدم وجود نطاقات محددة
+        if ($percentage >= 90) {
+            return ['name' => 'ممتاز', 'color' => 'success'];
+        } elseif ($percentage >= 75) {
+            return ['name' => 'جيد جداً', 'color' => 'primary'];
+        } elseif ($percentage >= 60) {
+            return ['name' => 'جيد', 'color' => 'info'];
+        } elseif ($percentage >= 50) {
+            return ['name' => 'مقبول', 'color' => 'warning'];
+        } else {
+            return ['name' => 'ضعيف', 'color' => 'danger'];
+        }
+    }
+
 }

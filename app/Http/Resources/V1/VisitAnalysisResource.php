@@ -67,7 +67,8 @@ class VisitAnalysisResource extends JsonResource
             'previous_visit'          => $this->whenLoaded('previousVisit'),
 
             'has_critical_issues'     => $this->hasCriticalIssues(),
-            
+            'criteria_scores'     => $this->visit->getCriteriaScores(),
+        
             'created_at' => $this->created_at?->format('Y-m-d | h:i:s A'),
             'updated_at' => $this->updated_at?->format('Y-m-d | h:i:s A'),
             'deleted_at' => $this->deleted_at?->format('Y-m-d | h:i:s A'),
