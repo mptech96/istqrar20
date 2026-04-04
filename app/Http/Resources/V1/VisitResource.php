@@ -4,6 +4,7 @@ namespace App\Http\Resources\V1;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Carbon\Carbon;
 
 class VisitResource extends JsonResource
 {
@@ -37,7 +38,6 @@ class VisitResource extends JsonResource
             'end_longitude' => $this->end_longitude,
             'location_url' => $this->location_url,
             'location_address' => $this->location_address,
-
             
             // النتائج
             'total_score' => (float) $this->total_score,
@@ -48,8 +48,11 @@ class VisitResource extends JsonResource
             'category_text' => $this->getCategoryText(),
             
             // الحالة
-            'status' => $this->status,
+            'status' => $this->getStatus(),
             'status_text' => $this->getStatusText(),
+            
+            // الوقت المتبقي بالثواني
+            'remaining_seconds' => $this->getRemainingSeconds(),
             
             // الموافقات
             'approved_by' => $this->approved_by,
@@ -84,9 +87,62 @@ class VisitResource extends JsonResource
         ];
     }
 
+    /**
+     * حساب الحالة مع مراعاة انتهاء الوقت
+     */
+    private function getStatus(): string
+    {
+        // إذا كانت الزيارة مكتملة أو ملغاة أو معتمدة أو مرفوضة، نرجع الحالة الأصلية
+        if (in_array($this->status, ['completed', 'cancelled', 'approved', 'rejected'])) {
+            return $this->status;
+        }
+        
+        // إذا انتهى الوقت المحدد للزيارة ولم تكتمل
+        $remainingSeconds = $this->getRemainingSeconds();
+        if ($remainingSeconds !== null && $remainingSeconds <= 0) {
+            return 'incomplete'; // غير مكتملة
+        }
+        
+        // غير ذلك نرجع الحالة الأصلية
+        return $this->status;
+    }
+
+    /**
+     * حساب الوقت المتبقي لانتهاء الزيارة بالثواني
+     */
+    private function getRemainingSeconds(): ?int
+    {
+        // إذا كانت الزيارة مكتملة أو ملغاة أو معتمدة، لا حاجة لحساب الوقت
+        if (in_array($this->status, ['completed', 'cancelled', 'approved', 'rejected'])) {
+            return null;
+        }
+        
+        // إذا لم يبدأ الوقت الفعلي بعد، أو لا يوجد وقت محدد
+        if (!$this->scheduled_date || !$this->scheduled_time || !$this->estimated_duration) {
+            return null;
+        }
+        
+        try {
+            // وقت بدء الزيارة المتوقع
+            $startDateTime = Carbon::parse($this->scheduled_date->format('Y-m-d') . ' ' . $this->scheduled_time);
+            
+            // وقت انتهاء الزيارة المتوقع
+            $endDateTime = $startDateTime->copy()->addMinutes($this->estimated_duration);
+            
+            $now = Carbon::now();
+            
+            // الوقت المتبقي بالثواني (قد يكون سالباً إذا انتهى الوقت)
+            return (int) $now->diffInSeconds($endDateTime, false);
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
     private function getStatusText(): string
     {
-        return match ($this->status) {
+        $status = $this->getStatus();
+        
+        return match ($status) {
             'draft' => 'مسودة',
             'scheduled' => 'مجدولة',
             'in_progress' => 'قيد التنفيذ',
@@ -95,6 +151,7 @@ class VisitResource extends JsonResource
             'under_review' => 'قيد المراجعة',
             'approved' => 'معتمدة',
             'rejected' => 'مرفوضة',
+            'incomplete' => 'غير مكتملة (انتهى الوقت)',
             default => 'غير معروف',
         };
     }
