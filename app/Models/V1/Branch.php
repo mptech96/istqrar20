@@ -138,7 +138,7 @@ class Branch extends Model
 
     public function getAverageScoreAttribute()
     {
-        return $this->visits()->whereYear('created_at', $this->visits()->latest()->value('created_at')?->year ?? now()->year)?->avg('percentage');
+        return $this->visits()->completed()->whereYear('created_at', $this->visits()->latest()->value('created_at')?->year ?? now()->year)?->avg('percentage');
     }
 
 }

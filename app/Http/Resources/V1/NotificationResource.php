@@ -14,20 +14,6 @@ class NotificationResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        $entity = null;
-
-        if($this->template->type == 'service_request') {
-            $entity = new ServiceRequestResource($this->entity);
-
-        }elseif($this->template->type == 'reminder_visit_tomorrow') {
-            $entity = new UserResource($this->entity);
-
-        }elseif(n_array($this->template->type , ['visit_scheduled', 'visit_started', 'visit_completed'])) {
-            $entity = new VisitResource($this->entity);
-            
-        }elseif(n_array($this->template->type , ['subscription_expiry_reminder', 'subscription_expired'])) {
-            $entity = new CompanyResource($this->entity);
-        }
         return [
             'id' => $this->id,
             'user_id' => $this->user_id,
@@ -38,7 +24,7 @@ class NotificationResource extends JsonResource
             'entity_id' => $this->entity_id,
             'entity_type' => $this->entity_type,
             'url' => $this->url,
-            'entity' => $entity,
+            'entity' => $this->entity,
             'created_at' => $this->created_at?->format('Y-m-d H:i:s'),
         ];
     }
