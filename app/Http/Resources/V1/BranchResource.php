@@ -38,8 +38,8 @@ class BranchResource extends JsonResource
             'compliance_formatted' => $percentage ? number_format($percentage, 2) . '%' : null,
 
             'category' => $this->category,
-            'total_visits' => $this->total_visits,
-            'last_visit_date' => $this->last_visit_date?->format('Y-m-d'),
+            'total_visits' => $this->visits()->completed()?->count(),
+            'last_visit_date' => $this->visits()->completed()->latest()->first()?->visit_date,
             'next_scheduled_visit' => $this->next_scheduled_visit?->format('Y-m-d'),
             
             // Status

@@ -25,7 +25,7 @@ class CompanyResource extends JsonResource
             'subscription_start' => $this->subscription_start,
             'subscription_end' => $this->subscription_end,
             'subscription_status' => $this->subscription_status,
-            'total_branches' => $this->total_branches,
+            'total_branches' => $this->branches()->active()?->count(),
             'overall_score' => (float) $this->overall_score,
             'category' => $this->category,
             'status' => (bool) $this->status,
