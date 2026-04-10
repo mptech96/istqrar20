@@ -204,7 +204,7 @@ class ChecklistController extends Controller
             }
         }
         
-        $checklists = $query->with($with)->paginate($request->input('per_page', 15));
+        $checklists = $query->with($with)->paginate($request->input('per_page', setting('items_per_page', '15', 'system')));
         
         return (ChecklistResource::collection($checklists));
     }

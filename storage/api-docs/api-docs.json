@@ -1896,6 +1896,16 @@
                                 "desc"
                             ]
                         }
+                    },
+                    {
+                        "name": "include",
+                        "in": "query",
+                        "description": "العلاقات المطلوب تضمينها",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "company,manager,users,visits"
+                        }
                     }
                 ],
                 "responses": {
@@ -3963,6 +3973,16 @@
                                 "desc"
                             ]
                         }
+                    },
+                    {
+                        "name": "include",
+                        "in": "query",
+                        "description": "العلاقات المطلوب تضمينها",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "manager"
+                        }
                     }
                 ],
                 "responses": {
@@ -3982,32 +4002,75 @@
                                                     },
                                                     "name": {
                                                         "type": "string",
-                                                        "example": "شركة الجودة"
+                                                        "example": "شركة التقنية المحدودة"
                                                     },
                                                     "email": {
                                                         "type": "string",
-                                                        "example": "info@company.com"
+                                                        "example": "company@example.com"
                                                     },
                                                     "phone": {
                                                         "type": "string",
                                                         "example": "+966500000000"
                                                     },
-                                                    "status": {
-                                                        "type": "boolean",
-                                                        "example": true
+                                                    "commercial_registration": {
+                                                        "type": "string",
+                                                        "example": "1010123456"
                                                     },
-                                                    "ai_support": {
-                                                        "type": "boolean",
-                                                        "example": false
+                                                    "city": {
+                                                        "type": "string",
+                                                        "example": "الرياض"
+                                                    },
+                                                    "latitude": {
+                                                        "type": "number",
+                                                        "format": "float",
+                                                        "example": 24.7136
+                                                    },
+                                                    "longitude": {
+                                                        "type": "number",
+                                                        "format": "float",
+                                                        "example": 46.6753
+                                                    },
+                                                    "address": {
+                                                        "type": "string",
+                                                        "example": "حي النخيل، شارع الملك فهد"
+                                                    },
+                                                    "contact_person": {
+                                                        "type": "string",
+                                                        "example": "أحمد محمد"
+                                                    },
+                                                    "logo": {
+                                                        "type": "string",
+                                                        "format": "binary"
+                                                    },
+                                                    "subscription_start": {
+                                                        "type": "string",
+                                                        "format": "date",
+                                                        "example": "2024-01-01"
+                                                    },
+                                                    "subscription_end": {
+                                                        "type": "string",
+                                                        "format": "date",
+                                                        "example": "2024-12-31"
                                                     },
                                                     "subscription_status": {
                                                         "type": "string",
                                                         "example": "active"
                                                     },
-                                                    "subscription_end": {
+                                                    "category": {
                                                         "type": "string",
-                                                        "format": "date",
-                                                        "example": "2026-12-31"
+                                                        "example": "تقنية المعلومات"
+                                                    },
+                                                    "status": {
+                                                        "type": "boolean",
+                                                        "example": true
+                                                    },
+                                                    "is_verified": {
+                                                        "type": "boolean",
+                                                        "example": false
+                                                    },
+                                                    "ai_support": {
+                                                        "type": "boolean",
+                                                        "example": false
                                                     },
                                                     "created_at": {
                                                         "type": "string",
@@ -4102,6 +4165,8 @@
                                     "commercial_registration",
                                     "city",
                                     "address",
+                                    "latitude",
+                                    "longitude",
                                     "contact_person",
                                     "subscription_start",
                                     "subscription_end",
@@ -4135,6 +4200,16 @@
                                     "address": {
                                         "type": "string",
                                         "example": "حي النخيل، شارع الملك فهد"
+                                    },
+                                    "latitude": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 24.7136
+                                    },
+                                    "longitude": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 46.6753
                                     },
                                     "contact_person": {
                                         "type": "string",
@@ -4176,10 +4251,6 @@
                                     "category": {
                                         "type": "string",
                                         "example": "تقنية المعلومات"
-                                    },
-                                    "is_verified": {
-                                        "type": "boolean",
-                                        "example": false
                                     },
                                     "ai_support": {
                                         "type": "boolean",
@@ -4428,6 +4499,16 @@
                                                     "type": "string",
                                                     "example": "حي النخيل، شارع الملك فهد"
                                                 },
+                                                "latitude": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 24.7136
+                                                },
+                                                "longitude": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 46.6753
+                                                },
                                                 "contact_person": {
                                                     "type": "string",
                                                     "example": "أحمد محمد"
@@ -4526,6 +4607,16 @@
                                     "address": {
                                         "type": "string",
                                         "example": "حي الصفا، شارع الأمير سلطان"
+                                    },
+                                    "latitude": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 24.7136
+                                    },
+                                    "longitude": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 46.6753
                                     },
                                     "contact_person": {
                                         "type": "string",
@@ -11220,6 +11311,16 @@
                                 "desc"
                             ]
                         }
+                    },
+                    {
+                        "name": "include",
+                        "in": "query",
+                        "description": "العلاقات المطلوب تضمينها",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "company,branch,creator"
+                        }
                     }
                 ],
                 "responses": {
@@ -11591,7 +11692,7 @@
                         "required": false,
                         "schema": {
                             "type": "string",
-                            "example": "company,branch,creator"
+                            "example": "company,branch,creator,managedBranch"
                         }
                     }
                 ],

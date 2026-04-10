@@ -65,7 +65,7 @@ class NotificationController extends Controller
 
         $notifications = $query->with(['user', 'template', 'entity'])
             ->orderBy('created_at', 'desc')
-            ->paginate($request->input('per_page', 15));
+            ->paginate($request->input('per_page', setting('items_per_page', '15', 'system')));
 
         return NotificationResource::collection($notifications);
     }

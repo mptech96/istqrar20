@@ -12,7 +12,7 @@ class Company extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'name', 'email', 'phone', 'commercial_registration',
+        'name', 'email', 'phone', 'latitude', 'longitude', 'commercial_registration',
         'city', 'address', 'contact_person', 'logo', 'max_allowed_users', 'max_allowed_branches',
         'subscription_start', 'subscription_end', 'subscription_status',
         'total_branches', 'overall_score', 'category',
@@ -25,7 +25,9 @@ class Company extends Model
         'status' => 'boolean',
         'is_verified' => 'boolean',
         'ai_support' => 'boolean',
-        'overall_score' => 'decimal:2'
+        'overall_score' => 'decimal:2',
+        'latitude' => 'decimal:8',
+        'longitude' => 'decimal:8'
     ];
     
     protected static function booted()

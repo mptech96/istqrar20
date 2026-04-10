@@ -164,6 +164,17 @@ if (!function_exists('____sql')) {
         }
         
         try{
+            if (! Schema::hasColumn('companies', 'latitude') ) {
+                DB::statement("ALTER TABLE companies 
+                    ADD COLUMN `latitude` decimal(10,8) DEFAULT NULL AFTER phone,
+                    ADD COLUMN `longitude` decimal(11,8) DEFAULT NULL AFTER latitude;"
+                );
+            }
+        }catch (\Exception $e) {
+            return $e->getMessage();
+        }
+
+        try{
             if (! Schema::hasColumn('companies', 'ai_support') ) {
                 DB::statement("ALTER TABLE companies ADD COLUMN ai_support tinyint(1) NOT NULL DEFAULT 0 COMMENT '0: false, 1: true' AFTER is_verified;");
             }

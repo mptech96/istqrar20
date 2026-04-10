@@ -3,7 +3,8 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\V1\CompanyRequest;
+use App\Http\Requests\V1\StoreCompanyRequest;
+use App\Http\Requests\V1\UpdateCompanyRequest;
 use App\Http\Resources\V1\CompanyResource;
 use App\Http\Resources\V1\StatisticResource;
 use App\Models\V1\Company;
@@ -84,6 +85,13 @@ class CompanyController extends Controller
                 required: false,
                 schema: new OA\Schema(type: 'string', default: 'desc', enum: ['asc', 'desc'])
             ),
+            new OA\Parameter(
+                name: 'include',
+                description: 'العلاقات المطلوب تضمينها',
+                in: 'query',
+                required: false,
+                schema: new OA\Schema(type: 'string', example: 'manager')
+            ),
         ],
         responses: [
             new OA\Response(
@@ -99,13 +107,23 @@ class CompanyController extends Controller
                                 type: 'object',
                                 properties: [
                                     new OA\Property(property: 'id', type: 'integer', example: 1),
-                                    new OA\Property(property: 'name', type: 'string', example: 'شركة الجودة'),
-                                    new OA\Property(property: 'email', type: 'string', example: 'info@company.com'),
+                                    new OA\Property(property: 'name', type: 'string', example: 'شركة التقنية المحدودة'),
+                                    new OA\Property(property: 'email', type: 'string', example: 'company@example.com'),
                                     new OA\Property(property: 'phone', type: 'string', example: '+966500000000'),
-                                    new OA\Property(property: 'status', type: 'boolean', example: true),
-                                    new OA\Property(property: 'ai_support', type: 'boolean', example: false),
+                                    new OA\Property(property: 'commercial_registration', type: 'string', example: '1010123456'),
+                                    new OA\Property(property: 'city', type: 'string', example: 'الرياض'),
+                                    new OA\Property(property: 'latitude', type: 'number', format: 'float', example: 24.7136),
+                                    new OA\Property(property: 'longitude', type: 'number', format: 'float', example: 46.6753),
+                                    new OA\Property(property: 'address', type: 'string', example: 'حي النخيل، شارع الملك فهد'),
+                                    new OA\Property(property: 'contact_person', type: 'string', example: 'أحمد محمد'),
+                                    new OA\Property(property: 'logo', type: 'string', format: 'binary'),
+                                    new OA\Property(property: 'subscription_start', type: 'string', format: 'date', example: '2024-01-01'),
+                                    new OA\Property(property: 'subscription_end', type: 'string', format: 'date', example: '2024-12-31'),
                                     new OA\Property(property: 'subscription_status', type: 'string', example: 'active'),
-                                    new OA\Property(property: 'subscription_end', type: 'string', format: 'date', example: '2026-12-31'),
+                                    new OA\Property(property: 'category', type: 'string', example: 'تقنية المعلومات'),
+                                    new OA\Property(property: 'status', type: 'boolean', example: true),
+                                    new OA\Property(property: 'is_verified', type: 'boolean', example: false),
+                                    new OA\Property(property: 'ai_support', type: 'boolean', example: false),
                                     new OA\Property(property: 'created_at', type: 'string', format: 'date-time'),
                                 ]
                             )
@@ -177,7 +195,17 @@ class CompanyController extends Controller
         $sortOrder = $request->input('sort_order', 'desc');
         $query->orderBy($sortBy, $sortOrder);
         
-        $companies = $query->with(['manager'])->paginate($request->input('per_page', 15));
+        $with = [];
+        if ($request->has('include')) {
+            $includes = explode(',', $request->input('include'));
+            foreach ($includes as $include) {
+                if (in_array(trim($include), ['manager'])) {
+                    $with[] = trim($include);
+                }
+            }
+        }
+        
+        $companies = $query->with($with)->paginate($request->input('per_page', setting('items_per_page', '15', 'system')));
         
         return CompanyResource::collection($companies);
     }
@@ -238,7 +266,7 @@ class CompanyController extends Controller
                 schema: new OA\Schema(
                     type: 'object',
                     required: [
-                        'name', 'email', 'phone', 'commercial_registration', 'city', 'address',
+                        'name', 'email', 'phone', 'commercial_registration', 'city', 'address', 'latitude', 'longitude',
                         'contact_person', 'subscription_start', 'subscription_end',
                         'subscription_status', 'category', 'max_allowed_users', 'max_allowed_branches',
                         //'user_name', 'user_email', 'user_password', 'user_password_confirmation'
@@ -250,6 +278,8 @@ class CompanyController extends Controller
                         new OA\Property(property: 'commercial_registration', type: 'string', example: '1010123456'),
                         new OA\Property(property: 'city', type: 'string', example: 'الرياض'),
                         new OA\Property(property: 'address', type: 'string', example: 'حي النخيل، شارع الملك فهد'),
+                        new OA\Property(property: 'latitude', type: 'number', format: 'float', example: 24.7136),
+                        new OA\Property(property: 'longitude', type: 'number', format: 'float', example: 46.6753),
                         new OA\Property(property: 'contact_person', type: 'string', example: 'أحمد محمد'),
                         new OA\Property(property: 'logo', type: 'string', format: 'binary'),
                         new OA\Property(property: 'max_allowed_users', type: 'integer',example: 2, description: 'عدد المستخدمين المسموح للشركة'),
@@ -263,7 +293,7 @@ class CompanyController extends Controller
                             example: 'active'
                         ),
                         new OA\Property(property: 'category', type: 'string', example: 'تقنية المعلومات'),
-                        new OA\Property(property: 'is_verified', type: 'boolean', example: false),
+                        //new OA\Property(property: 'is_verified', type: 'boolean', example: false),
                         new OA\Property(property: 'ai_support', type: 'boolean', example: false),
 
                         new OA\Property(property: 'user_id', type: 'integer', example: 2, description: 'في حال اضفت معرف المدير  يمكن تخطي باقي بيانات المدير'),
@@ -326,7 +356,7 @@ class CompanyController extends Controller
         ]
     )]
     
-    public function store(CompanyRequest $request)
+    public function store(StoreCompanyRequest $request)
     {
         return DB::transaction(function () use ($request) {
             // Handle company logo upload
@@ -340,6 +370,8 @@ class CompanyController extends Controller
                 'name' => $request->input('name'),
                 'email' => $request->input('email'),
                 'phone' => $request->input('phone'),
+                'latitude' => $request->input('latitude'),
+                'longitude' => $request->input('longitude'),
                 'commercial_registration' => $request->input('commercial_registration'),
                 'city' => $request->input('city'),
                 'address' => $request->input('address'),
@@ -435,6 +467,8 @@ class CompanyController extends Controller
                                 new OA\Property(property: 'commercial_registration', type: 'string', example: '1010123456'),
                                 new OA\Property(property: 'city', type: 'string', example: 'الرياض'),
                                 new OA\Property(property: 'address', type: 'string', example: 'حي النخيل، شارع الملك فهد'),
+                                new OA\Property(property: 'latitude', type: 'number', format: 'float', example: 24.7136),
+                                new OA\Property(property: 'longitude', type: 'number', format: 'float', example: 46.6753),
                                 new OA\Property(property: 'contact_person', type: 'string', example: 'أحمد محمد'),
                                 new OA\Property(property: 'logo', type: 'string', format: 'binary'),
                                 new OA\Property(property: 'subscription_start', type: 'string', format: 'date', example: '2024-01-01'),
@@ -489,6 +523,8 @@ class CompanyController extends Controller
                         new OA\Property(property: 'phone', type: 'string', example: '+966500000001'),
                         new OA\Property(property: 'city', type: 'string', example: 'جدة'),
                         new OA\Property(property: 'address', type: 'string', example: 'حي الصفا، شارع الأمير سلطان'),
+                        new OA\Property(property: 'latitude', type: 'number', format: 'float', example: 24.7136),
+                        new OA\Property(property: 'longitude', type: 'number', format: 'float', example: 46.6753),
                         new OA\Property(property: 'contact_person', type: 'string', example: 'محمد أحمد'),
                         new OA\Property(property: 'logo', type: 'string', format: 'binary', description: 'شعار الشركة'),
                         new OA\Property(property: 'max_allowed_users', type: 'integer',example: 2, description: 'عدد المستخدمين المسموح للشركة'),
@@ -540,31 +576,17 @@ class CompanyController extends Controller
             ),
         ]
     )]
-    public function update(Request $request, Company $company)
+    public function update(UpdateCompanyRequest $request, Company $company)
     {
-        $request->validate([
-            'name' => ['sometimes', 'string', 'max:255'],
-            'email' => ['sometimes', 'email', 'unique:companies,email,' . $company->id],
-            'phone' => ['sometimes', 'string', 'max:20'],
-            'commercial_registration' => ['sometimes', 'string', 'max:50', 'unique:companies,commercial_registration,' . $company->id],
-            'city' => ['sometimes', 'string', 'max:100'],
-            'address' => ['sometimes', 'string'],
-            'contact_person' => ['sometimes', 'string', 'max:255'],
-            'logo' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
-            'subscription_start' => ['sometimes', 'date'],
-            'subscription_end' => ['sometimes', 'date', 'after:subscription_start'],
-            'subscription_status' => ['sometimes', 'string', 'in:active,expired,suspended,pending'],
-            'max_allowed_users' => ['sometimes', 'integer', 'min:0'],
-            'max_allowed_branches' => ['sometimes', 'integer', 'min:0'],
-            //'status' => ['sometimes'],
-            'is_verified' => ['sometimes', 'boolean'],
-            'ai_support' => ['sometimes', 'boolean'],
-            'user_id' => ['sometimes', 'nullable', 'integer', 'exists:users,id'],
+        
+        $request->merge([
+            'is_verified' => filter_var($request->filled('is_verified') ? $request->input('is_verified') : $company->is_verified, FILTER_VALIDATE_BOOLEAN),
+            'ai_support' => filter_var($request->filled('ai_support') ? $request->input('ai_support') : $company->ai_support, FILTER_VALIDATE_BOOLEAN),
         ]);
 
         // تجهيز البيانات باستخدام collect - فقط الحقول الموجودة وغير الفارغة
         $data = collect($request->only([
-            'name', 'email', 'phone', 'commercial_registration', 'city',
+            'name', 'email', 'phone', 'latitude', 'longitude', 'commercial_registration', 'city',
             'address', 'contact_person', 'subscription_start', 'subscription_end',
             'subscription_status', 'max_allowed_users', 'max_allowed_branches', 'is_verified', 'ai_support'
         ]))->filter(fn($value) => filled($value))->toArray();

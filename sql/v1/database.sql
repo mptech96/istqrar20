@@ -5,6 +5,10 @@ CREATE TABLE IF NOT EXISTS `companies` (
     `name` varchar(255) NOT NULL,
     `email` varchar(255) NOT NULL,
     `phone` varchar(20) DEFAULT NULL,
+
+    `latitude` decimal(10,8) DEFAULT NULL,
+    `longitude` decimal(11,8) DEFAULT NULL,
+    
     `commercial_registration` varchar(50) DEFAULT NULL,
     `city` varchar(100) DEFAULT NULL,
     `address` text DEFAULT NULL,

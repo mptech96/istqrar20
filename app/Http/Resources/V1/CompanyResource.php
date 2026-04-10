@@ -15,15 +15,19 @@ class CompanyResource extends JsonResource
             'email' => $this->email,
             'phone' => $this->phone,
             'commercial_registration' => $this->commercial_registration,
+
             'city' => $this->city,
             'address' => $this->address,
+            'latitude' => $this->latitude ? (float) $this->latitude : null,
+            'longitude' => $this->longitude ? (float) $this->longitude : null,
+            
             'contact_person' => $this->contact_person,
             'logo' => $this->logo ? asset('uploads/companies/logos/' . $this->logo) : null,
             'max_allowed_users' => $this->max_allowed_users,
             'max_allowed_branches' => $this->max_allowed_branches,
 
-            'subscription_start' => $this->subscription_start,
-            'subscription_end' => $this->subscription_end,
+            'subscription_start' => $this->subscription_start?->format('Y-m-d | h:m:s A'),
+            'subscription_end' => $this->subscription_end?->format('Y-m-d | h:m:s A'),
             'subscription_status' => $this->subscription_status,
             'total_branches' => $this->branches()->active()?->count(),
             'overall_score' => (float) $this->overall_score,

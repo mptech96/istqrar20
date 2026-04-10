@@ -53,7 +53,7 @@ class ServiceRequestController extends Controller
         $sortOrder = $request->input('sort_order', 'desc');
         $query->orderBy($sortBy, $sortOrder);
 
-        $requests = $query->paginate($request->input('per_page', 15));
+        $requests = $query->paginate($request->input('per_page', setting('items_per_page', '15', 'system')));
 
         return ServiceRequestResource::collection($requests);
     }

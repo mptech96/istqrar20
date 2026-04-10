@@ -179,7 +179,7 @@ class CriteriaController extends Controller
             }
         }
         
-        $criterias = $query->with($with)->paginate($request->input('per_page', 15));
+        $criterias = $query->with($with)->paginate($request->input('per_page', setting('items_per_page', '15', 'system')));
         
         return CriteriaResource::collection($criterias);
     }

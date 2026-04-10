@@ -20,6 +20,8 @@ class CompanyRequest extends FormRequest
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'unique:companies,email'],
             'phone' => ['required', 'string', 'max:20', function ($attribute, $value, $fail) {if (!preg_match('/^[0-9+\-\s]+$/', $value)) {$fail('يرجى إدخال رقم هاتف صحيح');}}],
+            'latitude' => ['required', 'numeric', 'between:-90,90'],
+            'longitude' => ['required', 'numeric', 'between:-180,180'],
             'commercial_registration' => ['required', 'string', 'max:100', 'unique:companies,commercial_registration'],
             'city' => ['required', 'string', 'max:100'],
             'address' => ['required', 'string'],
@@ -81,6 +83,12 @@ class CompanyRequest extends FormRequest
             'phone.required' => 'حقل رقم الهاتف مطلوب.',
             'phone.string' => 'حقل رقم الهاتف يجب أن يكون نصاً.',
             'phone.max' => 'حقل رقم الهاتف لا يتجاوز 20 رقماً.',
+                        
+            'latitude.numeric' => 'حقل خط العرض يجب أن يكون رقماً.',
+            'latitude.between' => 'خط العرض يجب أن يكون بين -90 و 90.',
+            
+            'longitude.numeric' => 'حقل خط الطول يجب أن يكون رقماً.',
+            'longitude.between' => 'خط الطول يجب أن يكون بين -180 و 180.',
             
             'commercial_registration.required' => 'حقل السجل التجاري مطلوب.',
             'commercial_registration.string' => 'حقل السجل التجاري يجب أن يكون نصاً.',

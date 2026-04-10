@@ -99,6 +99,13 @@ class BranchController extends Controller
                 required: false,
                 schema: new OA\Schema(type: 'string', default: 'desc', enum: ['asc', 'desc'])
             ),
+            new OA\Parameter(
+                name: 'include',
+                description: 'العلاقات المطلوب تضمينها',
+                in: 'query',
+                required: false,
+                schema: new OA\Schema(type: 'string', example: 'company,manager,users,visits')
+            ),
         ],
         responses: [
             new OA\Response(
@@ -203,8 +210,18 @@ class BranchController extends Controller
         $sortBy = $request->input('sort_by', 'created_at');
         $sortOrder = $request->input('sort_order', 'desc');
         $query->orderBy($sortBy, $sortOrder);
+
+        $with = [];
+        if ($request->has('include')) {
+            $includes = explode(',', $request->input('include'));
+            foreach ($includes as $include) {
+                if (in_array(trim($include), ['company', 'manager', 'users', 'visits'])) {
+                    $with[] = trim($include);
+                }
+            }
+        }
         
-        $branches = $query->with(['company', 'manager'])->paginate($request->input('per_page', 15));
+        $branches = $query->with($with)->paginate($request->input('per_page', setting('items_per_page', '15', 'system')));
         
         return BranchResource::collection($branches);
     }
@@ -471,9 +488,19 @@ class BranchController extends Controller
             ),
         ]
     )]
-    public function show(Branch $branch)
+    public function show(Branch $branch, Request $request)
     {
-        $branch->load(['company', 'manager', 'users', 'visits']);
+        $with = [];
+        if ($request->has('include')) {
+            $includes = explode(',', $request->input('include'));
+            foreach ($includes as $include) {
+                if (in_array(trim($include), ['company', 'manager', 'users', 'visits'])) {
+                    $with[] = trim($include);
+                }
+            }
+        }
+        
+        $branch->load($with);
         return response()->json([
             'data' => new BranchResource($branch)
         ]);

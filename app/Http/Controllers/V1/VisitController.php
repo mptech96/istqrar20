@@ -281,7 +281,7 @@ class VisitController extends Controller
             }
         }
         
-        $visits = $query->with($with)->paginate($request->input('per_page', 15));
+        $visits = $query->with($with)->paginate($request->input('per_page', setting('items_per_page', '15', 'system')));
         
         return (VisitResource::collection($visits));
     }

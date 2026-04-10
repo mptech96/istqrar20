@@ -300,7 +300,7 @@ class TicketController extends Controller
             }
         }
         
-        $tickets = $query->with($with)->paginate($request->input('per_page', 15));
+        $tickets = $query->with($with)->paginate($request->input('per_page', setting('items_per_page', '15', 'system')));
         
         return TicketResource::collection($tickets);
     }
@@ -858,7 +858,7 @@ class TicketController extends Controller
         
         $replies = $query->with($with)
                         ->orderBy('created_at', 'asc')
-                        ->paginate($request->input('per_page', 15));
+                        ->paginate($request->input('per_page', setting('items_per_page', '15', 'system')));
         
         return TicketReplyResource::collection($replies);
     }

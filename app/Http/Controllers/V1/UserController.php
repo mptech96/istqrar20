@@ -96,6 +96,13 @@ class UserController extends Controller
                 required: false,
                 schema: new OA\Schema(type: 'string', default: 'desc', enum: ['asc', 'desc'])
             ),
+            new OA\Parameter(
+                name: 'include',
+                description: 'العلاقات المطلوب تضمينها',
+                in: 'query',
+                required: false,
+                schema: new OA\Schema(type: 'string', example: 'company,branch,creator')
+            ),
         ],
         responses: [
             new OA\Response(
@@ -192,7 +199,17 @@ class UserController extends Controller
         $sortOrder = $request->input('sort_order', 'desc');
         $query->orderBy($sortBy, $sortOrder);
         
-        $users = $query->with(['company', 'branch', 'creator'])->paginate($request->input('per_page', 15));
+        $with = [];
+        if ($request->has('include')) {
+            $includes = explode(',', $request->input('include'));
+            foreach ($includes as $include) {
+                if (in_array(trim($include), ['company', 'branch', 'creator'])) {
+                    $with[] = trim($include);
+                }
+            }
+        }
+
+        $users = $query->with($with)->paginate($request->input('per_page', setting('items_per_page', '15', 'system')));
         
         return UserResource::collection($users);
     }
@@ -434,7 +451,7 @@ class UserController extends Controller
                 description: 'العلاقات المطلوب تضمينها',
                 in: 'query',
                 required: false,
-                schema: new OA\Schema(type: 'string', example: 'company,branch,creator')
+                schema: new OA\Schema(type: 'string', example: 'company,branch,creator,managedBranch')
             ),
         ],
         responses: [
@@ -467,9 +484,18 @@ class UserController extends Controller
             ),
         ]
     )]
-    public function show(User $user)
+    public function show(User $user, Request $request)
     {
-        $user->load(['company', 'branch', 'creator', 'managedBranch']);
+        $with = [];
+        if ($request->has('include')) {
+            $includes = explode(',', $request->input('include'));
+            foreach ($includes as $include) {
+                if (in_array(trim($include), ['company', 'branch', 'creator', 'managedBranch'])) {
+                    $with[] = trim($include);
+                }
+            }
+        }
+        $user->load($with);
         return response()->json([
             'data' => new UserResource($user)
         ]);
