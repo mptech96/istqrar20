@@ -37,7 +37,7 @@ class Notification extends Model
 
             }
             else {
-                $builder->whereRaw('1 = 0');
+                //$builder->whereRaw('1 = 0');
             }
         });
 

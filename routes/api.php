@@ -194,17 +194,6 @@ Route::namespace('App\Http\Controllers\V1')->middleware(['throttle:60,1', 'api']
                 Route::get('/auditor', 'auditorReport');
             });
 
-            Route::prefix('notifications')->controller(NotificationController::class)->group(function () {
-                Route::get('/', 'index');
-                Route::get('/reminder-visit-tomorrow', 'reminder_visit_tomorrow');
-                Route::get('/subscription-expired', 'subscription_expired');
-                Route::get('/subscription-expiry-reminder', 'subscription_expiry_reminder');
-
-                Route::get('/{notification}', 'show');
-                Route::patch('/{notification}/read', 'markAsRead');
-                Route::post('/mark-all-read', 'markAllAsRead');
-                //http://localhost:8585/api/v1/notifications/reminder-visit-tomorrow
-            });
 
         });
         
@@ -236,6 +225,26 @@ Route::namespace('App\Http\Controllers\V1')->middleware(['throttle:60,1', 'api']
 
         });
 
+         Route::prefix('notifications')->controller(NotificationController::class)->group(function () {
+
+            Route::middleware(['api-module-priority', 'throttle:60,1'])->group(function () {
+                Route::get('/reminder-visit-tomorrow', 'reminder_visit_tomorrow');
+                Route::get('/subscription-expired', 'subscription_expired');
+                Route::get('/subscription-expiry-reminder', 'subscription_expiry_reminder');
+            });
+
+            Route::middleware(['api-token-priority'])->group(function () {
+                Route::get('/', 'index');
+                Route::get('/{notification}', 'show');
+                Route::patch('/{notification}/read', 'markAsRead');
+                Route::post('/mark-all-read', 'markAllAsRead');
+            });
+            
+            
+
+            //http://localhost:8585/api/v1/notifications/reminder-visit-tomorrow
+        });
+        
         Route::get('/docs', function () {
             return redirect('/api/v1/documentation');
         });

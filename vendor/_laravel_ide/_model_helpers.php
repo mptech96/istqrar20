@@ -1845,6 +1845,8 @@ namespace App\Models\V1 {
      * @property string|null $address
      * @property string|null $city
      * @property string|null $commercial_registration
+     * @property float|null $longitude
+     * @property float|null $latitude
      * @property string|null $phone
      * @property string $email
      * @property string $name
@@ -1864,6 +1866,8 @@ namespace App\Models\V1 {
      * @method static \Illuminate\Database\Eloquent\Builder<Company>|Company whereName($value)
      * @method static \Illuminate\Database\Eloquent\Builder<Company>|Company whereEmail($value)
      * @method static \Illuminate\Database\Eloquent\Builder<Company>|Company wherePhone($value)
+     * @method static \Illuminate\Database\Eloquent\Builder<Company>|Company whereLatitude($value)
+     * @method static \Illuminate\Database\Eloquent\Builder<Company>|Company whereLongitude($value)
      * @method static \Illuminate\Database\Eloquent\Builder<Company>|Company whereCommercialRegistration($value)
      * @method static \Illuminate\Database\Eloquent\Builder<Company>|Company whereCity($value)
      * @method static \Illuminate\Database\Eloquent\Builder<Company>|Company whereAddress($value)
@@ -6886,6 +6890,8 @@ namespace App\Models {
      * @property string|null $address
      * @property string|null $city
      * @property string|null $commercial_registration
+     * @property float|null $longitude
+     * @property float|null $latitude
      * @property string|null $phone
      * @property string $email
      * @property string $name
@@ -6895,6 +6901,8 @@ namespace App\Models {
      * @method static \Illuminate\Database\Eloquent\Builder<Company>|Company whereName($value)
      * @method static \Illuminate\Database\Eloquent\Builder<Company>|Company whereEmail($value)
      * @method static \Illuminate\Database\Eloquent\Builder<Company>|Company wherePhone($value)
+     * @method static \Illuminate\Database\Eloquent\Builder<Company>|Company whereLatitude($value)
+     * @method static \Illuminate\Database\Eloquent\Builder<Company>|Company whereLongitude($value)
      * @method static \Illuminate\Database\Eloquent\Builder<Company>|Company whereCommercialRegistration($value)
      * @method static \Illuminate\Database\Eloquent\Builder<Company>|Company whereCity($value)
      * @method static \Illuminate\Database\Eloquent\Builder<Company>|Company whereAddress($value)
