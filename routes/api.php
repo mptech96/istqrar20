@@ -205,6 +205,7 @@ Route::namespace('App\Http\Controllers\V1')->middleware(['throttle:60,1', 'api']
             Route::middleware(['api-token-priority'])->group(function () {
                 Route::post('logout', 'logout');
                 Route::get('me', 'me');
+                Route::post('update', 'update');
             });
             
         });

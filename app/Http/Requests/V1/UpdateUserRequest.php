@@ -14,17 +14,17 @@ class UpdateUserRequest extends FormRequest
 
     public function rules(): array
     {
-        $userId = $this->route('user') ? $this->route('user')->id : null;
+        $userId = $this->route('user') ? $this->route('user')->id : auth()->id();
 
         $rules = [
             // Basic information
-            'name' => ['sometimes', 'string', 'max:255'],
-            'email' => ['sometimes', 'email', 'unique:users,email,' . $userId],
-            'phone' => ['sometimes', 'string', 'max:20', function ($attribute, $value, $fail) {if (!preg_match('/^[0-9+\-\s]+$/', $value)) {$fail('يرجى إدخال رقم هاتف صحيح');}}],
-            'password' => ['sometimes', 'confirmed', Password::min(8)],
+            'name' => ['nullable', 'string', 'max:255'],
+            'email' => ['nullable', 'email', 'unique:users,email,' . $userId],
+            'phone' => ['nullable', 'string', 'max:20', function ($attribute, $value, $fail) {if (!preg_match('/^[0-9+\-\s]+$/', $value)) {$fail('يرجى إدخال رقم هاتف صحيح');}}],
+            'password' => ['nullable', 'confirmed', Password::min(8)],
             
             // Role and assignment
-            'role' => ['sometimes', 'string', 'in:super_admin,auditor,company_admin,branch_manager'],
+            'role' => ['nullable', 'string', 'in:super_admin,auditor,company_admin,branch_manager'],
             
             // Company and branch
             'company_id' => ['nullable', 'exists:companies,id'],
@@ -44,7 +44,7 @@ class UpdateUserRequest extends FormRequest
             ($this->route('user') && $this->route('user')->role === 'auditor')) {
             
             $rules = array_merge($rules, [
-                'national_number' => ['sometimes', 'string', 'max:50', 'unique:users,national_number,' . $userId],
+                'national_number' => ['nullable', 'string', 'max:50', 'unique:users,national_number,' . $userId],
                 'municipality_certificate' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'],
                 'driving_license' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'],
                 'personal_photo' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],

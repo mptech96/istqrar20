@@ -54,6 +54,6 @@ class HandlePutRequests
             }
         }
     
-    return $next($request);      
+        return $next($request);      
     }
 }

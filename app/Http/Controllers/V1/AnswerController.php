@@ -128,7 +128,7 @@ class AnswerController extends Controller
                             properties: [
                                 new OA\Property(property: 'total_answers', type: 'integer', example: 15),
                                 new OA\Property(property: 'total_score', type: 'number', format: 'float', example: 135.5),
-                                new OA\Property(property: 'max_possible_score', type: 'integer', example: 150),
+                                new OA\Property(property: 'total_max_score', type: 'integer', example: 150),
                                 new OA\Property(property: 'average_score', type: 'number', format: 'float', example: 9.03),
                                 new OA\Property(property: 'corrections_pending', type: 'integer', example: 3),
                                 new OA\Property(property: 'corrections_overdue', type: 'integer', example: 1),
@@ -186,8 +186,10 @@ class AnswerController extends Controller
         
         // إحصائيات
         $totalScore = $answers->sum('score');
-        $maxPossibleScore = $answers->sum('max_score');
+        $totalMaxScore = $answers->sum('max_score');
         $averageScore = $answers->count() > 0 ? $totalScore / $answers->count() : 0;
+        $percentageScore = $totalMaxScore > 0 ? ($totalScore / $totalMaxScore) * 100 : 0;
+
         
         $correctionsPending = $answers->where('correction_status', 'pending')->count();
         $correctionsOverdue = $answers->filter(function ($answer) {
@@ -199,8 +201,9 @@ class AnswerController extends Controller
             'statistics' => [
                 'total_answers' => $answers->count(),
                 'total_score' => $totalScore,
-                'max_possible_score' => $maxPossibleScore,
+                'total_max_score' => $totalMaxScore,
                 'average_score' => round($averageScore, 2),
+                'percentage_score' => round($percentageScore, 2),
                 'corrections_pending' => $correctionsPending,
                 'corrections_overdue' => $correctionsOverdue,
             ],
@@ -1538,16 +1541,16 @@ class AnswerController extends Controller
         }
     
         $totalScore = $answers->sum('score');
-        $maxPossibleScore = $answers->sum('max_score');
-        $percentage = $maxPossibleScore > 0
-            ? ($totalScore / $maxPossibleScore) * 100
+        $totalMaxScore = $answers->sum('max_score');
+        $percentage = $totalMaxScore > 0
+            ? ($totalScore / $totalMaxScore) * 100
             : 0;
     
         $category = $this->determineCategoryFromCriteria($visit);
     
         $visit->update([
             'total_score' => $totalScore,
-            'max_possible_score' => $maxPossibleScore,
+            'total_max_score' => $totalMaxScore,
             'percentage' => round($percentage, 2),
             'category' => $category,
         ]);

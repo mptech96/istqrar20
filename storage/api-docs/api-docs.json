@@ -243,7 +243,7 @@
                                                     "format": "float",
                                                     "example": 135.5
                                                 },
-                                                "max_possible_score": {
+                                                "total_max_score": {
                                                     "type": "integer",
                                                     "example": 150
                                                 },
@@ -1774,6 +1774,143 @@
                                 }
                             }
                         }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/auth/update": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "تحديث بيانات المستخدم",
+                "description": "تحديث بيانات المستخدم الحالي",
+                "operationId": "e4ff3c387ff4644ddd6bb1456963435c",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": ""
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": ""
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": ""
+                                    },
+                                    "password_confirmation": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": ""
+                                    },
+                                    "phone": {
+                                        "type": "string",
+                                        "example": ""
+                                    },
+                                    "municipality_certificate": {
+                                        "type": "file",
+                                        "format": "binary"
+                                    },
+                                    "driving_license": {
+                                        "type": "file",
+                                        "format": "binary"
+                                    },
+                                    "personal_photo": {
+                                        "type": "file",
+                                        "format": "binary"
+                                    },
+                                    "national_number": {
+                                        "type": "string",
+                                        "example": ""
+                                    },
+                                    "birth_date": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": ""
+                                    },
+                                    "gender": {
+                                        "type": "string",
+                                        "enum": [
+                                            "male",
+                                            "female",
+                                            "other"
+                                        ],
+                                        "example": "male"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "تم تحديث المستخدم بنجاح",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "تم تحديث المستخدم بنجاح"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "محمد أحمد (محدث)"
+                                                },
+                                                "email": {
+                                                    "type": "string",
+                                                    "example": "updated.user@example.com"
+                                                },
+                                                "phone": {
+                                                    "type": "string",
+                                                    "example": "+966511111112"
+                                                },
+                                                "role": {
+                                                    "type": "string",
+                                                    "example": "auditor"
+                                                },
+                                                "status": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "المستخدم غير موجود"
+                    },
+                    "422": {
+                        "description": "بيانات غير صالحة"
                     }
                 },
                 "security": [

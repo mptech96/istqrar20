@@ -129,6 +129,7 @@ class Company extends Model
     public function scopeWithActiveSubscription($query)
     {
         return $query->where('subscription_status', 'active')
+            ->where('subscription_start', '<=', now())
             ->where('subscription_end', '>', now());
     }
 
@@ -136,7 +137,14 @@ class Company extends Model
     {
         $company = $this->withActiveSubscription()->first();
         if($company) {
-            if($company->status == 1) return true;
+            if($company->status == 1) {
+
+                $this->update([
+                    'subscription_status' => 'active'
+                ]);
+                return true;
+
+            }
         } else {
             $this->update([
                 'subscription_status' => 'expired'

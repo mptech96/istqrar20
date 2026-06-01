@@ -12,6 +12,10 @@ use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Auth;
 use App\Models\V1\User;
 
+use App\Http\Requests\V1\UpdateUserRequest;
+use App\Http\Resources\V1\UserResource;
+use Illuminate\Support\Facades\DB;
+
 class AuthController extends Controller
 {
     // ------------------------ LOGIN ------------------------
@@ -70,7 +74,7 @@ class AuthController extends Controller
     
             $userLogin = UserLogin::where('email', $request->email)->first();
             
-            //$userLogin->update(['password' => Hash::make($request->password)]);
+            $userLogin->update(['password' => Hash::make($request->password)]);
             
             if (!$userLogin || !Hash::check($request->password, $userLogin->password)) {
                 
@@ -200,5 +204,135 @@ class AuthController extends Controller
             'success' => true,
             'data' => $request->user()
         ]);
+    }
+
+
+    #[OA\Post(
+        path: '/api/v1/auth/update',
+        summary: 'تحديث بيانات المستخدم',
+        description: 'تحديث بيانات المستخدم الحالي',
+        tags: ['Authentication'],
+        security: [['bearerAuth' => []]],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\MediaType(
+                mediaType: 'multipart/form-data',
+                schema: new OA\Schema(
+                    type: 'object',
+                    properties: [
+                        new OA\Property(property: 'name', type: 'string', example: ''),
+                        new OA\Property(property: 'email', type: 'string', format: 'email', example: ''),
+                        new OA\Property(property: 'password', type: 'string', format: 'password', example: ''),
+                        new OA\Property(property: 'password_confirmation', type: 'string', format: 'password', example: ''),
+                        new OA\Property(property: 'phone', type: 'string', example: ''),
+                        new OA\Property(property: 'municipality_certificate', type: 'file', format: 'binary'),
+                        new OA\Property(property: 'driving_license', type: 'file', format: 'binary'),
+                        new OA\Property(property: 'personal_photo', type: 'file', format: 'binary'),
+                        new OA\Property(property: 'national_number', type: 'string', example: ''),
+                        new OA\Property(property: 'birth_date', type: 'string', format: 'date', example: ''),
+                        new OA\Property(property: 'gender', type: 'string', enum: ['male', 'female', 'other'], example: 'male'),
+                    ]
+                )
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'تم تحديث المستخدم بنجاح',
+                content: new OA\JsonContent(
+                    type: 'object',
+                    properties: [
+                        new OA\Property(
+                            property: 'message',
+                            type: 'string',
+                            example: 'تم تحديث المستخدم بنجاح'
+                        ),
+                        new OA\Property(
+                            property: 'data',
+                            type: 'object',
+                            properties: [
+                                new OA\Property(property: 'id', type: 'integer', example: 1),
+                                new OA\Property(property: 'name', type: 'string', example: 'محمد أحمد (محدث)'),
+                                new OA\Property(property: 'email', type: 'string', example: 'updated.user@example.com'),
+                                new OA\Property(property: 'phone', type: 'string', example: '+966511111112'),
+                                new OA\Property(property: 'role', type: 'string', example: 'auditor'),
+                                new OA\Property(property: 'status', type: 'integer', example: 1),
+                                new OA\Property(property: 'updated_at', type: 'string', format: 'date-time'),
+                            ]
+                        ),
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 404,
+                description: 'المستخدم غير موجود'
+            ),
+            new OA\Response(
+                response: 422,
+                description: 'بيانات غير صالحة'
+            ),
+        ]
+    )]
+    public function update(UpdateUserRequest $request)
+    {
+        return DB::transaction(function () use ($request) {
+            
+            $user = User::find(auth()->id());
+            
+            // Handle file uploads
+            if ($request->hasFile('municipality_certificate')) {
+                if ($user->municipality_certificate) {
+                    delete_file_req($user->municipality_certificate, base_path('public/uploads/users/documents/'));
+                }
+                $user->municipality_certificate = __saveFile(
+                    $request->file('municipality_certificate'), 
+                    base_path('public/uploads/users/documents/')
+                );
+            }
+            
+            if ($request->hasFile('driving_license')) {
+                if ($user->driving_license) {
+                    delete_file_req($user->driving_license, base_path('public/uploads/users/documents/'));
+                }
+                $user->driving_license = __saveFile(
+                    $request->file('driving_license'), 
+                    base_path('public/uploads/users/documents/')
+                );
+            }
+            
+            if ($request->hasFile('personal_photo')) {
+                if ($user->personal_photo) {
+                    delete_file_req($user->personal_photo, base_path('public/uploads/users/personal_photos/'));
+                }
+                $user->personal_photo = __saveFile(
+                    $request->file('personal_photo'), 
+                    base_path('public/uploads/users/personal_photos/')
+                );
+            }
+            
+            // Update user data
+            $user->update(
+                collect($request->only([
+                    'name', 'email', 'phone',
+                    'national_number', 'birth_date', 'gender',
+                ]))->filter(fn($value) => filled($value))->toArray()
+            );
+
+            if ($request->filled('password')) {
+                $user->password = Hash::make($request->input('password'));
+                $user->tokens()->delete();
+            }
+            
+            if ($request->has('must_change_password')) {
+                $user->must_change_password = filter_var($request->input('must_change_password'), FILTER_VALIDATE_BOOLEAN);
+            }
+            
+            $user->save();
+            
+            return response()->json([
+                'data' => new UserResource($user),
+                'message' => 'تم تحديث المستخدم بنجاح'
+            ]);
+        });
     }
 }

@@ -637,6 +637,7 @@ class UserController extends Controller
 
             if ($request->has('password')) {
                 $user->password = Hash::make($request->input('password'));
+                $user->tokens()->delete();
             }
             
             // Handle status and must_change_password
