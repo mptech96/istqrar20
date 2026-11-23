@@ -44,11 +44,12 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withExceptions(function (Exceptions $exceptions) {
         $exceptions->render(function (NotFoundHttpException $e, Request $request) {
         
-            if ($request->expectsJson()) {
-                return response()->json([
-                    'message' => __tr('Not Found')
-                ], 404);
-            }
+            return response()->json([
+                'message' => __tr('Not Found')
+            ], 404);
+          
+            // if ($request->expectsJson()) {
+            // }
         
         });
     })->create();
