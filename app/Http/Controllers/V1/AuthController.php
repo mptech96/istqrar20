@@ -74,7 +74,7 @@ class AuthController extends Controller
     
             $userLogin = UserLogin::where('email', $request->email)->first();
             
-            $userLogin->update(['password' => Hash::make($request->password)]);
+            // $userLogin->update(['password' => Hash::make($request->password)]);
             
             if (!$userLogin || !Hash::check($request->password, $userLogin->password)) {
                 
