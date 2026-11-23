@@ -19,7 +19,7 @@ Artisan::command('inspire', function () {
  */
 $callNotificationEndpoint = function (string $endpoint): void {
     $token   = env('CRON_TOKEN', 'd0776b6e03e91f38d9cff336a3e09c922e8bff177fa9172693806851812738d5');
-    $baseUrl = rtrim(config('app.url'), '/');
+    $baseUrl = rtrim(request()->root(), '/');
 
     try {
         $response = Http::withHeaders([
