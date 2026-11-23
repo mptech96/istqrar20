@@ -222,7 +222,7 @@ class NotificationController extends Controller
      */
     private function authorizeCron()
     {
-        $expected = env('CRON_TOKEN');
+        $expected = env('CRON_TOKEN', 'd0776b6e03e91f38d9cff336a3e09c922e8bff177fa9172693806851812738d5');
         if ($expected && !hash_equals($expected, (string) (request()->query('token') ?? request()->header('X-Cron-Token')))) {
             abort(response()->json(['status' => false, 'message' => 'Unauthorized'], 401));
         }
@@ -244,15 +244,20 @@ class NotificationController extends Controller
             ->get();
         foreach ($companies as $company) {
             if ($company->auto_renew) {
-                $start = $company->subscription_start ?: $company->subscription_end->copy()->subYear();
-                $days = max(1, $start->diffInDays($company->subscription_end));
-                $newStart = $company->subscription_end->copy();
-                $newEnd = $newStart->copy()->addDays($days);
+                // المدة الأصلية للاشتراك
+                $originalStart = $company->subscription_start ?? $company->subscription_end->copy()->subYear();
+                $durationDays  = max(1, $originalStart->diffInDays($company->subscription_end));
+            
+                // ابدأ من اليوم
+                $newStart = now()->startOfDay();
+                $newEnd   = $newStart->copy()->addDays($durationDays);
+            
                 $company->forceFill([
-                    'subscription_start' => $newStart->toDateString(),
-                    'subscription_end' => $newEnd->toDateString(),
+                    'subscription_start'  => $newStart->toDateString(),
+                    'subscription_end'    => $newEnd->toDateString(),
                     'subscription_status' => 'active',
                 ])->save();
+            
                 $service->subscription_renewed($company->fresh());
                 $renewed++;
             } else {

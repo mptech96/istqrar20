@@ -295,6 +295,8 @@ class CompanyController extends Controller
                         new OA\Property(property: 'category', type: 'string', example: 'تقنية المعلومات'),
                         //new OA\Property(property: 'is_verified', type: 'boolean', example: false),
                         new OA\Property(property: 'ai_support', type: 'boolean', example: false),
+                        new OA\Property(property: 'auto_renew', type: 'boolean', example: false),
+                        new OA\Property(property: 'show_on_website', type: 'boolean', example: false),
 
                         new OA\Property(property: 'user_id', type: 'integer', example: 2, description: 'في حال اضفت معرف المدير  يمكن تخطي باقي بيانات المدير'),
                         new OA\Property(property: 'user_name', type: 'string', example: 'مدير الشركة'),
@@ -532,10 +534,15 @@ class CompanyController extends Controller
                         new OA\Property(property: 'max_allowed_users', type: 'integer',example: 2, description: 'عدد المستخدمين المسموح للشركة'),
                         new OA\Property(property: 'max_allowed_branches', type: 'integer',example: 1, description: 'عدد الفروع المسموح للشركة'),
                         new OA\Property(property: 'user_id', type: 'integer', example: 2),
-
+                        // new OA\Property(property: 'subscription_start', type: 'string', format: 'date', example: '2024-01-01'),
+                        // new OA\Property(property: 'subscription_end', type: 'string', format: 'date', example: '2024-12-31'),
+                        
                         new OA\Property(property: 'subscription_status', type: 'string', enum: ['active', 'inactive', 'suspended'], example: 'active'),
                         new OA\Property(property: 'is_verified', type: 'boolean', example: true),
                         new OA\Property(property: 'ai_support', type: 'boolean', example: false),
+                        new OA\Property(property: 'auto_renew', type: 'boolean', example: false),
+                        new OA\Property(property: 'show_on_website', type: 'boolean', example: false),
+
                     ]
                 )
             )

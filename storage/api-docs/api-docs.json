@@ -4393,6 +4393,14 @@
                                         "type": "boolean",
                                         "example": false
                                     },
+                                    "auto_renew": {
+                                        "type": "boolean",
+                                        "example": false
+                                    },
+                                    "show_on_website": {
+                                        "type": "boolean",
+                                        "example": false
+                                    },
                                     "user_id": {
                                         "description": "في حال اضفت معرف المدير  يمكن تخطي باقي بيانات المدير",
                                         "type": "integer",
@@ -4778,6 +4786,16 @@
                                         "type": "integer",
                                         "example": 2
                                     },
+                                    "subscription_start": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2024-01-01"
+                                    },
+                                    "subscription_end": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2024-12-31"
+                                    },
                                     "subscription_status": {
                                         "type": "string",
                                         "enum": [
@@ -4792,6 +4810,14 @@
                                         "example": true
                                     },
                                     "ai_support": {
+                                        "type": "boolean",
+                                        "example": false
+                                    },
+                                    "auto_renew": {
+                                        "type": "boolean",
+                                        "example": false
+                                    },
+                                    "show_on_website": {
                                         "type": "boolean",
                                         "example": false
                                     }
