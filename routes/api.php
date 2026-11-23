@@ -69,13 +69,13 @@ Route::namespace('App\Http\Controllers\V1')->middleware(['throttle:60,1', 'api']
             
             Route::prefix('checklists')->middleware(['user.role:super_admin'])->controller(ChecklistController::class)->group(function () {
                 Route::get('/', 'index');
+                Route::get('/industry-types', 'industryTypes');
                 Route::get('{checklist}', 'show');
                 Route::post('/', 'store');
                 Route::put('/{checklist}', 'update');
                 Route::delete('/{checklist}', 'destroy');
                 Route::post('/{id}/restore', 'restore');
                 
-                Route::get('/industry-types', 'industryTypes');
                 Route::get('{checklist}/statistics', 'statistics');
                 Route::post('/{checklist}/duplicate', 'duplicate');
                 
@@ -89,7 +89,7 @@ Route::namespace('App\Http\Controllers\V1')->middleware(['throttle:60,1', 'api']
                     Route::delete('/{question}', 'destroy');
                     Route::post('/{id}/restore', 'restore');
                     
-                    Route::post('{question}/duplicate', 'reorder');
+                    Route::post('{question}/duplicate', 'duplicate');
                     Route::get('{question}/evaluate', 'evaluate');
                     
                 });
@@ -147,15 +147,15 @@ Route::namespace('App\Http\Controllers\V1')->middleware(['throttle:60,1', 'api']
                 Route::get('/statistics/overview', 'statisticsOverview');
                 Route::get('/{ticket}', 'show');
                 Route::put('/{ticket}', 'update');
-                Route::delete('/{ticket}', 'destroy');
-                Route::post('/{id}/restore', 'restore');
+                Route::delete('/{ticket}', 'destroy')->middleware(['user.role:super_admin']);
+                Route::post('/{id}/restore', 'restore')->middleware(['user.role:super_admin']);
                 
                 // Additional actions
-                Route::post('/{ticket}/assign', 'assign');
-                Route::post('/{ticket}/resolve', 'resolve');
-                Route::post('/{ticket}/close', 'close');
-                Route::post('/{ticket}/reopen', 'reopen');
-                Route::post('/{ticket}/escalate', 'escalate');
+                Route::post('/{ticket}/assign', 'assign')->middleware(['user.role:super_admin']);
+                Route::post('/{ticket}/resolve', 'resolve')->middleware(['user.role:super_admin']);
+                Route::post('/{ticket}/close', 'close')->middleware(['user.role:super_admin']);
+                Route::post('/{ticket}/reopen', 'reopen')->middleware(['user.role:super_admin']);
+                Route::post('/{ticket}/escalate', 'escalate')->middleware(['user.role:super_admin']);
                 
                 // Replies
                 Route::get('/{ticket}/replies', 'replies');
@@ -246,6 +246,11 @@ Route::namespace('App\Http\Controllers\V1')->middleware(['throttle:60,1', 'api']
             //http://localhost:8585/api/v1/notifications/reminder-visit-tomorrow
         });
         
+        // Public website data (no auth)
+        Route::prefix('public')->controller(PublicController::class)->middleware(['api-module-priority'])->group(function () {
+            Route::get('/clients', 'clients');
+        });
+
         Route::get('/docs', function () {
             return redirect('/api/v1/documentation');
         });

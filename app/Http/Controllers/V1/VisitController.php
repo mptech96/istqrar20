@@ -1436,6 +1436,7 @@ class VisitController extends Controller
             }
             
             app(VisitAnalysisService::class)->generate($visit);
+            $this->syncBranchCompliance($visit);
             app(SyncEnterpriseStatisticsEngine::class)->updateFromVisit($visit);
 
             app(\App\Services\V1\NotificationService::class)->visit_completed($visit);
@@ -2426,6 +2427,37 @@ class VisitController extends Controller
         ]);
     }
     
+    /**
+     * تحديث نسبة الامتثال للفرع (من 100%) بعد كل زيارة مكتملة:
+     * نسبة آخر زيارة مكتملة، وعدد الزيارات المكتملة، وتاريخ آخر زيارة، والتصنيف،
+     * ثم الدرجة العامة للمنشأة = متوسط نسب فروعها التي لها زيارات.
+     */
+    private function syncBranchCompliance(Visit $visit): void
+    {
+        $branch = $visit->branch;
+        if (!$branch) return;
+        $completed = Visit::withoutGlobalScopes()
+            ->whereNull('deleted_at')
+            ->where('branch_id', $branch->id)
+            ->where('status', 'completed');
+        $last = (clone $completed)->orderByDesc('completed_at')->orderByDesc('id')->first();
+        $branch->forceFill([
+            'compliance_score' => $last ? (float) $last->percentage : 0,
+            'category' => $last?->category ?? $branch->category,
+            'total_visits' => (clone $completed)->count(),
+            'last_visit_date' => $last?->visit_date ?? $last?->scheduled_date,
+        ])->save();
+
+        $company = $branch->company;
+        if ($company) {
+            $avg = \App\Models\V1\Branch::where('company_id', $company->id)
+                ->whereNull('deleted_at')
+                ->where('total_visits', '>', 0)
+                ->avg('compliance_score');
+            $company->forceFill(['overall_score' => round((float) $avg, 2)])->save();
+        }
+    }
+
     private function getStatusColor(string $status): string
     {
         return match ($status) {

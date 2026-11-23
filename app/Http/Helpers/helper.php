@@ -234,6 +234,13 @@ if (!function_exists('____sql')) {
         }catch (\Exception $e) {
             return $e->getMessage();
         }
+        try{
+            if (! Schema::hasColumn('companies', 'auto_renew') ) {
+                DB::unprepared(file_get_contents( base_path('sql\v1\000000_update_2026_11_24.sql')));
+            }
+        }catch (\Exception $e) {
+            return $e->getMessage();
+        }
         
     }
 

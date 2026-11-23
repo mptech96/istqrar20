@@ -226,6 +226,21 @@ class DashboardController extends Controller
             ),
         ]
     )]
+    /**
+     * حالة الاشتراك (العقد/المتطلبات: عرض مدة الاشتراك المتبقية لكل منشأة وفرع)
+     */
+    private function subscriptionInfo($company): ?array
+    {
+        if (!$company) return null;
+        return [
+            'status' => $company->subscription_status,
+            'start' => $company->subscription_start?->format('Y-m-d'),
+            'end' => $company->subscription_end?->format('Y-m-d'),
+            'remaining_days' => $company->getRemainingSubscriptionDays(),
+            'auto_renew' => (bool) $company->auto_renew,
+        ];
+    }
+
     public function companyAdminDashboard(Request $request)
     {
         $user = auth()->user();
@@ -299,6 +314,7 @@ class DashboardController extends Controller
             ->get();
         
         return response()->json([
+            'subscription' => $this->subscriptionInfo(\App\Models\V1\Company::find($companyId)),
             'statistics' => [
                 'branches_count' => $branchesCount,
                 'auditors_count' => $auditorsCount,
@@ -457,6 +473,7 @@ class DashboardController extends Controller
                 'last_visit_date' => $branch->last_visit_date?->format('Y-m-d'),
                 'next_scheduled_visit' => $branch->next_scheduled_visit?->format('Y-m-d'),
             ],
+            'subscription' => $this->subscriptionInfo($branch->company),
             'statistics' => [
                 'total_visits' => $totalVisits,
                 'last_visit_score' => $lastVisit?->percentage,

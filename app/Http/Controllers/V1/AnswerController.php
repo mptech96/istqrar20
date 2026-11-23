@@ -1215,8 +1215,14 @@ class AnswerController extends Controller
     )]
     public function bulkStore(Visit $visit, BulkAnswerRequest $request)
     {
-        
-        if (!$visit->actual_start_time) {
+        // لا تُقبل الإجابات إلا لزيارة قيد التنفيذ
+        if ($visit->status !== 'in_progress') {
+            return response()->json([
+                'message' => 'لا يمكن تسجيل الإجابات إلا لزيارة قيد التنفيذ'
+            ], 400);
+        }
+        // انتهاء المدة المسموحة للتقييم
+        if ($visit->actual_start_time && $visit->estimated_duration) {
             $endTime = Carbon::parse($visit->actual_start_time)
             ->addMinutes($visit->estimated_duration);
             if ($endTime->isPast()){
@@ -1225,51 +1231,47 @@ class AnswerController extends Controller
                 ], 400);
             }
         }
-        
         return DB::transaction(function () use ($visit, $request) {
             // استخراج جميع question_id من الإجابات
             $questionIds = array_column($request->input('answers', []), 'question_id');
-            
             // جلب الأسئلة المرتبطة بالزيارة من قاعدة البيانات
             $questions = $visit->questions()
                 ->whereIn('questions.id', $questionIds)
                 ->get()
                 ->keyBy('id');
-            
             $answers = [];
-            
-            foreach ($request->input('answers', []) as $answerData) {
+            foreach ($request->input('answers', []) as $index => $answerData) {
                 // التحقق من وجود السؤال
                 if (!isset($questions[$answerData['question_id']])) {
                     continue;
                 }
-                
                 $question = $questions[$answerData['question_id']];
-                
-                // حساب إذا كانت الإجابة صحيحة
-                $isCorrect = $this->checkIfCorrect($question, $answerData['answer_value'] ?? null);
-                
-                // حساب النقاط إذا لم تكن موجودة
-                $score = $answerData['score'] ?? 0;
-                
-                // إنشاء الإجابة
-                $answer = Answer::create([
-                    'visit_id' => $visit->id,
-                    'question_id' => $answerData['question_id'],
-                    'answer_value' => $answerData['answer_value'] ?? null,
-                    'score' => $score,
-                    'max_score' => $question->max_score,
-                    'is_correct' => $isCorrect,
-                    'comment' => $answerData['comment'] ?? null,
-                    'auditor_comment' => $answerData['auditor_comment'] ?? null,
-                    'corrective_action' => $answerData['corrective_action'] ?? null,
-                    'corrective_deadline' => $answerData['corrective_deadline'] ?? null,
-                    'correction_status' => isset($answerData['corrective_action']) ? 'pending' : null,
-                ]);
-                
+                $value = $answerData['answer_value'] ?? null;
+                // حفظ أو تحديث الإجابة (يسمح بإعادة الحفظ دون تكرار)
+                $answer = Answer::updateOrCreate(
+                    ['visit_id' => $visit->id, 'question_id' => $question->id],
+                    [
+                        'answer_value' => $value,
+                        // الدرجة تُحسب في الخادم حسب نوع السؤال
+                        'score' => $this->computeScore($question, $value, $answerData['score'] ?? null),
+                        // الأسئلة النصية/التاريخ/الملفات ملاحظات غير مُقيَّمة: لا تدخل في حساب النسبة
+                        'max_score' => in_array($question->type, ['text', 'date', 'file']) ? 0 : $question->max_score,
+                        'is_correct' => $this->checkIfCorrect($question, $value),
+                        'comment' => $answerData['comment'] ?? null,
+                        'auditor_comment' => $answerData['auditor_comment'] ?? null,
+                        'corrective_action' => $answerData['corrective_action'] ?? null,
+                        'corrective_deadline' => $answerData['corrective_deadline'] ?? null,
+                        'correction_status' => !empty($answerData['corrective_action']) ? 'pending' : null,
+                    ]
+                );
+                // حفظ الصور/المرفقات المرفوعة مع هذه الإجابة
+                foreach ((array) $request->file("answers.$index.attachments", []) as $file) {
+                    if ($file) {
+                        saveAttachment($file, $answer);
+                    }
+                }
                 $answers[] = $answer;
             }
-            
             // تحديث إحصائيات الزيارة
             $this->updateVisitStatistics($visit);
             
@@ -1479,6 +1481,38 @@ class AnswerController extends Controller
         ]);
     }
     
+    /**
+     * حساب درجة الإجابة في الخادم حسب نوع السؤال (لا يُعتمد على الدرجة المرسلة من المتصفح إلا للأنواع المفتوحة)
+     */
+    private function computeScore(Question $question, $value, $clientScore = null): float
+    {
+        $max = (float) $question->max_score;
+        $v = is_string($value) ? strtolower(trim($value)) : $value;
+        switch ($question->type) {
+            case 'yes_no':
+                return in_array($v, ['yes', 'نعم', 'true', '1', 'صحيح'], true) ? $max : 0.0;
+            case 'scale_1_5':
+            case 'scale_1_10':
+                $scale = $question->type === 'scale_1_5' ? 5 : 10;
+                if (!is_numeric($v) || $v < 1 || $v > $scale) return 0.0;
+                return round(((float) $v / $scale) * $max, 2);
+            case 'multiple_choice':
+                $options = is_array($question->options) ? $question->options : (json_decode($question->options ?? '[]', true) ?: []);
+                foreach ($options as $option) {
+                    if ((string) ($option['value'] ?? '') === (string) $value) {
+                        return min($max, (float) ($option['score'] ?? 0));
+                    }
+                }
+                return 0.0;
+            case 'text':
+            case 'date':
+            case 'file':
+                return 0.0;
+            default:
+                return is_numeric($clientScore) ? max(0.0, min($max, (float) $clientScore)) : 0.0;
+        }
+    }
+
     private function checkIfCorrect(Question $question, $answerValue): ?bool
     {
         if (!$question->correct_answer) {

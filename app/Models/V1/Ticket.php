@@ -381,9 +381,11 @@ class Ticket extends Model
         $year = now()->format('Y');
         $month = now()->format('m');
         
-        $lastTicket = self::whereYear('created_at', now()->year)
-                         ->whereMonth('created_at', now()->month)
-                         ->orderBy('id', 'desc')
+        // يُبحث في كل التذاكر (بدون نطاق صلاحيات المستخدم وتشمل المحذوفة) لتفادي تكرار الرقم
+        // كان مدير المنشأة لا يرى تذاكر غيره فيولّد رقماً مكرراً ويفشل الحفظ (خطأ 500)
+        $lastTicket = self::withoutGlobalScopes()
+                         ->where('ticket_number', 'like', "{$prefix}-{$year}{$month}-%")
+                         ->orderBy('ticket_number', 'desc')
                          ->first();
         
         if ($lastTicket) {

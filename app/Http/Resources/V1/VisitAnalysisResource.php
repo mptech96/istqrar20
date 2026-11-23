@@ -17,9 +17,11 @@ class VisitAnalysisResource extends JsonResource
         return [
             'id'                      => $this->id,
             'visit_id'                => $this->visit_id,
-            'branch'                  => $this->branch->name,
-            'auditor'                  => $this->auditor->name,
-            'company'                 => $this->company->name,
+            'branch'                  => $this->branch?->name,
+            // اسم المراقب يُجلب دون نطاق المستخدمين حتى يظهر لمدير المنشأة/الفرع (كان يسبب خطأ 500 لهم)
+            'auditor'                 => $this->auditor?->name
+                ?? \App\Models\V1\User::withoutGlobalScopes()->find(optional($this->visit)->auditor_id)?->name,
+            'company'                 => $this->company?->name,
 
             'analysis_type'           => $this->analysis_type,
             'analysis_date'           => $this->analysis_date?->toDateString(),

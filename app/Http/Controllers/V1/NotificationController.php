@@ -217,34 +217,76 @@ class NotificationController extends Controller
         return $template;
     }
 
+    /**
+     * حماية مهام Cron: إذا ضُبط CRON_TOKEN في .env يجب تمريره كـ ?token= أو ترويسة X-Cron-Token
+     */
+    private function authorizeCron()
+    {
+        $expected = env('CRON_TOKEN');
+        if ($expected && !hash_equals($expected, (string) (request()->query('token') ?? request()->header('X-Cron-Token')))) {
+            abort(response()->json(['status' => false, 'message' => 'Unauthorized'], 401));
+        }
+    }
+
+    /**
+     * يومياً: الاشتراكات المنتهية (اليوم أو قبله ولم تُعالج)
+     * - إذا كان التجديد الآلي مفعّلاً: يُمدد الاشتراك بنفس مدته السابقة ويُرسل إشعار تجديد
+     * - غير ذلك: تتحول الحالة إلى expired ويُشعر مدير المنشأة ومدراء النظام
+     */
     public function subscription_expired()
     {
-        $companies = Company::todaySubscriptionExpired()->get();
-        foreach($companies as $company){
-            if($company->getRemainingSubscriptionDays() == 0){
-                app(\App\Services\V1\NotificationService::class)->subscription_expired($company);
+        $this->authorizeCron();
+        $service = app(\App\Services\V1\NotificationService::class);
+        $renewed = 0; $expired = 0;
+        $companies = Company::activeSubscription()
+            ->whereNotNull('subscription_end')
+            ->whereDate('subscription_end', '<=', now()->toDateString())
+            ->get();
+        foreach ($companies as $company) {
+            if ($company->auto_renew) {
+                $start = $company->subscription_start ?: $company->subscription_end->copy()->subYear();
+                $days = max(1, $start->diffInDays($company->subscription_end));
+                $newStart = $company->subscription_end->copy();
+                $newEnd = $newStart->copy()->addDays($days);
+                $company->forceFill([
+                    'subscription_start' => $newStart->toDateString(),
+                    'subscription_end' => $newEnd->toDateString(),
+                    'subscription_status' => 'active',
+                ])->save();
+                $service->subscription_renewed($company->fresh());
+                $renewed++;
+            } else {
+                $company->forceFill(['subscription_status' => 'expired'])->save();
+                $service->subscription_expired($company);
+                $expired++;
             }
         }
-        return response()->json(['status' => true]);
+        return response()->json(['status' => true, 'renewed' => $renewed, 'expired' => $expired]);
     }
 
+    /**
+     * يومياً: تذكير قبل انتهاء الاشتراك بـ 5 أيام
+     */
     public function subscription_expiry_reminder()
     {
-        $companies = Company::todaySubscriptionExpired()->get();
-        foreach($companies as $company){
-            if($company->getRemainingSubscriptionDays() == 5){
-                app(\App\Services\V1\NotificationService::class)->subscription_expiry_reminder($company);
-            }
+        $this->authorizeCron();
+        $companies = Company::subscriptionEndsInDays(5)->get();
+        foreach ($companies as $company) {
+            app(\App\Services\V1\NotificationService::class)->subscription_expiry_reminder($company);
         }
-        return response()->json(['status' => true]);
+        return response()->json(['status' => true, 'count' => $companies->count()]);
     }
 
+    /**
+     * يومياً: تذكير كل مفتش بعدد زياراته المجدولة غداً
+     */
     public function reminder_visit_tomorrow()
     {
+        $this->authorizeCron();
         $visits = Visit::tomorrowVisits()->get();
-        foreach($visits as $visit){
+        foreach ($visits as $visit) {
             app(\App\Services\V1\NotificationService::class)->reminder_visit_tomorrow($visit);
         }
-        return response()->json(['status' => true]);
+        return response()->json(['status' => true, 'count' => $visits->count()]);
     }
 }

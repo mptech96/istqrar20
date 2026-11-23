@@ -6924,6 +6924,21 @@
                 ]
             }
         },
+        "/api/v1/public/clients": {
+            "get": {
+                "tags": [
+                    "Public"
+                ],
+                "summary": "عملاؤنا",
+                "description": "قائمة المنشآت المتعاقدة التي فعّل مدير النظام ظهورها في صفحة (عملاؤنا) بالموقع العام: الاسم والشعار والمدينة فقط",
+                "operationId": "0da85b223929e6b836866419b38c5431",
+                "responses": {
+                    "200": {
+                        "description": "قائمة العملاء"
+                    }
+                }
+            }
+        },
         "/api/v1/checklists/{checklist}/questions": {
             "get": {
                 "tags": [
@@ -8712,9 +8727,7 @@
                                         "nullable": true
                                     },
                                     "phone": {
-                                        "type": "string",
-                                        "format": "phone",
-                                        "example": "+966501234567"
+                                        "type": "string"
                                     },
                                     "email": {
                                         "type": "string",
@@ -15432,6 +15445,10 @@
         {
             "name": "Notifications",
             "description": "الاشعارات"
+        },
+        {
+            "name": "Public",
+            "description": "Public"
         }
     ]
 }

@@ -68,7 +68,7 @@ class StoreBranchRequest extends FormRequest
                 }
             ],
             // Branch Manager User data
-            'user_id' => ['nullable', 'integer', 'exists:users,id'],
+            'user_id' => ['nullable', 'integer', Rule::exists('users', 'id')->where(fn ($query) => $query->whereIn('role', ['branch_manager']))],
 
 
             'user_name' => [
@@ -110,20 +110,8 @@ class StoreBranchRequest extends FormRequest
 
         ];
     }
-  
-    public function withValidator($validator): void
-    {
-        $validator->after(function ($validator) {
-            if($this->filled('user_id')){
-                $manager = \App\Models\V1\User::find($this->user_id);
-                if($manager?->role === 'super_admin') {
-                    $validator->errors()->add('user_id', __('خطا في اختيار المستخدم'));
-                }
-            }
-        });
-    }
-  
-    public function messages(): array
+
+   public function messages(): array
     {
         return [
             // رسائل حقول الفرع

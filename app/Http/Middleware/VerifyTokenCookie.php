@@ -26,7 +26,7 @@ class VerifyTokenCookie
                 
                 $accessToken = PersonalAccessToken::findToken(decrypt($token));
                 
-                if ($accessToken) {
+                if ($accessToken && (!$accessToken->expires_at || $accessToken->expires_at->isFuture())) {
                     
                     $user = $accessToken->tokenable;
                     Auth::setUser($user);

@@ -41,8 +41,8 @@ class Visit extends Model
     public function scopeTomorrowVisits($query)
     {
         return $query
-            //->scheduled()
-            //->whereDate('scheduled_date', now()->addDay()->toDateString())
+            ->whereIn('status', ['scheduled', 'draft'])
+            ->whereDate('scheduled_date', now()->addDay()->toDateString())
             ->select('auditor_id', \DB::raw('count(*) as total_visits'))
             ->groupBy('auditor_id');
 

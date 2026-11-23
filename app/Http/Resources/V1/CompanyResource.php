@@ -36,6 +36,8 @@ class CompanyResource extends JsonResource
             'status_text' => $this->status ? 'نشط' : 'غير نشط',
             'is_verified' => (bool) $this->is_verified,
             'ai_support' => (bool) $this->ai_support,
+            'auto_renew' => (bool) $this->auto_renew,
+            'show_on_website' => (bool) $this->show_on_website,
             'is_subscription_active' => $this->is_subscription_active,
             'average_score' => (float) round($this->average_score, 2),
             'remaining_subscription_days' => $this->getRemainingSubscriptionDays(),

@@ -3,6 +3,7 @@
 namespace App\Http\Requests\V1;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateBranchRequest extends FormRequest
 {
@@ -36,25 +37,13 @@ class UpdateBranchRequest extends FormRequest
             
             
             // Manager update
-            'manager_user_id' => ['nullable', 'integer', 'exists:users,id'],
+            'manager_user_id' => ['nullable', 'integer', Rule::exists('users', 'id')->where(fn ($query) => $query->whereIn('role', ['branch_manager']))],
             'manager_name' => ['nullable', 'string', 'max:255'],
             'manager_email' => ['nullable', 'email'],
             'manager_phone' => ['nullable', 'string', 'max:20'],
         ];
     }
 
-    public function withValidator($validator): void
-    {
-        $validator->after(function ($validator) {
-            if($this->filled('manager_user_id')){
-                $manager = \App\Models\V1\User::find($this->manager_user_id);
-                if($manager?->role === 'super_admin') {
-                    $validator->errors()->add('manager_user_id', __('خطا في اختيار المستخدم'));
-                }
-            }
-        });
-    }
-  
     public function messages(): array
     {
         return [

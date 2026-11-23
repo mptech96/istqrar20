@@ -382,6 +382,8 @@ class CompanyController extends Controller
                 'subscription_status' => $request->input('subscription_status'),
                 'category' => $request->input('category'),
                 'ai_support' => $request->input('ai_support'),
+                'auto_renew' => filter_var($request->input('auto_renew', false), FILTER_VALIDATE_BOOLEAN),
+                'show_on_website' => filter_var($request->input('show_on_website', false), FILTER_VALIDATE_BOOLEAN),
 
                 'max_allowed_users' => $request->input('max_allowed_users'),
                 'max_allowed_branches' => $request->input('max_allowed_branches'),
@@ -582,13 +584,15 @@ class CompanyController extends Controller
         $request->merge([
             'is_verified' => filter_var($request->filled('is_verified') ? $request->input('is_verified') : $company->is_verified, FILTER_VALIDATE_BOOLEAN),
             'ai_support' => filter_var($request->filled('ai_support') ? $request->input('ai_support') : $company->ai_support, FILTER_VALIDATE_BOOLEAN),
+            'auto_renew' => filter_var($request->filled('auto_renew') ? $request->input('auto_renew') : $company->auto_renew, FILTER_VALIDATE_BOOLEAN),
+            'show_on_website' => filter_var($request->filled('show_on_website') ? $request->input('show_on_website') : $company->show_on_website, FILTER_VALIDATE_BOOLEAN),
         ]);
 
         // تجهيز البيانات باستخدام collect - فقط الحقول الموجودة وغير الفارغة
         $data = collect($request->only([
             'name', 'email', 'phone', 'latitude', 'longitude', 'commercial_registration', 'city',
             'address', 'contact_person', 'subscription_start', 'subscription_end',
-            'subscription_status', 'max_allowed_users', 'max_allowed_branches', 'is_verified', 'ai_support'
+            'subscription_status', 'max_allowed_users', 'max_allowed_branches', 'is_verified', 'ai_support', 'auto_renew', 'show_on_website'
         ]))->filter(fn($value) => filled($value))->toArray();
 
         // معالجة خاصة لحقل status (boolean)

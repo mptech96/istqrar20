@@ -108,7 +108,7 @@ class AuthController extends Controller
                 'last_login_ip' => $request->ip()
             ]);
     
-            $token = encrypt($userLogin->createToken("auth_token")->plainTextToken);
+            $token = encrypt($userLogin->createToken("auth_token", ['*'], now()->addDay())->plainTextToken);
             
             app(\App\Http\Middleware\LoginThrottleMiddleware::class)->handleLoginAttempt($request->email, $request->ip(), true);
             
@@ -151,6 +151,14 @@ class AuthController extends Controller
     public function logout(Request $request)
     {
         $cookie = Cookie::forget('auth_token');
+        // إنهاء صلاحية التوكن الحالي فور تسجيل الخروج (يبقى السجل للتاريخ ولا يُحذف)
+        try {
+            $raw = $request->cookie('auth_token') ?? $request->bearerToken();
+            if ($raw) {
+                $accessToken = \Laravel\Sanctum\PersonalAccessToken::findToken(decrypt($raw));
+                $accessToken?->forceFill(['expires_at' => now()])->save();
+            }
+        } catch (\Exception $e) {}
         //$request->user()->tokens()->delete();
         //$request->user()->currentAccessToken()->delete();
         return response()->json([

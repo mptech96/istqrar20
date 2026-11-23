@@ -20,6 +20,7 @@ class Company extends Model
         'subscription_end' => 'date',
         'status' => 'boolean',
         'is_verified' => 'boolean',
+        'auto_renew' => 'boolean',
         'overall_score' => 'decimal:2'
     ];
     
@@ -52,6 +53,12 @@ class Company extends Model
                     ->whereDate('subscription_end', now()->toDateString());
     }
 
+    public function scopeSubscriptionEndsInDays($query, int $days)
+    {
+        return $query->activeSubscription()
+                    ->whereDate('subscription_end', now()->addDays($days)->toDateString());
+    }
+
     public function scopeWithActiveSubscription($query)
     {
         return $query->activeSubscription()->where('subscription_end', '>', now());
@@ -59,7 +66,7 @@ class Company extends Model
 
     public function getActiveSubscription()
     {
-        $company = $this->withActiveSubscription()->first();
+        $company = static::whereKey($this->getKey())->withActiveSubscription()->first();
         if($company) {
             if($company->status == 1) return true;
         } else {

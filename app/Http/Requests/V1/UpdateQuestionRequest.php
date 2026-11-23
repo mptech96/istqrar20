@@ -55,6 +55,16 @@ class UpdateQuestionRequest extends FormRequest
         return $rules;
     }
     
+    /**
+     * توافق مع الواجهة: النوع "rating" (تقييم 1-5) يُخزَّن كنوع scale_1_5
+     */
+    protected function prepareForValidation()
+    {
+        if ($this->input('type') === 'rating') {
+            $this->merge(['type' => 'scale_1_5']);
+        }
+    }
+
     public function withValidator($validator)
     {
         $validator->after(function ($validator) {

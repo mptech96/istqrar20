@@ -30,6 +30,8 @@ class CompanyRequest extends FormRequest
             'max_allowed_users' => ['nullable', 'integer', 'min:2'],
             'max_allowed_branches' => ['nullable', 'integer', 'min:1'],
             'ai_support' => ['nullable', 'boolean'],
+            'auto_renew' => ['nullable', 'boolean'],
+            'show_on_website' => ['nullable', 'boolean'],
 
             'subscription_start' => ['required', 'date', 'after_or_equal:today'],
             'subscription_end' => ['required', 'date', 'after:subscription_start'],
@@ -37,7 +39,7 @@ class CompanyRequest extends FormRequest
             'category' => ['required', 'string', 'max:100'],
             
             // Company Manager User data - Conditional validation based on user_id
-            'user_id' => ['nullable', 'integer', 'exists:users,id'],
+            'user_id' => ['nullable', 'integer', Rule::exists('users', 'id')->where(fn ($query) => $query->whereIn('role', ['company_admin', 'branch_manager']))],
             'user_name' => [
                 Rule::when($this->filled('user_id'), 
                     ['sometimes', 'nullable', 'string', 'max:255'],  // إذا كان user_id موجوداً: اختياري
@@ -168,6 +170,11 @@ class CompanyRequest extends FormRequest
 
     protected function prepareForValidation(): void
     {
+        foreach (['auto_renew', 'show_on_website'] as $flag) {
+            if ($this->has($flag)) {
+                $this->merge([$flag => filter_var($this->input($flag), FILTER_VALIDATE_BOOLEAN)]);
+            }
+        }
         if (!$this->has('ai_support')) {
             $this->merge([
                 'ai_support' => false,

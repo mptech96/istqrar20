@@ -37,22 +37,12 @@ class UpdateCompanyRequest extends FormRequest
             //'status' => ['sometimes'],
             'is_verified' => ['sometimes', 'boolean'],
             'ai_support' => ['sometimes', 'boolean'],
-            'user_id' => ['sometimes', 'nullable', 'integer', 'exists:users,id'],
+            'auto_renew' => ['sometimes', 'boolean'],
+            'show_on_website' => ['sometimes', 'boolean'],
+            'user_id' => ['sometimes', 'nullable', 'integer', Rule::exists('users', 'id')->where(fn ($query) => $query->whereIn('role', ['company_admin']))],
         ];
     }
 
-    public function withValidator($validator): void
-    {
-        $validator->after(function ($validator) {
-            if($this->filled('user_id')){
-                $manager = \App\Models\V1\User::find($this->user_id);
-                if($manager?->role === 'super_admin') {
-                    $validator->errors()->add('user_id', __('خطا في اختيار المستخدم'));
-                }
-            }
-        });
-    }
-  
     public function messages(): array
     {
         return [
@@ -154,6 +144,11 @@ class UpdateCompanyRequest extends FormRequest
 
     protected function prepareForValidation(): void
     {
+        foreach (['auto_renew', 'show_on_website'] as $flag) {
+            if ($this->filled($flag)) {
+                $this->merge([$flag => filter_var($this->input($flag), FILTER_VALIDATE_BOOLEAN)]);
+            }
+        }
         if ($this->filled('ai_support')) {
             $this->merge(['ai_support' => filter_var($this->input('ai_support'), FILTER_VALIDATE_BOOLEAN),]);
         }

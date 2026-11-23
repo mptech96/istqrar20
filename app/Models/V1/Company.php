@@ -16,7 +16,7 @@ class Company extends Model
         'city', 'address', 'contact_person', 'logo', 'max_allowed_users', 'max_allowed_branches',
         'subscription_start', 'subscription_end', 'subscription_status',
         'total_branches', 'overall_score', 'category',
-        'status', 'is_verified', 'ai_support'
+        'status', 'is_verified', 'ai_support', 'auto_renew', 'show_on_website'
     ];
 
     protected $casts = [
@@ -25,6 +25,8 @@ class Company extends Model
         'status' => 'boolean',
         'is_verified' => 'boolean',
         'ai_support' => 'boolean',
+        'auto_renew' => 'boolean',
+        'show_on_website' => 'boolean',
         'overall_score' => 'decimal:2',
         'latitude' => 'decimal:8',
         'longitude' => 'decimal:8'
@@ -135,7 +137,7 @@ class Company extends Model
 
     public function getActiveSubscription()
     {
-        $company = $this->withActiveSubscription()->first();
+        $company = static::whereKey($this->getKey())->withActiveSubscription()->first();
         if($company) {
             if($company->status == 1) {
 

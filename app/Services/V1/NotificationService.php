@@ -79,9 +79,13 @@ class NotificationService
     public function visit_completed($entity)
     {
         $template = NotificationTemplate::active()->where('type', 'visit_completed')->first();
+        if (!$template) return;
+        $ids = array_filter([
+            optional(optional($entity->company)->manager)->id,
+            optional($entity->branch)->manager_user_id,
+        ]);
         $users = User::where('role', 'super_admin')
-            ->orWhere('id', $entity->company->manager->id)
-            ->orWhere('id', $entity->branch->manager_user_id)
+            ->when($ids, fn ($q) => $q->orWhereIn('id', $ids))
             ->get();
         
         foreach($users as $user){
@@ -108,59 +112,71 @@ class NotificationService
     {
         $template = NotificationTemplate::active()->where('type', 'reminder_visit_tomorrow')->first();
         $user = $entity->auditor;
-
+        if (!$template || !$user) return;
         (new NotificationController)->store(new Request([
             'user_id' => $user->id,
             'notification_template_id' => $template->id,
-            //'title' => '',
             'body' => [
-                'visits_count' => $user->visits->count(),
+                // عدد زيارات الغد لهذا المفتش (محسوبة في scopeTomorrowVisits)
+                'visits_count' => $entity->total_visits ?? 0,
             ],
             'scheduled_date' => now(),
             'entity_id' => $user->id,
             'entity_type' => \App\Models\V1\User::class,
         ]));
-        
+    }
+
+    /**
+     * مستلمو إشعارات الاشتراك: مدير المنشأة + جميع مدراء النظام (حسب العقد: إشعار المدير العام بحالات الاشتراك المنتهية)
+     */
+    private function subscriptionRecipients($company)
+    {
+        $users = User::where('role', 'super_admin')->get();
+        if ($company->manager) {
+            $users->push($company->manager);
+        }
+        return $users->unique('id');
+    }
+
+    private function notifyCompany(string $type, $company, array $body, bool $includeAdmins = true)
+    {
+        $template = NotificationTemplate::active()->where('type', $type)->first();
+        if (!$template) return;
+        $users = $includeAdmins ? $this->subscriptionRecipients($company) : collect([$company->manager])->filter();
+        foreach ($users as $user) {
+            (new NotificationController)->store(new Request([
+                'user_id' => $user->id,
+                'notification_template_id' => $template->id,
+                'body' => $body,
+                'scheduled_date' => now(),
+                'entity_id' => $company->id,
+                'entity_type' => \App\Models\V1\Company::class,
+            ]));
+        }
     }
 
     public function subscription_expiry_reminder($entity)
     {
-        $template = NotificationTemplate::active()->where('type', 'reminder_visit_tomorrow')->first();
-        $user = $entity->manager;
-
-        (new NotificationController)->store(new Request([
-            'user_id' => $user->id,
-            'notification_template_id' => $template->id,
-            //'title' => '',
-            'body' => [
-                'company_name' => $entity->name,
-                'days_left' => $entity->getRemainingSubscriptionDays(),
-                'expiry_date' => $entity->subscription_end,
-            ],
-            'scheduled_date' => now(),
-            'entity_id' => $entity->id,
-            'entity_type' => \App\Models\V1\Company::class,
-        ]));
-        
+        $this->notifyCompany('subscription_expiry_reminder', $entity, [
+            'company_name' => $entity->name,
+            'days_left' => $entity->getRemainingSubscriptionDays(),
+            'expiry_date' => optional($entity->subscription_end)->toDateString(),
+        ]);
     }
 
     public function subscription_expired($entity)
     {
-        $template = NotificationTemplate::active()->where('type', 'subscription_expired')->first();
-        $user = $entity->manager;
+        $this->notifyCompany('subscription_expired', $entity, [
+            'company_name' => $entity->name,
+            'expiry_date' => optional($entity->subscription_end)->toDateString(),
+        ]);
+    }
 
-        (new NotificationController)->store(new Request([
-            'user_id' => $user->id,
-            'notification_template_id' => $template->id,
-            //'title' => '',
-            'body' => [
-                'company_name' => $entity->name,
-                'expiry_date' => $entity->subscription_end,
-            ],
-            'scheduled_date' => now(),
-            'entity_id' => $entity->id,
-            'entity_type' => \App\Models\V1\Company::class,
-        ]));
-        
+    public function subscription_renewed($entity)
+    {
+        $this->notifyCompany('subscription_renewed', $entity, [
+            'company_name' => $entity->name,
+            'expiry_date' => optional($entity->subscription_end)->toDateString(),
+        ]);
     }
 }

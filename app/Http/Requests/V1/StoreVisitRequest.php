@@ -24,7 +24,6 @@ class StoreVisitRequest extends FormRequest
             'internal_notes' => ['nullable', 'string'],
         ];
     }
-    
 
     public function messages(): array
     {
@@ -33,7 +32,8 @@ class StoreVisitRequest extends FormRequest
             'branch_id.exists' => 'الفرع المحدد غير موجود.',
             
             'auditor_id.required' => 'حقل معرف المدقق مطلوب.',
-            'auditor_id.exists' => 'المراقب المحدد غير موجود أو ليس لديه دور مراقب.',
+            'auditor_id.exists' => 'المدقق المحدد غير موجود.',
+            
             'checklist_id.required' => 'حقل معرف قائمة التحقق مطلوب.',
             'checklist_id.exists' => 'قائمة التحقق المحددة غير موجودة.',
             
@@ -61,7 +61,6 @@ class StoreVisitRequest extends FormRequest
             'scheduled_time' => 'الوقت المجدول',
             'estimated_duration' => 'المدة التقديرية (بالدقائق)',
             'internal_notes' => 'الملاحظات الداخلية',
-
         ];
     }
 }

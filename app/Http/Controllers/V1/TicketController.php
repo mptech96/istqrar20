@@ -638,18 +638,24 @@ class TicketController extends Controller
     )]
     public function update(UpdateTicketRequest $request, Ticket $ticket)
     {
-        $ticket->update($request->only([
+        // صاحب التذكرة يعدّل تذكرته فقط، ومدير النظام يعدّل أي تذكرة
+        $user = auth()->user();
+        if ($user->role !== 'super_admin' && (int) $ticket->created_by !== (int) $user->id) {
+            return response()->json(['message' => 'ليس لديك صلاحية لتعديل هذه التذكرة'], 403);
+        }
+        $isAdmin = $user->role === 'super_admin';
+        $ticket->update($request->only($isAdmin ? [
             'subject', 'description', 'priority', 'department', 
             'assigned_to', 'status', 'resolution', 'customer_satisfaction'
-        ]));
+        ] : ['subject', 'description', 'priority', 'customer_satisfaction']));
         
         // Handle assignment
-        if ($request->has('assigned_to') && $request->input('assigned_to')) {
+        if ($isAdmin && $request->has('assigned_to') && $request->input('assigned_to')) {
             $ticket->assignTo($request->input('assigned_to'));
         }
         
         // Handle resolution
-        if ($request->has('status') && $request->input('status') === 'resolved') {
+        if ($isAdmin && $request->has('status') && $request->input('status') === 'resolved') {
             if ($request->has('resolution')) {
                 $ticket->resolve($request->input('resolution'), Auth::id());
             }
