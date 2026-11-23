@@ -8712,7 +8712,9 @@
                                         "nullable": true
                                     },
                                     "phone": {
-                                        "type": "string"
+                                        "type": "string",
+                                        "format": "phone",
+                                        "example": "+966501234567"
                                     },
                                     "email": {
                                         "type": "string",

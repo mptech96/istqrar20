@@ -3,6 +3,7 @@
 namespace App\Http\Requests\V1;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreVisitRequest extends FormRequest
 {
@@ -15,7 +16,7 @@ class StoreVisitRequest extends FormRequest
     {
         return [
             'branch_id' => ['required', 'exists:branches,id'],
-            'auditor_id' => ['required', 'exists:users,id'],
+            'auditor_id' => ['required', Rule::exists('users', 'id')->where(fn ($query) => $query->where('role', 'auditor'))],
             'checklist_id' => ['required', 'exists:checklists,id'],
             'scheduled_date' => ['required', 'date', 'after_or_equal:today'],
             'scheduled_time' => ['nullable', 'date_format:H:i'],
@@ -23,6 +24,7 @@ class StoreVisitRequest extends FormRequest
             'internal_notes' => ['nullable', 'string'],
         ];
     }
+    
 
     public function messages(): array
     {
@@ -31,8 +33,7 @@ class StoreVisitRequest extends FormRequest
             'branch_id.exists' => 'الفرع المحدد غير موجود.',
             
             'auditor_id.required' => 'حقل معرف المدقق مطلوب.',
-            'auditor_id.exists' => 'المدقق المحدد غير موجود.',
-            
+            'auditor_id.exists' => 'المراقب المحدد غير موجود أو ليس لديه دور مراقب.',
             'checklist_id.required' => 'حقل معرف قائمة التحقق مطلوب.',
             'checklist_id.exists' => 'قائمة التحقق المحددة غير موجودة.',
             
@@ -60,6 +61,7 @@ class StoreVisitRequest extends FormRequest
             'scheduled_time' => 'الوقت المجدول',
             'estimated_duration' => 'المدة التقديرية (بالدقائق)',
             'internal_notes' => 'الملاحظات الداخلية',
+
         ];
     }
 }

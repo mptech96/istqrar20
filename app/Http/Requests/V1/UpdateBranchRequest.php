@@ -43,6 +43,18 @@ class UpdateBranchRequest extends FormRequest
         ];
     }
 
+    public function withValidator($validator): void
+    {
+        $validator->after(function ($validator) {
+            if($this->filled('manager_user_id')){
+                $manager = \App\Models\V1\User::find($this->manager_user_id);
+                if($manager?->role === 'super_admin') {
+                    $validator->errors()->add('manager_user_id', __('خطا في اختيار المستخدم'));
+                }
+            }
+        });
+    }
+  
     public function messages(): array
     {
         return [

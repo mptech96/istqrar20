@@ -41,6 +41,18 @@ class UpdateCompanyRequest extends FormRequest
         ];
     }
 
+    public function withValidator($validator): void
+    {
+        $validator->after(function ($validator) {
+            if($this->filled('user_id')){
+                $manager = \App\Models\V1\User::find($this->user_id);
+                if($manager?->role === 'super_admin') {
+                    $validator->errors()->add('user_id', __('خطا في اختيار المستخدم'));
+                }
+            }
+        });
+    }
+  
     public function messages(): array
     {
         return [

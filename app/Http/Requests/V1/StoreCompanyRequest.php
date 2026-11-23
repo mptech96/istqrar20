@@ -37,7 +37,7 @@ class StoreCompanyRequest extends FormRequest
             'category' => ['required', 'string', 'max:100'],
             
             // Company Manager User data - Conditional validation based on user_id
-            'user_id' => ['nullable', 'integer', 'exists:users,id'],
+            'user_id' => ['nullable', 'integer', Rule::exists('users', 'id')->where(fn ($query) => $query->whereIn('role', ['company_admin', 'branch_manager']))],
             'user_name' => [
                 Rule::when($this->filled('user_id'), 
                     ['sometimes', 'nullable', 'string', 'max:255'],  // إذا كان user_id موجوداً: اختياري
@@ -67,7 +67,7 @@ class StoreCompanyRequest extends FormRequest
             'user_gender' => ['nullable', 'integer', 'in:1,2,3'],
         ];
     }
-
+  
     public function messages(): array
     {
         return [

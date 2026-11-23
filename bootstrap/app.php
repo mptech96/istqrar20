@@ -42,7 +42,10 @@ return Application::configure(basePath: dirname(__DIR__))
         
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        $exceptions->render(function (NotFoundHttpException $e, Request $request) {
+        $exceptions->shouldRenderJsonWhen(
+            fn (Request $request, \Throwable $e) => $request->is('api/*') || $request->expectsJson()
+        )
+        ->render(function (NotFoundHttpException $e, Request $request) {
         
             return response()->json([
                 'message' => __tr('Not Found')
