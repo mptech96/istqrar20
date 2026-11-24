@@ -15,10 +15,15 @@ class BulkAnswerRequest extends FormRequest
     {
         return [
             'answers' => ['required', 'array', 'min:1'],
-            'answers.*.question_id' => ['required', 'exists:questions,id'],
+            'answers.*.question_id' => ['required', 'exists:questions,id', 'distinct'],
             'answers.*.answer_value' => ['required'],
             'answers.*.score' => ['nullable', 'numeric', 'min:0'],
             'answers.*.comment' => ['nullable', 'string'],
+            'answers.*.auditor_comment' => ['nullable', 'string'],
+            'answers.*.corrective_action' => ['nullable', 'string'],
+            'answers.*.corrective_deadline' => ['nullable', 'date', 'after_or_equal:today'],
+            'answers.*.attachments' => ['nullable', 'array', 'max:10'],
+            'answers.*.attachments.*' => ['file', 'max:10240'],
         ];
     }
 

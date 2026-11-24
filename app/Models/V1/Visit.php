@@ -219,29 +219,16 @@ class Visit extends Model
 
     public function calculateStatistics()
     {
-        $answers = $this->answers;
-        
-        $totalScore = $answers->sum('score');
-        $maxPossibleScore = $answers->sum('max_score');
-        $percentage = $maxPossibleScore > 0 ? ($totalScore / $maxPossibleScore) * 100 : 0;
-        
-        $this->update([
-            'total_score' => $totalScore,
-            'max_possible_score' => $maxPossibleScore,
-            'percentage' => $percentage,
-            'category' => $this->determineCategory($percentage),
-        ]);
-        
-        return $this;
-    }
+        $statistics = app(\App\Services\V1\Scoring\VisitScoringService::class)->calculate($this);
 
-    private function determineCategory(float $percentage): string
-    {
-        if ($percentage >= 90) return 'ممتاز';
-        if ($percentage >= 80) return 'جيد جدا';
-        if ($percentage >= 70) return 'جيد';
-        if ($percentage >= 60) return 'مقبول';
-        return 'ضعيف';
+        $this->update([
+            'total_score' => $statistics['total_score'],
+            'max_possible_score' => $statistics['max_possible_score'],
+            'percentage' => $statistics['percentage'],
+            'category' => $statistics['category'],
+        ]);
+
+        return $this->refresh();
     }
 
 
@@ -253,18 +240,24 @@ class Visit extends Model
      */
     public function getCriteriaScores(): \Illuminate\Support\Collection
     {
-        // جلب جميع إجابات الزيارة مع علاقات الأسئلة والمعايير ونطاقات المعايير
-        $answers = $this->answers()
-            ->with(['question.criteria.ranges'])
-            ->get();
+        $scoringService = app(\App\Services\V1\Scoring\VisitScoringService::class);
+        $questions = $this->checklist
+            ? $this->checklist->questions()
+                ->where('is_active', true)
+                ->with(['criteria.ranges'])
+                ->get()
+            : collect();
 
-        // تجميع النتائج حسب المعيار
+        $answers = $this->answers()
+            ->whereIn('question_id', $questions->pluck('id'))
+            ->get()
+            ->keyBy('question_id');
+
         $criteriaScores = [];
 
-        foreach ($answers as $answer) {
-            $question = $answer->question;
-            if (!$question || !$question->criteria) {
-                continue; // تجاهل الأسئلة غير المرتبطة بمعيار
+        foreach ($questions as $question) {
+            if (!$question->criteria || in_array($question->type, ['text', 'date', 'file'], true)) {
+                continue;
             }
 
             $criteria = $question->criteria;
@@ -272,6 +265,7 @@ class Visit extends Model
 
             if (!isset($criteriaScores[$criteriaId])) {
                 $criteriaScores[$criteriaId] = [
+                    'criteria_id' => $criteriaId,
                     'criteria_name' => $criteria->name,
                     'total_earned' => 0,
                     'total_possible' => 0,
@@ -279,19 +273,25 @@ class Visit extends Model
                 ];
             }
 
-            $criteriaScores[$criteriaId]['total_earned'] += $answer->score ?? 0;
-            $criteriaScores[$criteriaId]['total_possible'] += $question->max_score ?? 0;
+            $answer = $answers->get($question->id);
+            $questionMaximum = (float) $scoringService->maximumAchievableScore($question);
+            $answerMaximum = $answer && $answer->max_score !== null
+                ? (float) $answer->max_score
+                : $questionMaximum;
+
+            $criteriaScores[$criteriaId]['total_earned'] += $answer
+                ? min($answerMaximum, max(0, (float) $answer->score))
+                : 0;
+            $criteriaScores[$criteriaId]['total_possible'] += $questionMaximum;
         }
 
-        // حساب النسبة المئوية وتحديد المستوى لكل معيار
         $results = collect();
         foreach ($criteriaScores as $data) {
             $percentage = $data['total_possible'] > 0
                 ? round(($data['total_earned'] / $data['total_possible']) * 100, 2)
                 : 0;
 
-            // البحث عن نطاق المستوى المناسب
-            $level = $this->getCriteriaLevel($percentage, $data['criteria_name']);
+            $level = $this->getCriteriaLevel($percentage, (int) $data['criteria_id']);
 
             $results->push([
                 'criteria_name' => $data['criteria_name'],
@@ -311,17 +311,18 @@ class Visit extends Model
      * تحديد مستوى المعيار بناءً على النسبة المئوية والنطاقات المسجلة
      *
      * @param float $percentage
-     * @param string $criteriaName
+     * @param int $criteriaId
      * @return array
      */
-    private function getCriteriaLevel(float $percentage, string $criteriaName): array
+    private function getCriteriaLevel(float $percentage, int $criteriaId): array
     {
-        // البحث عن النطاق المناسب من جدول criteria_ranges
-        $range = \App\Models\V1\CriteriaRange::whereHas('criteria', function ($q) use ($criteriaName) {
-            $q->where('name', $criteriaName);
-        })->where('min_score', '<=', $percentage)
-        ->where('max_score', '>=', $percentage)
-        ->first();
+        // ربط نطاق النتيجة بمعرف المعيار نفسه لتجنب اختيار نطاق معيار آخر.
+        $range = \App\Models\V1\CriteriaRange::where('criteria_id', $criteriaId)
+            ->where('min_score', '<=', $percentage)
+            ->where('max_score', '>=', $percentage)
+            ->whereNull('deleted_at')
+            ->orderBy('min_score', 'desc')
+            ->first();
 
         if ($range) {
             return [

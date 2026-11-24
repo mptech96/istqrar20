@@ -8,6 +8,7 @@ use App\Http\Requests\V1\UpdateChecklistRequest;
 use App\Http\Resources\V1\ChecklistResource;
 use App\Models\V1\Checklist;
 use App\Models\V1\Company;
+use App\Models\V1\Visit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -482,6 +483,16 @@ class ChecklistController extends Controller
     )]
     public function update(UpdateChecklistRequest $request, Checklist $checklist)
     {
+        $hasVisits = Visit::withoutGlobalScopes()
+            ->where('checklist_id', $checklist->id)
+            ->exists();
+
+        if ($hasVisits && ($request->exists('total_score') || $request->exists('passing_score'))) {
+            return response()->json([
+                'message' => 'لا يمكن تغيير الدرجة الكلية أو درجة النجاح لقائمة مرتبطة بزيارات؛ حفاظاً على ثبات التقييمات. أنشئ نسخة جديدة من القائمة لتغيير إعدادات الدرجات.',
+            ], 409);
+        }
+
         $checklist->update($request->only([
             'name', 'code', 'description', 'version',
             'company_id', 'industry_type', 'total_score',
@@ -547,6 +558,16 @@ class ChecklistController extends Controller
     )]
     public function destroy(Checklist $checklist)
     {
+        $hasVisits = Visit::withoutGlobalScopes()
+            ->where('checklist_id', $checklist->id)
+            ->exists();
+
+        if ($hasVisits) {
+            return response()->json([
+                'message' => 'لا يمكن حذف قائمة مرتبطة بزيارات؛ حفاظاً على إمكانية عرض الزيارات ونتائجها. يمكنك تعطيل القائمة بدلاً من حذفها.',
+            ], 409);
+        }
+
         $checklist->delete();
         
         return response()->json([

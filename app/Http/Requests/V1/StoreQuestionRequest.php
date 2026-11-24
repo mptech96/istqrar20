@@ -51,7 +51,7 @@ class StoreQuestionRequest extends FormRequest
             $rules['options'] = ['nullable'];
         } else {
             $rules['options'] = ['nullable'];
-            $rules['correct_answer'] = ['nullable'];
+            $rules['correct_answer'] = ['nullable', 'string', 'max:255'];
         }
 
         return $rules;
@@ -74,13 +74,26 @@ class StoreQuestionRequest extends FormRequest
             // Validate that options array has unique values
             if ($this->has('options') && $this->input('type') === 'multiple_choice') {
                 $options = $this->input('options', []);
+                if (!is_array($options)) {
+                    return;
+                }
+
                 $values = array_column($options, 'value');
-                
+
                 if (count($values) !== count(array_unique($values))) {
                     $validator->errors()->add(
                         'options',
                         'قيم الخيارات يجب أن تكون فريدة.'
                     );
+                }
+            }
+
+            if ($this->input('type') === 'multiple_choice' && $this->input('passing_score') !== null) {
+                $options = $this->input('options', []);
+                $maximumOptionScore = collect(is_array($options) ? $options : [])->max(fn ($option) => (float) ($option['score'] ?? 0));
+                $effectiveMaximum = min((float) $this->input('max_score', 0), (float) ($maximumOptionScore ?? 0));
+                if ((float) $this->input('passing_score') > $effectiveMaximum) {
+                    $validator->errors()->add('passing_score', 'درجة النجاح لا يمكن أن تتجاوز أعلى درجة يمكن الحصول عليها من خيارات السؤال.');
                 }
             }
         });

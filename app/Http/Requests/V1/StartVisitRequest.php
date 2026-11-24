@@ -84,7 +84,7 @@ class StartVisitRequest extends FormRequest
                     $userLng = $this->input('start_longitude');
                     $branch = $visit->branch;
                     // التحقق من وجود إحداثيات الموقع في نموذج الزيارة
-                    if (!$branch->latitude || !$branch->longitude) {
+                    if (!$branch || $branch->latitude === null || $branch->longitude === null) {
                         $fail("عذراً، لم يتم تحديد إحداثيات موقع الفرع '" . ($branch->name ?? 'الفرع') . "' بعد. الرجاء التواصل مع الإدارة لتحديث بيانات موقع الفرع والمحاولة مرة أخرى.");
                         return; // لا يوجد موقع محدد للزيارة للمقارنة
                     }

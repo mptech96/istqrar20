@@ -14,13 +14,13 @@ class UpdateVisitRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'status' => ['prohibited'],
             'scheduled_date' => ['sometimes', 'date'],
             'scheduled_time' => ['nullable', 'date_format:H:i'],
             'estimated_duration' => ['nullable', 'integer', 'min:1', 'max:480'],
             'auditor_notes' => ['nullable', 'string'],
             'branch_feedback' => ['nullable', 'string'],
             'internal_notes' => ['nullable', 'string'],
-            'status' => ['sometimes', 'in:draft,scheduled,in_progress,completed,cancelled,under_review,approved,rejected'],
             //'total_score' => ['nullable', 'numeric', 'min:0', 'max:1000'],
             //'percentage' => ['nullable', 'numeric', 'min:0', 'max:100'],
             //'category' => ['nullable', 'string', 'in:A,B,C,D,F'],
@@ -32,6 +32,7 @@ class UpdateVisitRequest extends FormRequest
     public function messages(): array
     {
         return [
+            'status.prohibited' => 'لا يمكن تغيير حالة الزيارة من خلال طلب التحديث العام. استخدم إجراء بدء الزيارة أو إنهائها أو رفضها المخصص.',
             'scheduled_date.date' => 'حقل التاريخ المجدول يجب أن يكون تاريخاً صحيحاً.',
             
             'scheduled_time.date_format' => 'صيغة الوقت المجدول غير صحيحة. يجب أن تكون HH:MM (مثال: 14:30).',
@@ -46,7 +47,6 @@ class UpdateVisitRequest extends FormRequest
             
             'internal_notes.string' => 'حقل الملاحظات الداخلية يجب أن يكون نصاً.',
             
-            'status.in' => 'حالة الزيارة يجب أن تكون أحد: مسودة, مجدولة, قيد التنفيذ, مكتملة, ملغية, قيد المراجعة, معتمدة, مرفوضة.',
             
             'rejection_reason.string' => 'حقل سبب الرفض يجب أن يكون نصاً.',
             
@@ -68,13 +68,13 @@ class UpdateVisitRequest extends FormRequest
     public function attributes(): array
     {
         return [
+            'status' => 'حالة الزيارة',
             'scheduled_date' => 'التاريخ المجدول',
             'scheduled_time' => 'الوقت المجدول',
             'estimated_duration' => 'المدة التقديرية',
             'auditor_notes' => 'ملاحظات المدقق',
             'branch_feedback' => 'تقييم الفرع',
             'internal_notes' => 'الملاحظات الداخلية',
-            'status' => 'الحالة',
             'rejection_reason' => 'سبب الرفض',
             // 'total_score' => 'الدرجة الإجمالية',
             // 'percentage' => 'النسبة المئوية',

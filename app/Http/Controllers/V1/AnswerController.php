@@ -10,6 +10,7 @@ use App\Http\Resources\V1\AnswerResource;
 use App\Models\V1\Answer;
 use App\Models\V1\Visit;
 use App\Models\V1\Question;
+use App\Services\V1\Scoring\VisitScoringService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
@@ -184,13 +185,15 @@ class AnswerController extends Controller
         
         $answers = $query->with($with)->get();
         
-        // إحصائيات
-        $totalScore = $answers->sum('score');
-        $totalMaxScore = $answers->sum('max_score');
-        $averageScore = $answers->count() > 0 ? $totalScore / $answers->count() : 0;
-        $percentageScore = $totalMaxScore > 0 ? ($totalScore / $totalMaxScore) * 100 : 0;
+        // الإحصائيات الإجمالية تعتمد على كامل أسئلة القائمة، بما فيها الأسئلة التي لم تتم الإجابة عنها بعد.
+        $scoreStatistics = app(VisitScoringService::class)->calculate($visit);
+        $totalScore = $scoreStatistics['total_score'];
+        $totalMaxScore = $scoreStatistics['max_possible_score'];
+        $averageScore = $scoreStatistics['answered_questions'] > 0
+            ? $totalScore / $scoreStatistics['answered_questions']
+            : 0;
+        $percentageScore = $scoreStatistics['percentage'];
 
-        
         $correctionsPending = $answers->where('correction_status', 'pending')->count();
         $correctionsOverdue = $answers->filter(function ($answer) {
             return $answer->isOverdue();
@@ -329,49 +332,83 @@ class AnswerController extends Controller
     )]
     public function store(Visit $visit, StoreAnswerRequest $request)
     {
-        if ($visit->actual_start_time) {
-            $endTime = Carbon::parse($visit->actual_start_time)
-            ->addMinutes($visit->estimated_duration);
-            if ($endTime->isPast()){
+        if ($visit->status !== 'in_progress') {
+            return response()->json([
+                'message' => 'لا يمكن تسجيل الإجابات إلا لزيارة قيد التنفيذ.'
+            ], 400);
+        }
+
+        if ($visit->actual_start_time && $visit->estimated_duration) {
+            $endTime = Carbon::parse($visit->actual_start_time)->addMinutes($visit->estimated_duration);
+            if ($endTime->isPast()) {
                 return response()->json([
                     'message' => __tr('The evaluation period has ended.')
                 ], 400);
             }
         }
-        
-        $question = Question::findOrFail($request->input('question_id'));
-        
-        $answer = Answer::firstOrCreate(
-            [
-            'visit_id' => $visit->id,
-            'question_id' => $request->input('question_id')
-            ],
-            [
-            'visit_id' => $visit->id,
-            'question_id' => $request->input('question_id'),
-            'answer_value' => $request->input('answer_value'),
-            'score' => $request->input('score', 0),
-            'max_score' => $question->max_score,
-            'is_correct' => $this->checkIfCorrect($question, $request->input('answer_value')),
+
+        $question = $visit->questions()
+            ->where('questions.id', $request->input('question_id'))
+            ->where('questions.is_active', true)
+            ->first();
+
+        if (!$question) {
+            return response()->json([
+                'message' => 'السؤال المحدد غير نشط أو لا ينتمي إلى قائمة هذه الزيارة.'
+            ], 422);
+        }
+
+        $answerValue = $this->normalizeAnswerValue($question, $request->input('answer_value'));
+        $valueError = $this->validateAnswerValue($question, $answerValue);
+        if ($valueError !== null) {
+            return response()->json([
+                'message' => $valueError,
+                'errors' => ['answer_value' => [$valueError]],
+            ], 422);
+        }
+
+        $attachments = (array) $request->file('attachments', []);
+        $existingAnswer = $visit->answers()->where('question_id', $question->id)->with('attachments')->first();
+        $attachmentError = $this->validateRequiredAttachments($question, $existingAnswer, $attachments);
+        if ($attachmentError !== null) {
+            return response()->json([
+                'message' => $attachmentError,
+                'errors' => ['attachments' => [$attachmentError]],
+            ], 422);
+        }
+
+        $answerData = [
+            'answer_value' => $answerValue,
+            'score' => $this->computeScore($question, $answerValue, $request->input('score')),
+            'max_score' => $this->questionMaxScore($question),
+            'is_correct' => $this->checkIfCorrect($question, $answerValue),
             'comment' => $request->input('comment'),
             'auditor_comment' => $request->input('auditor_comment'),
             'corrective_action' => $request->input('corrective_action'),
             'corrective_deadline' => $request->input('corrective_deadline'),
-            'correction_status' => $request->input('corrective_action') ? 'pending' : null,
-        ]);
-        
-        foreach ($request->file('attachments') ?? [] as $file) {
+        ];
+
+        if ($request->filled('corrective_action')) {
+            $answerData['correction_status'] = 'pending';
+        }
+
+        $answer = Answer::updateOrCreate(
+            ['visit_id' => $visit->id, 'question_id' => $question->id],
+            $answerData
+        );
+
+        foreach ($attachments as $file) {
             saveAttachment($file, $answer);
         }
-        
+
         $this->updateVisitStatistics($visit);
-        
+
         return response()->json([
-            'data' => new AnswerResource($answer->load(['question'])),
+            'data' => new AnswerResource($answer->load(['question', 'attachments'])),
             'message' => 'تم تسجيل الإجابة بنجاح'
         ], 201);
     }
-    
+
     #[OA\Get(
         path: '/api/v1/visits/{visit}/answers/{answer}',
         operationId: 'getAnswer',
@@ -669,48 +706,95 @@ class AnswerController extends Controller
     )]
     public function update(UpdateAnswerRequest $request, Visit $visit, Answer $answer)
     {
-        if ($visit->actual_start_time) {
-            $endTime = Carbon::parse($visit->actual_start_time)
-            ->addMinutes($visit->estimated_duration);
-            if ($endTime->isPast()){
-                return response()->json([
-                    'message' => __tr('The evaluation period has ended.')
-                ], 400);
-            }
-        }
-        
         if ($answer->visit_id !== $visit->id) {
             return response()->json([
                 'message' => 'الإجابة لا تنتمي إلى هذه الزيارة'
             ], 404);
         }
+
+        $answerFieldsChanged = $request->exists('answer_value') || $request->exists('score') || $request->hasFile('attachments');
+        if ($answerFieldsChanged && $visit->status !== 'in_progress') {
+            return response()->json([
+                'message' => 'لا يمكن تعديل محتوى الإجابة إلا عندما تكون الزيارة قيد التنفيذ.'
+            ], 400);
+        }
+
+        if ($answerFieldsChanged && $visit->actual_start_time && $visit->estimated_duration) {
+            $endTime = Carbon::parse($visit->actual_start_time)->addMinutes($visit->estimated_duration);
+            if ($endTime->isPast()) {
+                return response()->json([
+                    'message' => __tr('The evaluation period has ended.')
+                ], 400);
+            }
+        }
+
+        $question = $answer->question;
+        if (!$question || (int) $question->checklist_id !== (int) $visit->checklist_id || !$question->is_active) {
+            return response()->json([
+                'message' => 'السؤال المرتبط بهذه الإجابة غير نشط أو لا ينتمي إلى قائمة الزيارة.'
+            ], 422);
+        }
+
         $updateData = $request->only([
-            'answer_value', 'score', 'comment', 'auditor_comment',
-            'corrective_action', 'corrective_deadline', 'correction_status', 'verified_by'
+            'comment', 'auditor_comment', 'corrective_action',
+            'corrective_deadline', 'correction_status', 'verified_by'
         ]);
-        
+
+        if ($request->exists('answer_value') || $request->exists('score')) {
+            $answerValue = $request->exists('answer_value')
+                ? $request->input('answer_value')
+                : $answer->answer_value;
+            $answerValue = $this->normalizeAnswerValue($question, $answerValue);
+
+            $valueError = $this->validateAnswerValue($question, $answerValue);
+            if ($valueError !== null) {
+                return response()->json([
+                    'message' => $valueError,
+                    'errors' => ['answer_value' => [$valueError]],
+                ], 422);
+            }
+
+            $attachments = (array) $request->file('attachments', []);
+            $attachmentError = $this->validateRequiredAttachments($question, $answer, $attachments);
+            if ($attachmentError !== null) {
+                return response()->json([
+                    'message' => $attachmentError,
+                    'errors' => ['attachments' => [$attachmentError]],
+                ], 422);
+            }
+
+            $updateData['answer_value'] = $answerValue;
+            $updateData['score'] = $this->computeScore(
+                $question,
+                $answerValue,
+                $request->input('score', $answer->score)
+            );
+            $updateData['max_score'] = $this->questionMaxScore($question);
+            $updateData['is_correct'] = $this->checkIfCorrect($question, $answerValue);
+        }
+
         if ($request->has('correction_status') && $request->input('correction_status') === 'completed') {
             $updateData['corrected_at'] = now();
         }
-        
+
         if ($request->has('verified_by')) {
             $updateData['verified_at'] = now();
         }
-        
+
         $answer->update($updateData);
-        
-        foreach ($request->file('attachments') ?? [] as $file) {
+
+        foreach ((array) $request->file('attachments', []) as $file) {
             saveAttachment($file, $answer);
         }
-        
+
         $this->updateVisitStatistics($visit);
-        
+
         return response()->json([
-            'data' => new AnswerResource($answer->load(['question'])),
+            'data' => new AnswerResource($answer->load(['question', 'attachments'])),
             'message' => 'تم تحديث الإجابة بنجاح'
         ]);
     }
-    
+
     #[OA\Delete(
         path: '/api/v1/visits/{visit}/answers/{answer}',
         operationId: 'deleteAnswer',
@@ -779,6 +863,12 @@ class AnswerController extends Controller
     )]
     public function destroy(Visit $visit, Answer $answer)
     {
+        if ($visit->status !== 'in_progress') {
+            return response()->json([
+                'message' => 'لا يمكن حذف إجابة إلا عندما تكون الزيارة قيد التنفيذ.'
+            ], 400);
+        }
+
         if ($answer->visit_id !== $visit->id) {
             return response()->json([
                 'message' => 'الإجابة لا تنتمي إلى هذه الزيارة'
@@ -866,6 +956,12 @@ class AnswerController extends Controller
     )]
     public function restore(Visit $visit, $answerId)
     {
+        if ($visit->status !== 'in_progress') {
+            return response()->json([
+                'message' => 'لا يمكن استعادة إجابة إلا عندما تكون الزيارة قيد التنفيذ.'
+            ], 400);
+        }
+
         $answer = Answer::withTrashed()
             ->where('visit_id', $visit->id)
             ->where('id', $answerId)
@@ -1215,89 +1311,116 @@ class AnswerController extends Controller
     )]
     public function bulkStore(Visit $visit, BulkAnswerRequest $request)
     {
-        // لا تُقبل الإجابات إلا لزيارة قيد التنفيذ
         if ($visit->status !== 'in_progress') {
             return response()->json([
                 'message' => 'لا يمكن تسجيل الإجابات إلا لزيارة قيد التنفيذ'
             ], 400);
         }
-        // انتهاء المدة المسموحة للتقييم
+
         if ($visit->actual_start_time && $visit->estimated_duration) {
-            $endTime = Carbon::parse($visit->actual_start_time)
-            ->addMinutes($visit->estimated_duration);
-            if ($endTime->isPast()){
+            $endTime = Carbon::parse($visit->actual_start_time)->addMinutes($visit->estimated_duration);
+            if ($endTime->isPast()) {
                 return response()->json([
                     'message' => __tr('The evaluation period has ended.')
                 ], 400);
             }
         }
-        return DB::transaction(function () use ($visit, $request) {
-            // استخراج جميع question_id من الإجابات
-            $questionIds = array_column($request->input('answers', []), 'question_id');
-            // جلب الأسئلة المرتبطة بالزيارة من قاعدة البيانات
-            $questions = $visit->questions()
-                ->whereIn('questions.id', $questionIds)
-                ->get()
-                ->keyBy('id');
+
+        $answerItems = $request->input('answers', []);
+        $questionIds = collect($answerItems)->pluck('question_id')->unique()->values();
+        $questions = $visit->questions()
+            ->where('questions.is_active', true)
+            ->whereIn('questions.id', $questionIds)
+            ->get()
+            ->keyBy('id');
+
+        $invalidQuestionIds = $questionIds->diff($questions->keys())->values()->all();
+        if (!empty($invalidQuestionIds)) {
+            return response()->json([
+                'message' => 'تحتوي البيانات على سؤال غير نشط أو لا ينتمي إلى قائمة هذه الزيارة.',
+                'invalid_question_ids' => $invalidQuestionIds,
+            ], 422);
+        }
+
+        // تحقق من جميع البيانات قبل الحفظ حتى لا يتم حفظ جزء من الإجابات فقط.
+        foreach ($answerItems as $index => $answerData) {
+            $question = $questions->get($answerData['question_id']);
+            $valueError = $this->validateAnswerValue($question, $answerData['answer_value'] ?? null);
+            if ($valueError !== null) {
+                return response()->json([
+                    'message' => $valueError,
+                    'errors' => ["answers.$index.answer_value" => [$valueError]],
+                ], 422);
+            }
+
+            $files = (array) $request->file("answers.$index.attachments", []);
+            $existingAnswer = $visit->answers()
+                ->where('question_id', $question->id)
+                ->with('attachments')
+                ->first();
+            $attachmentError = $this->validateRequiredAttachments($question, $existingAnswer, $files);
+            if ($attachmentError !== null) {
+                return response()->json([
+                    'message' => $attachmentError,
+                    'errors' => ["answers.$index.attachments" => [$attachmentError]],
+                ], 422);
+            }
+        }
+
+        return DB::transaction(function () use ($visit, $request, $answerItems, $questions) {
             $answers = [];
-            foreach ($request->input('answers', []) as $index => $answerData) {
-                // التحقق من وجود السؤال
-                if (!isset($questions[$answerData['question_id']])) {
-                    continue;
+
+            foreach ($answerItems as $index => $answerData) {
+                $question = $questions->get($answerData['question_id']);
+                $value = $this->normalizeAnswerValue($question, $answerData['answer_value']);
+
+                $data = [
+                    'answer_value' => $value,
+                    'score' => $this->computeScore($question, $value, $answerData['score'] ?? null),
+                    'max_score' => $this->questionMaxScore($question),
+                    'is_correct' => $this->checkIfCorrect($question, $value),
+                    'comment' => $answerData['comment'] ?? null,
+                    'auditor_comment' => $answerData['auditor_comment'] ?? null,
+                    'corrective_action' => $answerData['corrective_action'] ?? null,
+                    'corrective_deadline' => $answerData['corrective_deadline'] ?? null,
+                ];
+
+                if (!empty($answerData['corrective_action'])) {
+                    $data['correction_status'] = 'pending';
                 }
-                $question = $questions[$answerData['question_id']];
-                $value = $answerData['answer_value'] ?? null;
-                // حفظ أو تحديث الإجابة (يسمح بإعادة الحفظ دون تكرار)
+
                 $answer = Answer::updateOrCreate(
                     ['visit_id' => $visit->id, 'question_id' => $question->id],
-                    [
-                        'answer_value' => $value,
-                        // الدرجة تُحسب في الخادم حسب نوع السؤال
-                        'score' => $this->computeScore($question, $value, $answerData['score'] ?? null),
-                        // الأسئلة النصية/التاريخ/الملفات ملاحظات غير مُقيَّمة: لا تدخل في حساب النسبة
-                        'max_score' => in_array($question->type, ['text', 'date', 'file']) ? 0 : $question->max_score,
-                        'is_correct' => $this->checkIfCorrect($question, $value),
-                        'comment' => $answerData['comment'] ?? null,
-                        'auditor_comment' => $answerData['auditor_comment'] ?? null,
-                        'corrective_action' => $answerData['corrective_action'] ?? null,
-                        'corrective_deadline' => $answerData['corrective_deadline'] ?? null,
-                        'correction_status' => !empty($answerData['corrective_action']) ? 'pending' : null,
-                    ]
+                    $data
                 );
-                // حفظ الصور/المرفقات المرفوعة مع هذه الإجابة
+
                 foreach ((array) $request->file("answers.$index.attachments", []) as $file) {
                     if ($file) {
                         saveAttachment($file, $answer);
                     }
                 }
+
                 $answers[] = $answer;
             }
-            // تحديث إحصائيات الزيارة
+
             $this->updateVisitStatistics($visit);
-            
-            // حساب الإحصائيات
-            $totalScore = collect($answers)->sum('score');
-            $totalMaxScore = collect($answers)->sum('max_score');
-            $averageScore = count($answers) > 0 ? $totalScore / count($answers) : 0;
-            $percentageScore = $totalMaxScore > 0 ? ($totalScore / $totalMaxScore) * 100 : 0;
-            
-            // تحويل المصفوفة إلى collection ثم تحميل العلاقة
+
             $answersCollection = collect($answers);
-            
-            // تحميل العلاقة للسؤال لكل إجابة
-            // الطريقة الأولى: باستخدام load() على كل نموذج
-            foreach ($answers as $answer) {
-                $answer->load('question');
-            }
-            
-            // الطريقة الثانية: تحميل جماعي باستخدام with()
             $answersWithQuestions = Answer::whereIn('id', $answersCollection->pluck('id'))
                 ->with('question')
                 ->get();
-            
+
+            $scoreStatistics = app(VisitScoringService::class)->calculate($visit);
+            $totalScore = $scoreStatistics['total_score'];
+            $totalMaxScore = $scoreStatistics['max_possible_score'];
+            $averageScore = $scoreStatistics['answered_questions'] > 0
+                ? $totalScore / $scoreStatistics['answered_questions']
+                : 0;
+            $percentageScore = $scoreStatistics['percentage'];
+
             return response()->json([
                 'success' => true,
-                'data' => AnswerResource::collection($answersWithQuestions), // استخدام $answersWithQuestions هنا
+                'data' => AnswerResource::collection($answersWithQuestions),
                 'message' => 'تم تسجيل الإجابات بنجاح',
                 'statistics' => [
                     'total_created' => count($answers),
@@ -1305,8 +1428,8 @@ class AnswerController extends Controller
                     'total_max_score' => $totalMaxScore,
                     'average_score' => round($averageScore, 2),
                     'percentage_score' => round($percentageScore, 2),
-                    'correct_answers' => collect($answers)->where('is_correct', true)->count(),
-                    'incorrect_answers' => collect($answers)->where('is_correct', false)->count(),
+                    'correct_answers' => $answersCollection->filter(fn ($answer) => $answer->is_correct === true)->count(),
+                    'incorrect_answers' => $answersCollection->filter(fn ($answer) => $answer->is_correct === false)->count(),
                 ],
             ], 201);
         });
@@ -1497,10 +1620,11 @@ class AnswerController extends Controller
                 if (!is_numeric($v) || $v < 1 || $v > $scale) return 0.0;
                 return round(((float) $v / $scale) * $max, 2);
             case 'multiple_choice':
-                $options = is_array($question->options) ? $question->options : (json_decode($question->options ?? '[]', true) ?: []);
+                $options = $question->getOptionsArray();
+                $normalizedValue = trim((string) $value);
                 foreach ($options as $option) {
-                    if ((string) ($option['value'] ?? '') === (string) $value) {
-                        return min($max, (float) ($option['score'] ?? 0));
+                    if (trim((string) ($option['value'] ?? '')) === $normalizedValue) {
+                        return min($max, max(0, (float) ($option['score'] ?? 0)));
                     }
                 }
                 return 0.0;
@@ -1508,97 +1632,128 @@ class AnswerController extends Controller
             case 'date':
             case 'file':
                 return 0.0;
+            case 'number':
+                // مثل مسار تقييم السؤال: أي قيمة رقمية صحيحة تحصل على الدرجة الكاملة.
+                // لا نعتمد على الدرجة المرسلة من العميل حتى لا يمكن التلاعب بالنتيجة.
+                return is_numeric($v) ? $max : 0.0;
             default:
-                return is_numeric($clientScore) ? max(0.0, min($max, (float) $clientScore)) : 0.0;
+                return 0.0;
         }
     }
 
     private function checkIfCorrect(Question $question, $answerValue): ?bool
     {
-        if (!$question->correct_answer) {
+        if ($question->correct_answer === null || $question->correct_answer === '') {
             return null;
         }
-        
-        return $answerValue === $question->correct_answer;
+
+        if ($question->type === 'yes_no') {
+            return strtolower(trim((string) $answerValue)) === strtolower(trim((string) $question->correct_answer));
+        }
+
+        if ($question->type === 'multiple_choice') {
+            return trim((string) $answerValue) === trim((string) $question->correct_answer);
+        }
+
+        if (in_array($question->type, ['number', 'scale_1_5', 'scale_1_10'], true)
+            && is_numeric($answerValue)
+            && is_numeric($question->correct_answer)) {
+            return (float) $answerValue === (float) $question->correct_answer;
+        }
+
+        return (string) $answerValue === (string) $question->correct_answer;
     }
     
-    private function determineCategoryFromCriteria(Visit $visit): string
+    private function questionMaxScore(Question $question): int
     {
-        // جلب الإجابات مع الأسئلة والمعايير
-        $answers = $visit->answers()
-            ->with('question.criteria')
-            ->get()
-            ->filter(fn ($a) => $a->question && $a->question->criteria);
-    
-        if ($answers->isEmpty()) {
-            return 'N/A';
-        }
-    
-        // تجميع حسب المعيار
-        $grouped = $answers->groupBy(fn ($a) => $a->question->criteria->id);
-    
-        $weightedScore = 0;
-        $totalWeight = 0;
-    
-        foreach ($grouped as $criteriaId => $criteriaAnswers) {
-            $criteria = $criteriaAnswers->first()->question->criteria;
-    
-            $criteriaScore = $criteriaAnswers->sum('score');
-            $criteriaMax = $criteriaAnswers->sum('max_score');
-    
-            if ($criteriaMax <= 0) {
-                continue;
-            }
-    
-            $percentage = ($criteriaScore / $criteriaMax) * 100;
-    
-            // تطبيق وزن المعيار
-            $weightedScore += $percentage * $criteria->weight;
-            $totalWeight += $criteria->weight;
-        }
-    
-        if ($totalWeight == 0) {
-            return 'N/A';
-        }
-    
-        $finalPercentage = $weightedScore / $totalWeight;
-    
-        return $this->resolveCategoryFromRanges($finalPercentage);
+        return app(VisitScoringService::class)->maximumAchievableScore($question);
     }
-    
+
+    private function normalizeAnswerValue(Question $question, $value)
+    {
+        return $question->type === 'multiple_choice' && is_string($value)
+            ? trim($value)
+            : $value;
+    }
+
+    private function validateAnswerValue(Question $question, $value): ?string
+    {
+        if (!is_scalar($value) || $value === '') {
+            return 'قيمة الإجابة غير صالحة لهذا السؤال.';
+        }
+
+        $normalized = is_string($value) ? trim($value) : (string) $value;
+        if ($question->type === 'multiple_choice') {
+            $value = $normalized;
+        }
+        if ($normalized === '') {
+            return 'قيمة الإجابة لا يمكن أن تكون فارغة.';
+        }
+
+        switch ($question->type) {
+            case 'yes_no':
+                if (!in_array(strtolower($normalized), ['yes', 'no', 'نعم', 'لا', 'true', 'false', '1', '0', 'صحيح', 'خطأ'], true)) {
+                    return 'يجب أن تكون الإجابة نعم أو لا.';
+                }
+                break;
+
+            case 'scale_1_5':
+            case 'scale_1_10':
+                $maximum = $question->type === 'scale_1_5' ? 5 : 10;
+                if (!is_numeric($normalized) || (float) $normalized < 1 || (float) $normalized > $maximum) {
+                    return "يجب أن تكون الإجابة رقماً بين 1 و {$maximum}.";
+                }
+                break;
+
+            case 'multiple_choice':
+                $options = $question->getOptionsArray();
+                $validValues = collect($options)->pluck('value')->map(fn ($item) => trim((string) $item))->all();
+                if (!in_array($normalized, $validValues, true)) {
+                    return 'قيمة الاختيار غير موجودة ضمن خيارات السؤال.';
+                }
+                break;
+
+            case 'date':
+                if (strtotime($normalized) === false) {
+                    return 'يجب أن تكون الإجابة تاريخاً صالحاً.';
+                }
+                break;
+
+            case 'number':
+                if (!is_numeric($normalized)) {
+                    return 'يجب أن تكون الإجابة رقماً.';
+                }
+                break;
+
+            case 'text':
+            case 'file':
+                break;
+
+            default:
+                return 'نوع السؤال غير مدعوم.';
+        }
+
+        return null;
+    }
+
+    private function validateRequiredAttachments(Question $question, ?Answer $existingAnswer, array $newAttachments): ?string
+    {
+        $required = $question->has_attachment || $question->type === 'file';
+        if (!$required || !empty($newAttachments)) {
+            return null;
+        }
+
+        if ($existingAnswer && $existingAnswer->attachments()->exists()) {
+            return null;
+        }
+
+        return 'يجب إرفاق ملف أو صورة لهذا السؤال قبل حفظ الإجابة.';
+    }
+
     private function updateVisitStatistics(Visit $visit): void
     {
-        $answers = $visit->answers()->with('question')->get();
-    
-        if ($answers->isEmpty()) {
-            return;
-        }
-    
-        $totalScore = $answers->sum('score');
-        $totalMaxScore = $answers->sum('max_score');
-        $percentage = $totalMaxScore > 0
-            ? ($totalScore / $totalMaxScore) * 100
-            : 0;
-    
-        $category = $this->determineCategoryFromCriteria($visit);
-    
-        $visit->update([
-            'total_score' => $totalScore,
-            'total_max_score' => $totalMaxScore,
-            'percentage' => round($percentage, 2),
-            'category' => $category,
-        ]);
+        $visit->calculateStatistics();
     }
-    
-    private function resolveCategoryFromRanges(float $percentage): string
-    {
-        $range = DB::table('criteria_ranges')
-            ->where('min_score', '<=', $percentage)
-            ->where('max_score', '>=', $percentage)
-            ->orderBy('min_score')
-            ->first();
-    
-        return $range ? $range->name : 'Unclassified';
-    }
+
     
 }

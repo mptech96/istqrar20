@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use App\Services\V1\Analysis\VisitAnalysisService;
+use App\Services\V1\Scoring\VisitScoringService;
 use App\Services\V1\Statistics\SyncEnterpriseStatisticsEngine;
 use OpenApi\Attributes as OA;
 
@@ -602,20 +603,43 @@ class VisitController extends Controller
     )]
     public function store(StoreVisitRequest $request)
     {
+        $branch = Branch::findOrFail($request->input('branch_id'));
+        $checklist = Checklist::findOrFail($request->input('checklist_id'));
+
+        if (!$checklist->is_active) {
+            return response()->json([
+                'message' => 'لا يمكن إنشاء زيارة باستخدام قائمة غير نشطة.',
+            ], 422);
+        }
+
+        if ($checklist->company_id !== null && (int) $checklist->company_id !== (int) $branch->company_id) {
+            return response()->json([
+                'message' => 'قائمة التقييم لا تتبع الشركة المالكة للفرع المحدد.',
+            ], 422);
+        }
+
+        $scoreValidation = app(VisitScoringService::class)->checklistScore($checklist);
+        if (!$scoreValidation['is_valid']) {
+            return response()->json([
+                'message' => 'لا يمكن إنشاء الزيارة لأن مجموع درجات الأسئلة الفعالة أقل من الدرجة المحددة للقائمة.',
+                'score_validation' => $scoreValidation,
+            ], 422);
+        }
+
         $visit = Visit::create([
-            'branch_id' => $request->input('branch_id'),
+            'branch_id' => $branch->id,
             'auditor_id' => $request->input('auditor_id'),
-            'checklist_id' => $request->input('checklist_id'),
+            'checklist_id' => $checklist->id,
             'scheduled_date' => $request->input('scheduled_date'),
             'scheduled_time' => $request->input('scheduled_time'),
-            'estimated_duration' => $request->input('estimated_duration', Checklist::find($request->input('checklist_id'))?->time_estimate),
+            'estimated_duration' => $request->input('estimated_duration', $checklist->time_estimate),
             'internal_notes' => $request->input('internal_notes'),
             'status' => 'scheduled',
-            'max_possible_score' => Checklist::find($request->input('checklist_id'))->total_score ?? 100,
+            'max_possible_score' => $scoreValidation['available_score'],
         ]);
 
         app(\App\Services\V1\NotificationService::class)->visit_scheduled($visit);
-        
+
         return response()->json([
             'data' => new VisitResource($visit->load(['branch', 'auditor', 'checklist'])),
             'message' => 'تم إنشاء الزيارة بنجاح'
@@ -943,14 +967,9 @@ class VisitController extends Controller
     )]
     public function update(UpdateVisitRequest $request, Visit $visit)
     {
-        $visit->update($request->only([
-            'scheduled_date', 'scheduled_time', 'estimated_duration',
-            'auditor_notes', 'branch_feedback', 'internal_notes',
-            'status', //'total_score', 'percentage', 'category',
-            //'approved_by', 
-            'rejection_reason'
-        ]));
-        
+        // يتم تغيير حالات التنفيذ والإنهاء والاعتماد عبر نقاطها المخصصة فقط.
+        $visit->update($request->validated());
+
         return response()->json([
             'data' => new VisitResource($visit->load(['branch', 'auditor', 'checklist'])),
             'message' => 'تم تحديث الزيارة بنجاح'
@@ -1268,13 +1287,29 @@ class VisitController extends Controller
             ], 400);
         }
         
+        // لا تبدأ زيارة مرتبطة بقائمة تم تعطيلها بعد جدولة الزيارة.
+        if (!$visit->checklist || !$visit->checklist->is_active) {
+            return response()->json([
+                'message' => 'لا يمكن بدء الزيارة لأن قائمة التقييم غير موجودة أو غير نشطة.',
+            ], 422);
+        }
+
+        // التأكد من أن القائمة لا تزال مستوفية لمجموع الدرجات قبل بدء التنفيذ.
+        $scoreValidation = app(VisitScoringService::class)->checklistScore($visit->checklist);
+        if (!$scoreValidation['is_valid']) {
+            return response()->json([
+                'message' => 'لا يمكن بدء الزيارة لأن مجموع درجات الأسئلة الفعالة لم يعد يستوفي درجة القائمة.',
+                'score_validation' => $scoreValidation,
+            ], 422);
+        }
+
         // التحقق من تاريخ الزيارة المجدول
         if ($visit->scheduled_date->toDateString() != now()->toDateString()) {
             return response()->json([
                 'message' => 'This action cannot be completed. The scheduled visit date must be today.'
             ], 400);
         }
-        
+
         // تحديث بيانات الزيارة مع حقول الموقع
         $validated = $request->validated();
         
@@ -1282,6 +1317,7 @@ class VisitController extends Controller
             'status' => 'in_progress',
             'actual_start_time' => now(),
             'visit_date' => now()->toDateString(),
+            'max_possible_score' => $scoreValidation['available_score'],
             'start_latitude' => $validated['start_latitude'],
             'start_longitude' => $validated['start_longitude'],
             'location_url' => $validated['location_url'] ?? null,
@@ -1418,7 +1454,34 @@ class VisitController extends Controller
                     'message' => 'لا يمكن إنهاء الزيارة إلا إذا كانت قيد التنفيذ'
                 ], 400);
             }
-            
+
+            if (!$visit->checklist) {
+                return response()->json([
+                    'message' => 'لا يمكن إنهاء الزيارة لأن قائمة التقييم المرتبطة بها غير موجودة أو محذوفة.',
+                ], 422);
+            }
+
+            $scoringService = app(VisitScoringService::class);
+            $scoreValidation = $scoringService->checklistScore($visit->checklist);
+            if (!$scoreValidation['is_valid']) {
+                return response()->json([
+                    'message' => 'لا يمكن إنهاء الزيارة لأن مجموع درجات الأسئلة الفعالة لا يستوفي درجة القائمة.',
+                    'score_validation' => $scoreValidation,
+                ], 422);
+            }
+
+            $completionIssues = $scoringService->completionIssues($visit);
+            if (!empty($completionIssues['missing_questions']) || !empty($completionIssues['missing_attachments'])) {
+                return response()->json([
+                    'message' => 'لا يمكن إنهاء الزيارة قبل استكمال الأسئلة الإلزامية والمرفقات المطلوبة.',
+                    'completion_validation' => $completionIssues,
+                ], 422);
+            }
+
+            // تحديث مجموع النقاط من الأسئلة الفعالة كلها، وليس من الإجابات المرسلة فقط.
+            $visit->calculateStatistics();
+            $visit->refresh();
+
             $visit->update([
                 'status' => 'completed',
                 'actual_end_time' => now(),

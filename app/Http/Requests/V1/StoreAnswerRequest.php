@@ -21,6 +21,8 @@ class StoreAnswerRequest extends FormRequest
             'auditor_comment' => ['nullable', 'string'],
             'corrective_action' => ['nullable', 'string'],
             'corrective_deadline' => ['nullable', 'date', 'after_or_equal:today'],
+            'attachments' => ['nullable', 'array', 'max:10'],
+            'attachments.*' => ['file', 'max:10240'],
         ];
     }
 

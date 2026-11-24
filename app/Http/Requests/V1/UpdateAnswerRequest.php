@@ -22,6 +22,8 @@ class UpdateAnswerRequest extends FormRequest
             'corrective_deadline' => ['nullable', 'date', 'after_or_equal:today'],
             'correction_status' => ['sometimes', 'in:pending,in_progress,completed,verified,waived'],
             'verified_by' => ['nullable', 'exists:users,id'],
+            'attachments' => ['nullable', 'array', 'max:10'],
+            'attachments.*' => ['file', 'max:10240'],
         ];
     }
 

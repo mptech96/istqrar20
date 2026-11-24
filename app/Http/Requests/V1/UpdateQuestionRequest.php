@@ -13,7 +13,9 @@ class UpdateQuestionRequest extends FormRequest
 
     public function rules(): array
     {
-        $questionId = $this->route('question') ? $this->route('question')->id : null;
+        $routeQuestion = $this->route('question');
+        $currentType = is_object($routeQuestion) ? $routeQuestion->type : null;
+        $effectiveType = $this->input('type', $currentType);
 
         $rules = [
             // Question data
@@ -28,7 +30,7 @@ class UpdateQuestionRequest extends FormRequest
             // Weight and scoring
             'weight' => ['sometimes', 'integer', 'min:1', 'max:100'],
             'max_score' => ['sometimes', 'integer', 'min:1', 'max:100'],
-            'passing_score' => ['nullable', 'integer', 'min:0', 'lte:max_score'],
+            'passing_score' => ['nullable', 'integer', 'min:0'],
             
             // Settings
             'is_required' => ['nullable', 'boolean'],
@@ -41,15 +43,29 @@ class UpdateQuestionRequest extends FormRequest
             'is_active' => ['nullable', 'boolean'],
         ];
 
-        // Add validation for options if type is being changed to multiple_choice
-        if ($this->input('type') === 'multiple_choice') {
-            $rules['options'] = ['required', 'array', 'min:2'];
-            $rules['options.*.value'] = ['required', 'string', 'max:255'];
-            $rules['options.*.score'] = ['required', 'integer', 'min:0', 'max:100'];
-            $rules['correct_answer'] = ['nullable', 'string', 'max:255'];
-        } elseif ($this->has('options') && ($this->input('type') !== 'multiple_choice')) {
-            $rules['options'] = ['nullable'];
-            $rules['correct_answer'] = ['nullable'];
+        // Validate option edits using the existing type when the client omits it.
+        if ($effectiveType === 'multiple_choice') {
+            if ($this->input('type') === 'multiple_choice' && !$this->has('options') && $currentType !== 'multiple_choice') {
+                $rules['options'] = ['required', 'array', 'min:2'];
+            } elseif ($this->has('options')) {
+                $rules['options'] = ['required', 'array', 'min:2'];
+            }
+
+            if (isset($rules['options']) || $this->has('options')) {
+                $rules['options.*.value'] = ['required', 'string', 'max:255'];
+                $rules['options.*.score'] = ['required', 'integer', 'min:0', 'max:100'];
+            }
+
+            if ($this->has('correct_answer')) {
+                $rules['correct_answer'] = ['nullable', 'string', 'max:255'];
+            }
+        } else {
+            if ($this->has('options')) {
+                $rules['options'] = ['nullable'];
+            }
+            if ($this->exists('correct_answer')) {
+                $rules['correct_answer'] = ['nullable', 'string', 'max:255'];
+            }
         }
 
         return $rules;
@@ -69,15 +85,46 @@ class UpdateQuestionRequest extends FormRequest
     {
         $validator->after(function ($validator) {
             // Validate that options array has unique values
-            if ($this->has('options') && $this->input('type') === 'multiple_choice') {
+            $routeQuestion = $this->route('question');
+            $currentType = is_object($routeQuestion) ? $routeQuestion->type : null;
+            $effectiveType = $this->input('type', $currentType);
+            if ($this->has('options') && $effectiveType === 'multiple_choice') {
                 $options = $this->input('options', []);
+                if (!is_array($options)) {
+                    return;
+                }
+
                 $values = array_column($options, 'value');
-                
+
                 if (count($values) !== count(array_unique($values))) {
                     $validator->errors()->add(
                         'options',
                         'قيم الخيارات يجب أن تكون فريدة.'
                     );
+                }
+            }
+
+            // Validate against the effective persisted values as well as submitted fields.
+            $routeQuestion = $this->route('question');
+            $effectiveMaxScore = $this->input('max_score', is_object($routeQuestion) ? $routeQuestion->max_score : null);
+            $effectivePassingScore = $this->input('passing_score', is_object($routeQuestion) ? $routeQuestion->passing_score : null);
+
+            if ($effectivePassingScore !== null && $effectiveMaxScore !== null
+                && (float) $effectivePassingScore > (float) $effectiveMaxScore) {
+                $validator->errors()->add(
+                    'passing_score',
+                    'درجة النجاح يجب أن تكون أقل من أو تساوي الدرجة القصوى.'
+                );
+            }
+
+            if ($effectiveType === 'multiple_choice' && $effectivePassingScore !== null) {
+                $effectiveOptions = $this->has('options')
+                    ? $this->input('options', [])
+                    : (is_object($routeQuestion) ? $routeQuestion->getOptionsArray() : []);
+                $maximumOptionScore = collect(is_array($effectiveOptions) ? $effectiveOptions : [])->max(fn ($option) => (float) ($option['score'] ?? 0));
+                $effectiveAchievableMaximum = min((float) ($effectiveMaxScore ?? 0), (float) ($maximumOptionScore ?? 0));
+                if ((float) $effectivePassingScore > $effectiveAchievableMaximum) {
+                    $validator->errors()->add('passing_score', 'درجة النجاح لا يمكن أن تتجاوز أعلى درجة يمكن الحصول عليها من خيارات السؤال.');
                 }
             }
         });

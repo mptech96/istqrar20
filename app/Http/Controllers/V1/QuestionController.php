@@ -8,6 +8,7 @@ use App\Http\Requests\V1\UpdateQuestionRequest;
 use App\Http\Resources\V1\QuestionResource;
 use App\Models\V1\Checklist;
 use App\Models\V1\Question;
+use App\Models\V1\Visit;
 use App\Models\V1\Criteria;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
@@ -361,6 +362,12 @@ class QuestionController extends Controller
     )]
     public function store(Checklist $checklist, StoreQuestionRequest $request): JsonResponse
     {
+        if ($this->checklistHasVisits($checklist)) {
+            return response()->json([
+                'message' => 'لا يمكن تعديل أسئلة قائمة مرتبطة بزيارات موجودة حفاظاً على ثبات نتائج الزيارات. أنشئ نسخة جديدة من القائمة للتعديلات.',
+            ], 409);
+        }
+
         $questionData = [
             'checklist_id' => $checklist->id,
             'criteria_id' => $request->input('criteria_id'),
@@ -381,7 +388,9 @@ class QuestionController extends Controller
         
         // Handle options for multiple choice questions
         if ($request->input('type') === 'multiple_choice' && $request->has('options')) {
-            $questionData['options'] = json_encode($request->input('options'));
+            $questionData['options'] = $request->input('options');
+        }
+        if ($request->exists('correct_answer')) {
             $questionData['correct_answer'] = $request->input('correct_answer');
         }
         
@@ -655,6 +664,12 @@ class QuestionController extends Controller
                 'message' => 'السؤال لا ينتمي إلى هذه القائمة'
             ], 404);
         }
+
+        if ($this->checklistHasVisits($checklist)) {
+            return response()->json([
+                'message' => 'لا يمكن تعديل أسئلة قائمة مرتبطة بزيارات موجودة حفاظاً على ثبات نتائج الزيارات. أنشئ نسخة جديدة من القائمة للتعديلات.',
+            ], 409);
+        }
         
         $questionData = $request->only([
             'criteria_id', 'question_text', 'description', 'help_text',
@@ -663,13 +678,23 @@ class QuestionController extends Controller
             'sort_order', 'is_active'
         ]);
         
-        // Handle options for multiple choice questions
-        if ($request->input('type') === 'multiple_choice' && $request->has('options')) {
-            $questionData['options'] = json_encode($request->input('options'));
-            $questionData['correct_answer'] = $request->input('correct_answer');
-        } elseif ($request->has('type') && $request->input('type') !== 'multiple_choice') {
-            $questionData['options'] = null;
-            $questionData['correct_answer'] = null;
+        // Handle options even when the client omits the unchanged question type.
+        $effectiveType = $request->input('type', $question->type);
+        if ($effectiveType === 'multiple_choice') {
+            if ($request->has('options')) {
+                $questionData['options'] = $request->input('options');
+            }
+            if ($request->exists('correct_answer')) {
+                $questionData['correct_answer'] = $request->input('correct_answer');
+            }
+        } else {
+            if ($request->has('type') && $question->type === 'multiple_choice') {
+                $questionData['options'] = null;
+                $questionData['correct_answer'] = null;
+            }
+            if ($request->exists('correct_answer')) {
+                $questionData['correct_answer'] = $request->input('correct_answer');
+            }
         }
         
         $question->update($questionData);
@@ -739,6 +764,12 @@ class QuestionController extends Controller
                 'message' => 'السؤال لا ينتمي إلى هذه القائمة'
             ], 404);
         }
+
+        if ($this->checklistHasVisits($checklist)) {
+            return response()->json([
+                'message' => 'لا يمكن حذف سؤال من قائمة مرتبطة بزيارات موجودة حفاظاً على ثبات نتائج الزيارات.',
+            ], 409);
+        }
         
         $question->delete();
         
@@ -805,6 +836,12 @@ class QuestionController extends Controller
             ->where('checklist_id', $checklist->id)
             ->where('id', $questionId)
             ->firstOrFail();
+
+        if ($this->checklistHasVisits($checklist)) {
+            return response()->json([
+                'message' => 'لا يمكن استعادة أسئلة قائمة مرتبطة بزيارات موجودة حفاظاً على ثبات نتائج الزيارات.',
+            ], 409);
+        }
             
         $question->restore();
         
@@ -870,6 +907,12 @@ class QuestionController extends Controller
     )]
     public function reorder(Checklist $checklist, Request $request): JsonResponse
     {
+        if ($this->checklistHasVisits($checklist)) {
+            return response()->json([
+                'message' => 'لا يمكن إعادة ترتيب أسئلة قائمة مرتبطة بزيارات موجودة حفاظاً على ثبات سجل التقييم.',
+            ], 409);
+        }
+
         $request->validate([
             'questions_order' => ['required', 'array', 'min:1'],
             'questions_order.*.id' => ['required', 'exists:questions,id'],
@@ -962,6 +1005,12 @@ class QuestionController extends Controller
     */
     public function duplicate(Checklist $checklist, Question $question): JsonResponse
     {
+        if ($this->checklistHasVisits($checklist)) {
+            return response()->json([
+                'message' => 'لا يمكن نسخ سؤال إلى قائمة مرتبطة بزيارات موجودة حفاظاً على ثبات نتائج الزيارات. أنشئ نسخة جديدة من القائمة للتعديلات.',
+            ], 409);
+        }
+
         // Ensure the question belongs to the checklist
         if ($question->checklist_id !== $checklist->id) {
             return response()->json([
@@ -1051,6 +1100,12 @@ class QuestionController extends Controller
     */
     public function evaluate(Checklist $checklist, Question $question, Request $request): JsonResponse
     {
+        if ((int) $question->checklist_id !== (int) $checklist->id) {
+            return response()->json([
+                'message' => 'السؤال المحدد لا ينتمي إلى قائمة التقييم المطلوبة.',
+            ], 404);
+        }
+
         $request->validate([
             'answer' => ['required'],
         ]);
@@ -1153,15 +1208,16 @@ class QuestionController extends Controller
             return ['score' => 0, 'is_correct' => false];
         }
         
-        $options = json_decode($question->options, true);
+        $options = $question->getOptionsArray();
+        $normalizedAnswer = trim((string) $answer);
         
         foreach ($options as $option) {
-            if ($option['value'] === $answer) {
-                $isCorrect = $question->correct_answer ? 
-                    ($answer === $question->correct_answer) : null;
+            if (trim((string) ($option['value'] ?? '')) === $normalizedAnswer) {
+                $isCorrect = $question->correct_answer !== null && $question->correct_answer !== ''
+                    ? ($normalizedAnswer === trim((string) $question->correct_answer)) : null;
                     
                 return [
-                    'score' => $option['score'],
+                    'score' => min((float) $question->max_score, max(0, (float) ($option['score'] ?? 0))),
                     'is_correct' => $isCorrect,
                 ];
             }
@@ -1180,4 +1236,17 @@ class QuestionController extends Controller
         // For now, return full score if answer is provided
         return ['score' => $question->max_score, 'is_correct' => null];
     }
+
+    /**
+     * A checklist's question definition must remain immutable after visits exist.
+     * Historical score snapshots live in visits.max_possible_score and answers.max_score;
+     * blocking mutations prevents the remaining question metadata from drifting.
+     */
+    private function checklistHasVisits(Checklist $checklist): bool
+    {
+        return Visit::withoutGlobalScopes()
+            ->where('checklist_id', $checklist->id)
+            ->exists();
+    }
+
 }
